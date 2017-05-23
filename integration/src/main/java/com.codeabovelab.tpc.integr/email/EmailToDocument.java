@@ -29,6 +29,8 @@ public final class EmailToDocument {
         addField(db, F_SUBJECT, msg.getSubject());
         addField(db, F_SENDER, msg.getSender());
         addField(db, F_FROM, msg.getFrom());
+        // parser produce errors like ' javax.mail.internet.AddressException: Domain contains illegal character in string'
+        // on any address with _ and may other symbols
         addField(db, F_RECIPIENTS, msg.getAllRecipients());
         addField(db, F_SENT_DATE, msg.getSentDate());
         return db.build();
