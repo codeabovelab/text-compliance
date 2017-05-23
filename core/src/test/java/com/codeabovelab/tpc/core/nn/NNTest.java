@@ -9,6 +9,7 @@ import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache;
+import org.deeplearning4j.text.documentiterator.DocumentIterator;
 import org.deeplearning4j.text.documentiterator.LabelAwareDocumentIterator;
 import org.deeplearning4j.text.documentiterator.LabelsSource;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -48,6 +50,12 @@ public class NNTest {
             Collection<String> words = pv.wordsNearest(pattern, 10);
             System.out.println(pattern + " has similar words: " + words);
         }
+        //tasks:
+        // implement sentence delimiter (for NN learning & analysis)
+        // implement "text cleaner" - especially for emails, we must consider "forward" & citation
+        // find way to differentiate DOC from words in this network or use different network for words
+        System.out.println(pv.similarity("DOC_<436524.1075857649853.JavaMail.evans@thyme>", "DOC_<22480806.1075857604258.JavaMail.evans@thyme>"));
+        System.out.println(pv.similarity("DOC_<13395955.1075852729395.JavaMail.evans@thyme>", "DOC_<22480806.1075857604258.JavaMail.evans@thyme>"));
     }
 
     private ParagraphVectors loadOrCreate(String workDir, File pvf) throws Exception {
@@ -57,7 +65,7 @@ public class NNTest {
             pv = WordVectorSerializer.readParagraphVectors(pvf);
         } else {
             log.warn("DB is non exists creating.");
-            LabelAwareDocumentIterator iter = new MyLabelAwareDocumentIterator(workDir);
+            DocumentIterator iter = new MyLabelAwareDocumentIterator(workDir + "/emails");
 
             AbstractCache<VocabWord> cache = new AbstractCache<>();
 
@@ -65,14 +73,15 @@ public class NNTest {
             t.setTokenPreProcessor(new CommonPreprocessor());
 
             pv = new ParagraphVectors.Builder()
-              .minWordFrequency(1)
+              .minWordFrequency(5)
               .iterations(5)
               .epochs(1)
               .layerSize(100)
               .learningRate(0.025)
               .windowSize(5)
               .iterate(iter)
-              .trainWordVectors(false)
+              .trainWordVectors(true)
+              //.trainWordVectors(false)
               .vocabCache(cache)
               .tokenizerFactory(t)
               .sampling(0)
@@ -88,6 +97,7 @@ public class NNTest {
 
     private static class MyLabelAwareDocumentIterator implements LabelAwareDocumentIterator {
 
+        private static final Pattern SKIP_HTML = Pattern.compile("<[\\S][^>]*>", Pattern.DOTALL);
         private final EmailToDocument etd = new EmailToDocument();
         private final String dir;
         private Document doc;
@@ -109,18 +119,26 @@ public class NNTest {
 
         @Override
         public String currentLabel() {
-            return doc.getId();
+            return "DOC_" + doc.getId();
         }
 
         @Override
         public InputStream nextDocument() {
+            counter++;
             Path path = fileIter.next();
             log.info("Choose {}-th mail at path {}", counter, path);
-            counter++;
             processEmail(path);
             String str = ((DocumentImpl)doc).getBody().getData();
+            // workaround to skip html tags
+            str = SKIP_HTML.matcher(str).replaceAll("");
+            int b = str.indexOf("@");
+            if(str.startsWith("null")) {
+                int width = 20;
+                System.out.println(str.substring(Math.max(b - width, 0), Math.min(b + width, str.length())));
+            }
             return new ByteArrayInputStream(str.getBytes());
         }
+
 
         @Override
         public boolean hasNext() {
