@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.text;
+package com.codeabovelab.tpc.text;
 
 /**
  * Consumer for text

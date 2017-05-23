@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.core.processor;
 
-import com.codeabovelab.tpc.core.text.Text;
+import com.codeabovelab.tpc.text.Text;
 
 /**
  */

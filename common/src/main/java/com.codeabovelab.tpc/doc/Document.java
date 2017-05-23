@@ -1,6 +1,6 @@
-package com.codeabovelab.tpc.core.doc;
+package com.codeabovelab.tpc.doc;
 
-import com.codeabovelab.tpc.core.text.Textual;
+import com.codeabovelab.tpc.text.Textual;
 
 /**
  */

@@ -1,7 +1,7 @@
 package com.codeabovelab.tpc.core.processor;
 
-import com.codeabovelab.tpc.core.text.Text;
-import com.codeabovelab.tpc.core.text.TextCoordinates;
+import com.codeabovelab.tpc.text.Text;
+import com.codeabovelab.tpc.text.TextCoordinates;
 
 import java.util.ArrayList;
 import java.util.Collections;

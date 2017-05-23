@@ -1,7 +1,7 @@
-package com.codeabovelab.tpc.core.doc;
+package com.codeabovelab.tpc.doc;
 
-import com.codeabovelab.tpc.core.text.TextConsumer;
-import com.codeabovelab.tpc.core.text.TextImpl;
+import com.codeabovelab.tpc.text.TextConsumer;
+import com.codeabovelab.tpc.text.TextImpl;
 import lombok.Data;
 
 /**
@@ -38,6 +38,10 @@ public final class DocumentFieldImpl implements DocumentField {
         this.name = b.name;
         this.id = parentId + this.name;
         this.data = new TextImpl(this.id, b.data);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.core.processor;
 
-import com.codeabovelab.tpc.core.doc.Document;
+import com.codeabovelab.tpc.doc.Document;
 import com.google.common.collect.ImmutableMap;
 import lombok.Data;
 

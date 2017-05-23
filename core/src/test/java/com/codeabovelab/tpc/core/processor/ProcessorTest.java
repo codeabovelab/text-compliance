@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.core.processor;
 
-import com.codeabovelab.tpc.core.doc.DocumentImpl;
+import com.codeabovelab.tpc.doc.DocumentImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

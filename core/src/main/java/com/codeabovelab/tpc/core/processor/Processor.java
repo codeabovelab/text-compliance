@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.core.processor;
 
-import com.codeabovelab.tpc.core.doc.Document;
+import com.codeabovelab.tpc.doc.Document;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,7 +1,7 @@
-package com.codeabovelab.tpc.core.doc;
+package com.codeabovelab.tpc.doc;
 
-import com.codeabovelab.tpc.core.text.TextConsumer;
-import com.codeabovelab.tpc.core.text.TextImpl;
+import com.codeabovelab.tpc.text.TextConsumer;
+import com.codeabovelab.tpc.text.TextImpl;
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.core.processor;
 
-import com.codeabovelab.tpc.core.text.TextCoordinates;
+import com.codeabovelab.tpc.text.TextCoordinates;
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
 
