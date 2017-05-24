@@ -1,0 +1,13 @@
+dependencies {
+
+    compile 'com.google.guava:guava'
+    compile 'com.google.guava:guava'
+    compile 'org.projectlombok:lombok'
+
+    compile 'org.jetbrains.kotlin:kotlin-stdlib'
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
+
+    testCompile 'org.jetbrains.kotlin:kotlin-test'
+    testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+    testCompile 'junit:junit'
+}

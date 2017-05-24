@@ -1,0 +1,26 @@
+ext {
+    nd4j = '0.8.0'
+    dl4j = '0.8.0'
+    datavec = '0.8.0'
+}
+
+dependencies {
+
+    compile project(':common')
+    compile project(':integration')
+
+    compile 'com.google.guava:guava'
+    compile 'org.projectlombok:lombok'
+
+    compile "org.nd4j:nd4j-native-platform:${nd4j}"
+    compile "org.deeplearning4j:deeplearning4j-core:${dl4j}"
+    compile "org.deeplearning4j:deeplearning4j-nlp:${dl4j}"
+    compile "org.datavec:datavec-data-codec:${datavec}"
+
+    compile 'org.jetbrains.kotlin:kotlin-stdlib'
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
+
+    testCompile 'org.jetbrains.kotlin:kotlin-test'
+    testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+    testCompile 'junit:junit'
+}

@@ -17,6 +17,7 @@ import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFac
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
@@ -40,6 +41,7 @@ public class NNTest {
     }
 
     @Test
+    @Ignore
     public void test() throws Exception {
         String workDir = "/home/rad/tmp/nn-data/";
 

@@ -1,0 +1,15 @@
+dependencies {
+
+    compile project(':common')
+
+    compile 'com.google.guava:guava'
+    compile 'org.projectlombok:lombok'
+    compile 'com.sun.mail:javax.mail:1.5.6'
+
+    compile 'org.jetbrains.kotlin:kotlin-stdlib'
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
+
+    testCompile 'org.jetbrains.kotlin:kotlin-test'
+    testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+    testCompile 'junit:junit'
+}
