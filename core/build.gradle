@@ -15,6 +15,7 @@ dependencies {
     compile "org.nd4j:nd4j-native-platform:${nd4j}"
     compile "org.deeplearning4j:deeplearning4j-core:${dl4j}"
     compile "org.deeplearning4j:deeplearning4j-nlp:${dl4j}"
+    compile "org.deeplearning4j:deeplearning4j-nlp-uima:${dl4j}"
     compile "org.datavec:datavec-data-codec:${datavec}"
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'

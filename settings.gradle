@@ -1,5 +1,5 @@
 rootProject.name = 'text-complience'
 
-rootDir.eachDir { dir ->
-    include ":${dir.name}"
-}
+include ":integration"
+include ":core"
+include ":common"
