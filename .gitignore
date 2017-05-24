@@ -2,5 +2,8 @@
 *.iml
 
 target/
+build/
+.gradle/
+/gradle/
 *.log
 *.log.zip
