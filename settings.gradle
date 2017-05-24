@@ -1,0 +1,5 @@
+rootProject.name = 'text-complience'
+
+rootDir.eachDir { dir ->
+    include ":${dir.name}"
+}
