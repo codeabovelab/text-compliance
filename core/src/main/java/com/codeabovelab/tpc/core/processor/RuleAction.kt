@@ -5,6 +5,6 @@ import com.codeabovelab.tpc.text.Text;
 /**
  * Must be a thread safe.
  */
-public interface RuleAction {
-    void apply(Text text, ProcessingContext pc);
+interface RuleAction<in T: PredicateResult> {
+    fun apply(text: Text, pc: ProcessingContext)
 }
