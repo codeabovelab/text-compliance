@@ -33,7 +33,7 @@ class TextClassifierTest {
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.builder().build(), attributes = emptyMap())
+        val pc = PredicateContext(document = DocumentImpl.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
         for(text in texts) {
             System.out.println(i++)
             val res = tc.test(pc, TextImpl("sample_" + i, text))
@@ -73,15 +73,4 @@ class TextClassifierTest {
 
         WordVectorSerializer.writeParagraphVectors(pv, pvf)
     }
-
-
-//    fun createIter(String dir): UimaSentenceIterator  {
-//        UimaResource ur = new UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
-//          .createEngineDescription(TokenizerAnnotator.getDescription(),
-//            SentenceAnnotator.getDescription())));
-//        CollectionReader cr = new CollectionReaderImpl(dir);
-//        return new SentenceIteratorImpl(cr, ur);
-//    }
-
-
 }

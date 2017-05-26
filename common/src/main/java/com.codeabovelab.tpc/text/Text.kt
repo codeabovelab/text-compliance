@@ -16,7 +16,7 @@ interface Text {
      * Give current text.
      * @return text
      */
-    val data: CharSequence?
+    val data: CharSequence
 
     /**
      * length of current text

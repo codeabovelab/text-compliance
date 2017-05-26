@@ -46,7 +46,7 @@ class DocumentImpl(b: DocumentImpl.Builder) : Document {
         this.id = b.id!!
         this.body = TextImpl(this.id, b.body!!)
         val fb = ImmutableList.builder<DocumentField>()
-        b.fields.forEach { f -> fb.add(f.build(b)) }
+        b.fields.forEach { fb.add(it.build(b)) }
         this.fields = fb.build()
     }
 

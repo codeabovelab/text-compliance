@@ -26,16 +26,13 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
     }
 
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {
-        val str = text.data.toString()
-        val tokenizer = pv.tokenizerFactory.create(str)
+        val si = SentenceIteratorImpl.create(TextIterator.singleton(text))
         var entries = ArrayList<TextClassifierResult.Entry>()
-        while(tokenizer.hasMoreTokens()) {
-            val token = tokenizer.nextToken()
+        while(si.hasNext()) {
+            val token = si.nextSentence()
             if(token.isEmpty()) {
                 continue
             }
-            println("token:" + token)
-            //TODO use sentences
             val indArray = pv.inferVector(token)
             val labels = pv.nearestLabels(indArray, maxLabels)
             val labelsWithSim = labels.stream().map {

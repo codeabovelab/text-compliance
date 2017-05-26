@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.doc
 
 import com.codeabovelab.tpc.text.TextConsumer
 import com.codeabovelab.tpc.text.TextImpl
-import lombok.Data
 
 /**
  */
@@ -34,7 +33,7 @@ class DocumentFieldImpl(parentId: String, b: DocumentFieldImpl.Builder) : Docume
     init {
         this.name = b.name!!
         this.id = parentId + this.name
-        this.data = TextImpl(this.id, b.data)
+        this.data = TextImpl(this.id, b.data!!)
     }
 
     override fun read(consumer: TextConsumer) {
