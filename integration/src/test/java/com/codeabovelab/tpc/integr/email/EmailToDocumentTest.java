@@ -1,8 +1,6 @@
 package com.codeabovelab.tpc.integr.email;
 
-import com.codeabovelab.tpc.doc.Document;
 import com.codeabovelab.tpc.doc.DocumentField;
-import com.codeabovelab.tpc.doc.DocumentFieldImpl;
 import com.codeabovelab.tpc.doc.DocumentImpl;
 import com.codeabovelab.tpc.text.TextualUtil;
 import com.google.common.collect.ImmutableList;
@@ -14,7 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  */
