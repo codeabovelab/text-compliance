@@ -23,7 +23,7 @@ public final class EmailToDocument {
     public Document apply(InputStream is) throws Exception {
         Session session = null;
         MimeMessage msg = new MimeMessage(session, is);
-        DocumentImpl.Builder db = DocumentImpl.builder()
+        DocumentImpl.Builder db = DocumentImpl.Companion.builder()
           .id(msg.getMessageID())
           .body(getContent(msg));
         addField(db, F_SUBJECT, msg.getSubject());
@@ -38,7 +38,7 @@ public final class EmailToDocument {
 
     private void addField(DocumentImpl.Builder db, String name, Object value) throws Exception {
         String str = toString(value);
-        db.addField(DocumentFieldImpl.builder().name(name).data(str));
+        db.addField(DocumentFieldImpl.Companion.builder().name(name).data(str));
     }
 
     private String toString(Object value) {

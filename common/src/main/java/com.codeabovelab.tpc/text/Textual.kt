@@ -1,19 +1,19 @@
-package com.codeabovelab.tpc.text;
+package com.codeabovelab.tpc.text
 
 /**
  * Something that has text.
  */
-public interface Textual {
+interface Textual {
 
     /**
      * Unique id of textual. May be uuid or something else.
      * @return non null string
      */
-    String getId();
+    val id: String
 
     /**
      * Sequentially invoke consumer on internal text.
      * @param consumer non null value
      */
-    void read(TextConsumer consumer);
+    fun read(consumer: TextConsumer)
 }
