@@ -10,6 +10,6 @@ class TextualImpl(override val id: String, text: String) : Textual {
     }
 
     override fun read(consumer: TextConsumer) {
-        consumer.consume(text)
+        consumer(text)
     }
 }

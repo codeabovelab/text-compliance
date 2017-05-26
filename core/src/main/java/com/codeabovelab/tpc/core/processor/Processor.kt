@@ -1,6 +1,7 @@
 package com.codeabovelab.tpc.core.processor;
 
 import com.codeabovelab.tpc.doc.Document;
+import com.codeabovelab.tpc.text.TextConsumer
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,7 @@ class Processor {
         prb.documentId = doc.id
         val pc = ProcessingContext(doc, prb, selectRules())
         doc.read(pc::onText)
-        return prb.build();
+        return prb.build()
     }
 
     private fun selectRules(): List<Rule<*>> {

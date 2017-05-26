@@ -17,3 +17,5 @@ interface Textual {
      */
     fun read(consumer: TextConsumer)
 }
+
+typealias TextConsumer = (Text) -> Unit

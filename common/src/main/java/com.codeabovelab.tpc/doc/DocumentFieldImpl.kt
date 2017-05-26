@@ -38,7 +38,7 @@ class DocumentFieldImpl(parentId: String, b: DocumentFieldImpl.Builder) : Docume
     }
 
     override fun read(consumer: TextConsumer) {
-        consumer.consume(data)
+        consumer(data)
     }
 
     companion object {

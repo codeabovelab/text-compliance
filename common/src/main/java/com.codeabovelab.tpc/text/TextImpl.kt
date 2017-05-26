@@ -8,9 +8,9 @@ class TextImpl(override val id: String, override val data: String? = null) : Tex
     override val length: Int
         get() = data?.length ?: -1
 
-    override fun getCoordinates(offset: Int, len: Int): TextCoordinates {
-        var l = len
-        if (len == -1) l = length
+    override fun getCoordinates(offset: Int, length: Int): TextCoordinates {
+        var l = length
+        if (length == -1) l = this.length
         return TextCoordinatesImpl(id, offset, l)
     }
 }

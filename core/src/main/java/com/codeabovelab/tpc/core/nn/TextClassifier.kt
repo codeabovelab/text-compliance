@@ -31,6 +31,9 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
         var entries = ArrayList<TextClassifierResult.Entry>()
         while(tokenizer.hasMoreTokens()) {
             val token = tokenizer.nextToken()
+            if(token.isEmpty()) {
+                continue
+            }
             println("token:" + token)
             //TODO use sentences
             val indArray = pv.inferVector(token)

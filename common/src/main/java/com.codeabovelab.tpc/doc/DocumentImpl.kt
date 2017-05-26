@@ -51,7 +51,7 @@ class DocumentImpl(b: DocumentImpl.Builder) : Document {
     }
 
     override fun read(consumer: TextConsumer) {
-        consumer.consume(body)
+        consumer(body)
         fields.forEach { df -> df.read(consumer) }
     }
 
