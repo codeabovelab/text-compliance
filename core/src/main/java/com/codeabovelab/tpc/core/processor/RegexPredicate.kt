@@ -21,7 +21,7 @@ class RegexPredicate(regexp: String): RulePredicate<PredicateResult> {
             if(list == null) {
                 list = ArrayList()
             }
-            list?.add(PredicateResult.Entry(coord))
+            list.add(PredicateResult.Entry(coord))
         }
         return PredicateResult(list.orEmpty())
     }

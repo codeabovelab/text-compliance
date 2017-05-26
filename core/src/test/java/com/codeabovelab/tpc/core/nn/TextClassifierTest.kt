@@ -22,8 +22,8 @@ class TextClassifierTest {
 
     @Test
     fun test() {
-        val workDir = "/home/rad/tmp/nn-data/";
-        val filePath = workDir + "ParagraphVectors.zip";
+        val workDir = "/home/rad/tmp/nn-data/"
+        val filePath = workDir + "ParagraphVectors.zip"
 
         createIfNeed(workDir, filePath)
 
@@ -51,11 +51,11 @@ class TextClassifierTest {
     }
 
     fun createIfNeed(workDir: String, filePath: String) {
-        var pv: ParagraphVectors? = null
+        var pv: ParagraphVectors?
         val pvf = File(filePath)
         if(pvf.exists()) {
             log.warn("DB is exists, do nothing.");
-            return;
+            return
         }
         log.warn("DB is non exists, creating.");
         val iter = SampleSentenceIterator(workDir + "/manually")
