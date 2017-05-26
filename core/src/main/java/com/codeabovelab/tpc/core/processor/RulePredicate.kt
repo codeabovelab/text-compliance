@@ -5,7 +5,7 @@ import com.codeabovelab.tpc.text.Text;
 /**
  * Test that rule match specified text
  */
-interface RulePredicate<out T: PredicateResult> {
+interface RulePredicate<out T: PredicateResult<*>> {
     /**
      * Test that specified text in context is match.
      * @param pc context

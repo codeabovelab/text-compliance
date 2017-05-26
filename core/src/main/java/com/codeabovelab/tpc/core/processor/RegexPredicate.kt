@@ -7,11 +7,11 @@ import java.util.regex.Pattern
 
 /**
  */
-class RegexPredicate(regexp: String): RulePredicate<PredicateResult> {
+class RegexPredicate(regexp: String): RulePredicate<PredicateResult<*>> {
 
     val pattern: Pattern = Pattern.compile(regexp)
 
-    override fun test(pc: PredicateContext, text: Text): PredicateResult {
+    override fun test(pc: PredicateContext, text: Text): PredicateResult<*> {
         val matcher = pattern.matcher(text.data)
         var list: MutableList<PredicateResult.Entry>? = null
         while(matcher.find()) {
@@ -21,7 +21,7 @@ class RegexPredicate(regexp: String): RulePredicate<PredicateResult> {
             if(list == null) {
                 list = ArrayList()
             }
-            list?.add(PredicateResult.Entry(coord))
+            list.add(PredicateResult.Entry(coord))
         }
         return PredicateResult(list.orEmpty())
     }

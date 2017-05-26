@@ -4,7 +4,7 @@ import com.codeabovelab.tpc.text.TextCoordinates
 
 /**
  */
-open class PredicateResult(val entries: List<Entry>) {
+open class PredicateResult<out E: PredicateResult.Entry>(val entries: List<E>) {
 
     open class Entry(val coordinates: TextCoordinates)
 

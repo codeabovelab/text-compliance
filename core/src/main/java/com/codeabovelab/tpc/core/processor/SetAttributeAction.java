@@ -4,7 +4,7 @@ import com.codeabovelab.tpc.text.Text;
 
 /**
  */
-public class SetAttributeAction implements RuleAction {
+public class SetAttributeAction implements RuleAction<PredicateResult<?>> {
     private final String name;
     private final Object value;
 
@@ -14,7 +14,7 @@ public class SetAttributeAction implements RuleAction {
     }
 
     @Override
-    public void apply(Text text, ProcessingContext pc) {
+    public void apply(ProcessingContext pc, Text text, PredicateResult<?> result) {
         pc.getAttributes().put(name, value);
     }
 }
