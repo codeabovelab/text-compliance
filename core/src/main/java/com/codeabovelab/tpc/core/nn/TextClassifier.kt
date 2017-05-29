@@ -1,16 +1,13 @@
 package com.codeabovelab.tpc.core.nn;
 
-import com.codeabovelab.tpc.core.processor.PredicateContext;
-import com.codeabovelab.tpc.core.processor.PredicateResult;
-import com.codeabovelab.tpc.core.processor.RulePredicate;
-import com.codeabovelab.tpc.text.Text;
+import com.codeabovelab.tpc.core.processor.PredicateContext
+import com.codeabovelab.tpc.core.processor.PredicateResult
+import com.codeabovelab.tpc.core.processor.RulePredicate
+import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.TextCoordinates
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
-import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-import org.nd4j.linalg.ops.transforms.Transforms;
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
+import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
+import org.nd4j.linalg.ops.transforms.Transforms
 
 import java.util.stream.Collectors
 
@@ -22,7 +19,7 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
 
     init {
         pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile)
-        pv.tokenizerFactory = createTokenizerFactory()
+        pv.tokenizerFactory = TokenizerFactoryImpl()
     }
 
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {
@@ -30,9 +27,10 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
         var entries = ArrayList<TextClassifierResult.Entry>()
         while(si.hasNext()) {
             val token = si.nextSentence()
-            if(token.isEmpty()) {
+            if(token.isNullOrEmpty()) {
                 continue
             }
+
             val indArray = pv.inferVector(token)
             val labels = pv.nearestLabels(indArray, maxLabels)
             val labelsWithSim = labels.stream().map {
@@ -40,17 +38,13 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
                 val similarity = Transforms.cosineSim(indArray, lm)
                 TextClassifierResult.Label(it, similarity)
             }.collect(Collectors.toList())
-            val resEntry = TextClassifierResult.Entry(text.getCoordinates(0, -1), labels = labelsWithSim)
+            val resEntry = TextClassifierResult.Entry(
+                    coordinates = text.getCoordinates(si.currentOffset()!!, token!!.length),
+                    labels = labelsWithSim)
             entries.add(resEntry)
         }
         return TextClassifierResult(entries = entries)
     }
-}
-
-fun createTokenizerFactory(): TokenizerFactory {
-    var t = DefaultTokenizerFactory()
-    t.tokenPreProcessor = CommonPreprocessor()
-    return t
 }
 
 class TextClassifierResult(

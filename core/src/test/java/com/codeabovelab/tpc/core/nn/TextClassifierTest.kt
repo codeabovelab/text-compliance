@@ -52,7 +52,7 @@ class TextClassifierTest {
         log.warn("DB is non exists, creating.")
         val iter = SampleSentenceIterator(workDir + "/manually")
         val cache = AbstractCache<VocabWord>()
-        val t = createTokenizerFactory()
+        val t = TokenizerFactoryImpl()
         var pv = ParagraphVectors.Builder()
           .minWordFrequency(3)
           .iterations(5)
