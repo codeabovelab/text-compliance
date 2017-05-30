@@ -7,6 +7,7 @@ import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.TextCoordinates
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
+import org.deeplearning4j.models.word2vec.VocabWord
 import org.nd4j.linalg.ops.transforms.Transforms
 
 import java.util.stream.Collectors
@@ -26,20 +27,23 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
         val si = SentenceIteratorImpl.create(TextIterator.singleton(text))
         var entries = ArrayList<TextClassifierResult.Entry>()
         while(si.hasNext()) {
-            val token = si.nextSentence()
-            if(token.isNullOrEmpty()) {
+            val sentence = si.nextSentence()
+            if(sentence.isNullOrEmpty()) {
                 continue
             }
-
-            val indArray = pv.inferVector(token)
-            val labels = pv.nearestLabels(indArray, maxLabels)
+            val words = si.currentWords()!!
+            val vws = words.stream().filter { it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
+            //println(vws.map { it.word })
+            val indArray = pv.inferVector(vws)
+            //val labels = pv.nearestLabels(indArray, maxLabels) we tru to use unlabeled text
+            val labels = pv.wordsNearest(indArray, maxLabels)
             val labelsWithSim = labels.stream().map {
                 val lm = pv.getWordVectorMatrix(it)
                 val similarity = Transforms.cosineSim(indArray, lm)
                 TextClassifierResult.Label(it, similarity)
             }.collect(Collectors.toList())
             val resEntry = TextClassifierResult.Entry(
-                    coordinates = text.getCoordinates(si.currentOffset()!!, token!!.length),
+                    coordinates = text.getCoordinates(si.currentOffset()!!, sentence!!.length),
                     labels = labelsWithSim)
             entries.add(resEntry)
         }

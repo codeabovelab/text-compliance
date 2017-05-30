@@ -38,7 +38,9 @@ class TextClassifierTest {
             System.out.println(i++)
             val res = tc.test(pc, TextImpl("sample_" + i, text))
             res.entries.forEach {
-                System.out.println(it.coordinates.toString() + ": " + it.labels)
+                val offset = it.coordinates.offset
+                val sentence = text.substring(offset, offset + it.coordinates.length)
+                System.out.println(sentence + ": " + it.labels)
             }
         }
     }
@@ -50,7 +52,8 @@ class TextClassifierTest {
             return
         }
         log.warn("DB is non exists, creating.")
-        val iter = SampleSentenceIterator(workDir + "/manually")
+        val iter = DirSentenceIterator(workDir + "/manually")
+        //TODO teach on tagged words
         val cache = AbstractCache<VocabWord>()
         val t = TokenizerFactoryImpl()
         var pv = ParagraphVectors.Builder()

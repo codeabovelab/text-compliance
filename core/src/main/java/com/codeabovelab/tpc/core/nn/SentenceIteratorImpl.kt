@@ -6,8 +6,10 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory
 import org.apache.uima.fit.util.JCasUtil
 import org.apache.uima.jcas.JCas
 import org.apache.uima.util.Progress
+import org.cleartk.opennlp.tools.PosTaggerAnnotator
 import org.cleartk.opennlp.tools.SentenceAnnotator
 import org.cleartk.token.type.Sentence
+import org.cleartk.token.type.Token
 import org.deeplearning4j.text.annotator.TokenizerAnnotator
 import org.deeplearning4j.text.sentenceiterator.BaseSentenceIterator
 import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator
@@ -69,7 +71,10 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         resource.analysisEngine.process(cas)
         val list = ArrayList<SentenceData>()
         JCasUtil.select(cas.jCas, Sentence::class.java).mapTo(list) {
-            SentenceData(it.coveredText, it.begin)
+            val words = JCasUtil.selectCovered(cas.jCas, Token::class.java, it).map {
+                WordData(it.coveredText, it.begin, Pos.parse(it.pos))
+            }
+            SentenceData(it.coveredText, it.begin, words)
         }
         return list.iterator()
     }
@@ -83,15 +88,22 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         return curr?.offset
     }
 
+    fun currentWords(): List<WordData>? {
+        return curr?.words
+    }
+
     @Synchronized private fun getReader(): CollectionReaderImpl {
         return reader
     }
 
     companion object {
-        fun create(iter: TextIterator): SentenceIteratorImpl {
+        fun create(iter: TextIterator, pos: Boolean = true): SentenceIteratorImpl {
             val ur = UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
-              .createEngineDescription(TokenizerAnnotator.getDescription(),
-                SentenceAnnotator.getDescription())))
+              .createEngineDescription(
+                      SentenceAnnotator.getDescription(),
+                      TokenizerAnnotator.getDescription(),
+                      PosTaggerAnnotator.getDescription())
+            ))
             val cr = CollectionReaderImpl(iter)
             return SentenceIteratorImpl(cr, ur)
         }
@@ -109,7 +121,19 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         return getReader().getLabels()
     }
 
-    data class SentenceData(val str: String, val offset: Int)
+    interface StrData {
+        val str: String
+        val offset: Int
+    }
+    data class SentenceData(
+            override val str: String,
+            override val offset: Int, val words: List<WordData>
+    ): StrData
+    data class WordData(
+            override val str: String,
+            override val offset: Int,
+            val pos: Pos
+    ): StrData
 }
 
 class CollectionReaderImpl(private val iter: TextIterator): JCasCollectionReader_ImplBase() {
@@ -125,9 +149,8 @@ class CollectionReaderImpl(private val iter: TextIterator): JCasCollectionReader
 
     override fun getNext(jCas: JCas) {
         var text = iter.next()
-
         // set the document's text
-        jCas.documentText = text.data.toString();
+        jCas.documentText = text.data.toString()
     }
 
     fun reset() {
