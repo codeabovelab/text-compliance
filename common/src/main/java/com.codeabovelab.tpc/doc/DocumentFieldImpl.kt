@@ -33,7 +33,7 @@ class DocumentFieldImpl(parentId: String, b: DocumentFieldImpl.Builder) : Docume
     init {
         this.name = b.name!!
         this.id = parentId + this.name
-        this.data = TextImpl(this.id, b.data!!)
+        this.data = TextImpl(this.id, b.data.orEmpty())
     }
 
     override fun read(consumer: TextConsumer) {
