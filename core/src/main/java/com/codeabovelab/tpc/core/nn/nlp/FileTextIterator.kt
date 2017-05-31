@@ -20,7 +20,7 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
     init {
         val m = pattern.matcher(filePath.fileName.toString())
         if (m.find()) {
-            _labels = (1 until m.groupCount()).map { m.group(it) }
+            _labels = (1 until m.groupCount()).map { "#" + m.group(it) }
         } else {
             _labels = Collections.emptyList()
         }
