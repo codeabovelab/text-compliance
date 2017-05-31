@@ -25,8 +25,8 @@ class TextClassifierTest {
 
     @Test
     fun test() {
-        val workDir = "/home/rad/tmp/nn-data/";
-        val filePath = workDir + "ParagraphVectors.zip";
+        val workDir = "/home/rad/tmp/nn-data/"
+        val filePath = workDir + "ParagraphVectors.zip"
 
         createIfNeed(workDir, filePath)
 

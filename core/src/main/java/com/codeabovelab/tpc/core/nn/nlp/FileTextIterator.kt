@@ -18,6 +18,7 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
     private var _labels: List<String>
 
     init {
+        println("Load $id")
         val m = pattern.matcher(filePath.fileName.toString())
         if (m.find()) {
             _labels = (1 until m.groupCount()).map { m.group(it) }

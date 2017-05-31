@@ -56,13 +56,17 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
             return false
         }
         val cas = resource.retrieve()
-        sentences = getSentences(cas)
-        while (!sentences.hasNext()) {
-            if (!reader.hasNext()) {
-                return false
-            }
-            cas.reset()
+        try {
             sentences = getSentences(cas)
+            while (!sentences.hasNext()) {
+                if (!reader.hasNext()) {
+                    return false
+                }
+                cas.reset()
+                sentences = getSentences(cas)
+            }
+        } finally {
+            resource.release(cas)
         }
         return true
     }
@@ -105,6 +109,10 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
                       TokenizerAnnotator.getDescription(),
                       PosTaggerAnnotator.getDescription())
             ))
+            val cr = CollectionReaderImpl(iter)
+            return SentenceIteratorImpl(cr, ur)
+        }
+        fun create(ur: UimaResource, iter: TextIterator): SentenceIteratorImpl {
             val cr = CollectionReaderImpl(iter)
             return SentenceIteratorImpl(cr, ur)
         }

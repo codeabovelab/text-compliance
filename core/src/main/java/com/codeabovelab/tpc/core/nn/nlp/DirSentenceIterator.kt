@@ -1,7 +1,10 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
+import org.apache.uima.fit.factory.AnalysisEngineFactory
+import org.cleartk.opennlp.tools.SentenceAnnotator
 import org.deeplearning4j.text.sentenceiterator.BaseSentenceIterator
 import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator
+import org.deeplearning4j.text.uima.UimaResource
 import org.slf4j.LoggerFactory
 import java.io.*
 
@@ -20,6 +23,11 @@ class DirSentenceIterator (
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: LabelAwareSentenceIterator? = null
     private var labels: List<String> = Collections.emptyList()
+    private val ur = UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
+        .createEngineDescription(
+                SentenceAnnotator.getDescription()
+        )
+    ))
 
     init {
         reset()
@@ -51,7 +59,7 @@ class DirSentenceIterator (
                 }
             }
         }
-        println(sentence)
+        //println(sentence)
         return sentence
     }
 
@@ -61,7 +69,7 @@ class DirSentenceIterator (
         }
         val path = fileIter.next()
         try {
-            return SentenceIteratorImpl.create(FileTextIterator(path))
+            return SentenceIteratorImpl.create(ur, FileTextIterator(path))
         } catch (e: IOException) {
             throw RuntimeException("On read " + path,  e)
         }
@@ -72,6 +80,7 @@ class DirSentenceIterator (
     }
 
     override fun reset() {
+        log.warn("Call reset on $dir")
         try {
             val stream = Files.walk(Paths.get(dir))
               .filter{ it.toString().endsWith(".txt") }
