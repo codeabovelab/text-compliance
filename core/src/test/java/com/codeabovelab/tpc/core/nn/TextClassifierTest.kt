@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.nn
 
+import com.codeabovelab.tpc.core.nn.nlp.DirSentenceIterator
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
@@ -57,18 +58,19 @@ class TextClassifierTest {
         val cache = AbstractCache<VocabWord>()
         val t = TokenizerFactoryImpl()
         var pv = ParagraphVectors.Builder()
-          .minWordFrequency(3)
-          .iterations(5)
-          .epochs(2)
-          .layerSize(300)
-          .learningRate(0.025)
+          .minWordFrequency(5)
+          .iterations(2)
+          .epochs(1)
+          .layerSize(100)
+          .learningRate(0.05)
+          .useUnknown(true)
           .windowSize(7)
           .iterate(iter)
           .trainWordVectors(true)
           .trainSequencesRepresentation(true)
           .vocabCache(cache)
           .tokenizerFactory(t)
-          .negativeSample(7.0)
+          .negativeSample(0.0)
           .sampling(1E-5)
           .build()
 

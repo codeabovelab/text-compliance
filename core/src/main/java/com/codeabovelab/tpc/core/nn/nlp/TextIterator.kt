@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.nn
+package com.codeabovelab.tpc.core.nn.nlp
 
 import com.codeabovelab.tpc.text.Text
 

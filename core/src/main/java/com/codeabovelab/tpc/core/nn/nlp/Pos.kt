@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.nn
+package com.codeabovelab.tpc.core.nn.nlp
 
 /**
  * Part-of-speech
@@ -159,7 +159,7 @@ enum class Pos {
                 }
                 return Pos.valueOf(s)
             } catch(e: Exception) {
-                return Pos.UNKNOWN
+                return UNKNOWN
             }
         }
     }

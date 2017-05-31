@@ -1,5 +1,7 @@
 package com.codeabovelab.tpc.core.nn;
 
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
+import com.codeabovelab.tpc.core.nn.nlp.TextIterator
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.core.processor.PredicateResult
 import com.codeabovelab.tpc.core.processor.RulePredicate
@@ -33,7 +35,7 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
             }
             val words = si.currentWords()!!
             val vws = words.stream().filter { it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
-            //println(vws.map { it.word })
+            println(vws.map { it.word })
             val indArray = pv.inferVector(vws)
             //val labels = pv.nearestLabels(indArray, maxLabels) we tru to use unlabeled text
             val labels = pv.wordsNearest(indArray, maxLabels)

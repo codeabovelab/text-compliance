@@ -1,5 +1,6 @@
-package com.codeabovelab.tpc.core.nn
+package com.codeabovelab.tpc.core.nn.nlp
 
+import com.codeabovelab.tpc.core.nn.nlp.TextIterator
 import org.apache.uima.cas.CAS
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase
 import org.apache.uima.fit.factory.AnalysisEngineFactory
@@ -97,7 +98,7 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
     }
 
     companion object {
-        fun create(iter: TextIterator, pos: Boolean = true): SentenceIteratorImpl {
+        fun create(iter: TextIterator): SentenceIteratorImpl {
             val ur = UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
               .createEngineDescription(
                       SentenceAnnotator.getDescription(),
@@ -121,43 +122,29 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         return getReader().getLabels()
     }
 
-    interface StrData {
-        val str: String
-        val offset: Int
-    }
-    data class SentenceData(
-            override val str: String,
-            override val offset: Int, val words: List<WordData>
-    ): StrData
-    data class WordData(
-            override val str: String,
-            override val offset: Int,
-            val pos: Pos
-    ): StrData
-}
+    class CollectionReaderImpl(private val iter: TextIterator): JCasCollectionReader_ImplBase() {
 
-class CollectionReaderImpl(private val iter: TextIterator): JCasCollectionReader_ImplBase() {
+        override fun hasNext(): Boolean {
+            return iter.hasNext()
+        }
 
-    override fun hasNext(): Boolean {
-        return iter.hasNext()
-    }
-
-    override fun getProgress(): Array<out Progress>? {
-        return arrayOf()
-    }
+        override fun getProgress(): Array<out Progress>? {
+            return arrayOf()
+        }
 
 
-    override fun getNext(jCas: JCas) {
-        var text = iter.next()
-        // set the document's text
-        jCas.documentText = text.data.toString()
-    }
+        override fun getNext(jCas: JCas) {
+            var text = iter.next()
+            // set the document's text
+            jCas.documentText = text.data.toString()
+        }
 
-    fun reset() {
-        iter.reset()
-    }
+        fun reset() {
+            iter.reset()
+        }
 
-    fun getLabels(): List<String>? {
-        return iter.labels
+        fun getLabels(): List<String>? {
+            return iter.labels
+        }
     }
 }

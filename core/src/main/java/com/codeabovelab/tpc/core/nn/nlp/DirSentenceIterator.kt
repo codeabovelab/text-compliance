@@ -1,13 +1,9 @@
-package com.codeabovelab.tpc.core.nn
+package com.codeabovelab.tpc.core.nn.nlp
 
-import com.codeabovelab.tpc.text.Text
-import com.codeabovelab.tpc.text.TextImpl
-import org.apache.commons.io.IOUtils
 import org.deeplearning4j.text.sentenceiterator.BaseSentenceIterator
 import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator
 import org.slf4j.LoggerFactory
 import java.io.*
-import java.nio.charset.StandardCharsets
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -55,7 +51,7 @@ class DirSentenceIterator (
                 }
             }
         }
-        //println(sentence)
+        println(sentence)
         return sentence
     }
 
@@ -65,12 +61,7 @@ class DirSentenceIterator (
         }
         val path = fileIter.next()
         try {
-            val f = path.toFile()
-            val fis = FileInputStream(f)
-            val str = IOUtils.toString(fis, StandardCharsets.UTF_8)
-
-            //TODO use stream
-            return SentenceIteratorImpl.create(TextIterator.singleton(TextImpl(f.canonicalPath, str)), pos = false)
+            return SentenceIteratorImpl.create(FileTextIterator(path))
         } catch (e: IOException) {
             throw RuntimeException("On read " + path,  e)
         }
