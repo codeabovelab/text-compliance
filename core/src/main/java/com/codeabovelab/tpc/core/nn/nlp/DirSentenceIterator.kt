@@ -22,7 +22,6 @@ class DirSentenceIterator (
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: LabelAwareSentenceIterator? = null
-    private var labels: List<String> = Collections.emptyList()
     private val ur = UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
         .createEngineDescription(
                 SentenceAnnotator.getDescription()
@@ -34,12 +33,12 @@ class DirSentenceIterator (
     }
 
     override fun currentLabel(): String? {
-        return null
+        return sentenceIter?.currentLabel()
     }
 
 
     override fun currentLabels(): List<String> {
-        return labels
+        return sentenceIter?.currentLabels() ?: Collections.emptyList()
     }
 
     override fun nextSentence(): String? {
@@ -83,7 +82,7 @@ class DirSentenceIterator (
         log.warn("Call reset on $dir")
         try {
             val stream = Files.walk(Paths.get(dir))
-              .filter{ it.toString().endsWith(".txt") }
+              .filter{ it.toString().endsWith(".txt") }.sorted()
             this.fileIter = stream.iterator()
         } catch (e: IOException) {
             log.error("On {}", dir, e)

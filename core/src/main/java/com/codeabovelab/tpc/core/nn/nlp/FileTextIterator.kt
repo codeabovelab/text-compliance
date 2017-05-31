@@ -15,16 +15,16 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
     private var reader: Iterator<String> = Collections.emptyIterator()
     private var id: String = filePath.toAbsolutePath().toString()
     private var _index: Int = 0
-    private var _labels: List<String>
+    private val _labels: List<String>
 
     init {
-        println("Load $id")
         val m = pattern.matcher(filePath.fileName.toString())
         if (m.find()) {
             _labels = (1 until m.groupCount()).map { m.group(it) }
         } else {
             _labels = Collections.emptyList()
         }
+        println("Load $id with labels: $_labels")
         reset()
     }
 

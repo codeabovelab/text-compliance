@@ -34,11 +34,15 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
                 continue
             }
             val words = si.currentWords()!!
-            val vws = words.stream().filter { it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
-            println(vws.map { it.word })
-            val indArray = pv.inferVector(vws)
-            //val labels = pv.nearestLabels(indArray, maxLabels) we tru to use unlabeled text
-            val labels = pv.wordsNearest(indArray, maxLabels)
+            val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
+            //println(vws.map { it.word })
+            //TODO commented code is produce incorrect vector (full of zeros)!!!! how to build vector for words?
+            //val indArray = pv.inferVector(vws)
+            val indArray = pv.inferVector(sentence)
+            //println(indArray)
+
+            val labels = pv.nearestLabels(indArray, maxLabels)
+            //val labels = pv.wordsNearest(indArray, maxLabels)
             val labelsWithSim = labels.stream().map {
                 val lm = pv.getWordVectorMatrix(it)
                 val similarity = Transforms.cosineSim(indArray, lm)
