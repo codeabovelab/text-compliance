@@ -19,6 +19,7 @@ import java.util.stream.Collectors
 class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate<TextClassifierResult> {
 
     val pv: ParagraphVectors
+    val uima = SentenceIteratorImpl.uimaResource()
 
     init {
         pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile)
@@ -26,7 +27,7 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
     }
 
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {
-        val si = SentenceIteratorImpl.create(TextIterator.singleton(text))
+        val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(text))
         var entries = ArrayList<TextClassifierResult.Entry>()
         while(si.hasNext()) {
             val sentence = si.nextSentence()

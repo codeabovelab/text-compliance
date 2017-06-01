@@ -102,16 +102,18 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
     }
 
     companion object {
-        fun create(iter: TextIterator): SentenceIteratorImpl {
-            val ur = UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
-              .createEngineDescription(
-                      SentenceAnnotator.getDescription(),
-                      TokenizerAnnotator.getDescription(),
-                      PosTaggerAnnotator.getDescription())
+        fun uimaResource(): UimaResource {
+            return UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
+                    .createEngineDescription(
+                            SentenceAnnotator.getDescription(),
+                            TokenizerAnnotator.getDescription(),
+                            PosTaggerAnnotator.getDescription())
             ))
-            val cr = CollectionReaderImpl(iter)
-            return SentenceIteratorImpl(cr, ur)
         }
+
+        /**
+         * @see #uimaResource
+         */
         fun create(ur: UimaResource, iter: TextIterator): SentenceIteratorImpl {
             val cr = CollectionReaderImpl(iter)
             return SentenceIteratorImpl(cr, ur)
