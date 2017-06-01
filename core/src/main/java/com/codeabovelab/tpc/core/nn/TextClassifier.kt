@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.nn;
+package com.codeabovelab.tpc.core.nn
 
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.nn.nlp.TextIterator
@@ -28,7 +28,7 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
 
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {
         val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(text))
-        var entries = ArrayList<TextClassifierResult.Entry>()
+        val entries = ArrayList<TextClassifierResult.Entry>()
         while(si.hasNext()) {
             val sentence = si.nextSentence()
             if(sentence.isNullOrEmpty()) {

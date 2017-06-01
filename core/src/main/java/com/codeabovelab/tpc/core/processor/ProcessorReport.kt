@@ -1,8 +1,8 @@
-package com.codeabovelab.tpc.core.processor;
+package com.codeabovelab.tpc.core.processor
 
-import com.google.common.collect.ImmutableList;
-import lombok.Data;
-import lombok.Setter;
+import com.google.common.collect.ImmutableList
+import lombok.Data
+import lombok.Setter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 

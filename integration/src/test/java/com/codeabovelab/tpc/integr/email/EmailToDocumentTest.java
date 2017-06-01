@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class EmailToDocumentTest {
 
-    private static final List<String> FILEDS = ImmutableList.of(
+    private static final List<String> FIELDS = ImmutableList.of(
       EmailToDocument.F_FROM,
       EmailToDocument.F_RECIPIENTS,
       EmailToDocument.F_SENDER,
@@ -75,7 +75,7 @@ public class EmailToDocumentTest {
         System.out.println(doc);
         assertNotNull(doc.getBody().getData());
         Map<String, DocumentField> fields = doc.getFields().stream().collect(Collectors.toMap(DocumentField::getName, Function.identity()));
-        for(String name: FILEDS) {
+        for(String name: FIELDS) {
             System.out.println("Test field: " + name);
             DocumentField df = fields.get(name);
             assertNotNull(df);

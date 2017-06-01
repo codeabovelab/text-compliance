@@ -36,7 +36,7 @@ public final class EmailToDocument {
         return db.build();
     }
 
-    private void addField(DocumentImpl.Builder db, String name, Object value) throws Exception {
+    private void addField(DocumentImpl.Builder db, String name, Object value) {
         String str = toString(value);
         db.addField(DocumentFieldImpl.Companion.builder().name(name).data(str));
     }

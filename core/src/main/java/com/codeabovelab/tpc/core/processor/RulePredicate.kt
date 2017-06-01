@@ -1,6 +1,6 @@
-package com.codeabovelab.tpc.core.processor;
+package com.codeabovelab.tpc.core.processor
 
-import com.codeabovelab.tpc.text.Text;
+import com.codeabovelab.tpc.text.Text
 
 /**
  * Test that rule match specified text

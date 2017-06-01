@@ -1,8 +1,8 @@
-package com.codeabovelab.tpc.core.processor;
+package com.codeabovelab.tpc.core.processor
 
-import com.codeabovelab.tpc.doc.Document;
-import com.codeabovelab.tpc.text.Text;
-import com.google.common.collect.ImmutableMap;
+import com.codeabovelab.tpc.doc.Document
+import com.codeabovelab.tpc.text.Text
+import com.google.common.collect.ImmutableMap
 
 /**
  * Processing context, it can be used in concurrent environment.

@@ -144,7 +144,7 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
 
 
         override fun getNext(jCas: JCas) {
-            var text = iter.next()
+            val text = iter.next()
             // set the document's text
             jCas.documentText = text.data.toString()
         }

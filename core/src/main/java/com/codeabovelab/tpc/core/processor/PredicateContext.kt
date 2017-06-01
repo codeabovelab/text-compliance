@@ -1,6 +1,6 @@
-package com.codeabovelab.tpc.core.processor;
+package com.codeabovelab.tpc.core.processor
 
-import com.codeabovelab.tpc.doc.Document;
+import com.codeabovelab.tpc.doc.Document
 
 /**
  * Read only context for predicate evaluation.

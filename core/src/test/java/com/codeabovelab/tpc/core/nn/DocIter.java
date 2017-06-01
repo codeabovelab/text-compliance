@@ -28,7 +28,7 @@ class DocIter {
     private Iterator<Path> fileIter;
     private int counter;
 
-    public DocIter(String dir) throws Exception {
+    public DocIter(String dir) {
         this.dir = dir;
         reset();
     }
