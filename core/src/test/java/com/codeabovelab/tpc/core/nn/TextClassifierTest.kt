@@ -28,7 +28,6 @@ class TextClassifierTest {
         val workDir = "/home/rad/tmp/nn-data/"
         val filePath = workDir + "ParagraphVectors.zip"
 
-        createIfNeed(workDir, filePath)
 
         val tc = TextClassifier(vectorsFile = filePath, maxLabels = 3)
 
@@ -46,36 +45,5 @@ class TextClassifierTest {
         }
     }
 
-    fun createIfNeed(workDir: String, filePath: String) {
-        val pvf = File(filePath)
-        if(pvf.exists()) {
-            log.warn("DB is exists, do nothing.")
-            return
-        }
-        log.warn("DB is non exists, creating.")
-        val iter = DirSentenceIterator(workDir + "/manually")
-        //TODO teach on tagged words
-        val cache = AbstractCache<VocabWord>()
-        val t = TokenizerFactoryImpl()
-        var pv = ParagraphVectors.Builder()
-          .minWordFrequency(5)
-          .iterations(2)
-          .epochs(1)
-          .layerSize(100)
-          .learningRate(0.05)
-          .useUnknown(true)
-          .windowSize(7)
-          .iterate(iter)
-          .trainWordVectors(true)
-          .trainSequencesRepresentation(true)
-          .vocabCache(cache)
-          .tokenizerFactory(t)
-          .negativeSample(0.0)
-          .sampling(1E-5)
-          .build()
 
-        pv.fit()
-
-        WordVectorSerializer.writeParagraphVectors(pv, pvf)
-    }
 }

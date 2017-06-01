@@ -1,0 +1,30 @@
+dependencies {
+
+    compile project(':core')
+
+    compile 'com.google.guava:guava'
+    compile 'args4j:args4j:2.33'
+
+    compile 'org.jetbrains.kotlin:kotlin-stdlib'
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
+
+    testCompile 'org.jetbrains.kotlin:kotlin-test'
+    testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+    testCompile 'junit:junit'
+}
+
+apply plugin: 'application'
+
+mainClassName = 'com.codeabovelab.tpc.tool.MainKt'
+
+jar {
+    manifest {
+        attributes("Main-Class": mainClassName)
+    }
+}
+
+distributions {
+    main {
+        baseName = 'text-compliance'
+    }
+}
