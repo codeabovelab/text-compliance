@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.teach
+package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.processor.PredicateContext
@@ -21,14 +21,15 @@ class Classify(
         val tc = TextClassifier(vectorsFile = in_learned, maxLabels = 3)
 
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
+        val pc = PredicateContext(document = DocumentImpl.Companion.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
         for(text in texts) {
-            System.out.println(i++)
-            val res = tc.test(pc, TextImpl("sample_" + i, text))
+            i++
+            println("Text #$i")
+            val res = tc.test(pc, TextImpl("sample_$i", text))
             res.entries.forEach {
                 val offset = it.coordinates.offset
                 val sentence = text.substring(offset, offset + it.coordinates.length)
-                System.out.println(sentence + ": " + it.labels)
+                System.out.println(sentence + "\n\t" + it.labels)
             }
         }
 

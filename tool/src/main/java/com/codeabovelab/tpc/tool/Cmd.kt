@@ -1,7 +1,7 @@
 package com.codeabovelab.tpc.tool
 
-import com.codeabovelab.tpc.tool.teach.Classify
-import com.codeabovelab.tpc.tool.teach.Learning
+import com.codeabovelab.tpc.tool.Classify
+import com.codeabovelab.tpc.tool.learn.Learning
 import org.kohsuke.args4j.Argument
 import org.kohsuke.args4j.Option
 import java.util.*
@@ -22,6 +22,9 @@ class Cmd {
     @field:Option(name = "-l", usage = "path to learned data")
     var learned: String? = null
 
+    @field:Option(name = "-c", usage = "path to config file")
+    var config: String? = null
+
     fun run() {
         command!!.create(this)()
     }
@@ -31,7 +34,11 @@ class Cmd {
             override fun create(cmd: Cmd): () -> Unit {
                 Objects.requireNonNull(cmd.in_path, "'i' is required")
                 Objects.requireNonNull(cmd.out_path, "'o' is required")
-                return Learning(cmd.in_path!!, cmd.out_path!!)::run
+                return Learning(
+                        srcDir = cmd.in_path!!,
+                        filePath = cmd.out_path!!,
+                        config = cmd.config
+                )::run
             }
         },
         classify {
