@@ -16,7 +16,8 @@ object Config {
 
 
     fun <T: Any> read(dest: T, istream: InputStream) {
-        om.readValue(istream, dest.javaClass)
+        val reader = om.readerForUpdating(dest)
+        reader.readValue<T>(istream)
     }
 
     fun  <T: Any> write(src: T, ostream: OutputStream, withNulls: Boolean = false) {
