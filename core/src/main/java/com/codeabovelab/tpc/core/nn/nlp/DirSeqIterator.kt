@@ -65,7 +65,13 @@ class DirSeqIterator(
             val word = VocabWord(1.0, str!!)
             sequence.addElement(word)
         }
-
+        val labels = sentenceIter?.currentLabels() ?: Collections.emptyList()
+        for (label in labels) {
+            if (label.isEmpty()) {
+                continue
+            }
+            sequence.addSequenceLabel(VocabWord(1.0, label))
+        }
         sequence.sequenceId = seqCounter.getAndIncrement()
         return sequence
     }
