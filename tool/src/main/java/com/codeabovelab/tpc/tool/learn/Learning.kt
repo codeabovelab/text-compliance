@@ -1,7 +1,7 @@
 package com.codeabovelab.tpc.tool.learn
 
 import com.codeabovelab.tpc.core.nn.TokenizerFactoryImpl
-import com.codeabovelab.tpc.core.nn.nlp.DirSentenceIterator
+import com.codeabovelab.tpc.core.nn.nlp.DirSeqIterator
 import com.codeabovelab.tpc.tool.util.Config
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
@@ -30,16 +30,17 @@ class Learning(
             return
         }
         //TODO learn on tagged words
-        val iter = DirSentenceIterator(srcDir)
+        val iter = DirSeqIterator(srcDir)
         val cache = AbstractCache<VocabWord>()
         val t = TokenizerFactoryImpl()
         val lc = LearnConfig()
         configure(lc)
         val pv = ParagraphVectors.Builder(lc.doc2vec)
-                .iterate(iter)
+                //.iterate(iter)
                 .vocabCache(cache)
                 .tokenizerFactory(t)
                 .build()
+        pv.setSequenceIterator(iter)
         pv.fit()
 
         log.warn("Save learned data to $filePath.")
@@ -64,3 +65,4 @@ class Learning(
         }
     }
 }
+

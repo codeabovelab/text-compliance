@@ -1,13 +1,13 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
-import com.codeabovelab.tpc.core.nn.nlp.TextIterator
 import org.apache.uima.cas.CAS
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase
 import org.apache.uima.fit.factory.AnalysisEngineFactory
 import org.apache.uima.fit.util.JCasUtil
 import org.apache.uima.jcas.JCas
 import org.apache.uima.util.Progress
-import org.cleartk.opennlp.tools.PosTaggerAnnotator
+import org.cleartk.clearnlp.MpAnalyzer
+import org.cleartk.clearnlp.PosTagger
 import org.cleartk.opennlp.tools.SentenceAnnotator
 import org.cleartk.token.type.Sentence
 import org.cleartk.token.type.Token
@@ -77,7 +77,11 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         val list = ArrayList<SentenceData>()
         JCasUtil.select(cas.jCas, Sentence::class.java).mapTo(list) {
             val words = JCasUtil.selectCovered(cas.jCas, Token::class.java, it).map {
-                WordData(it.coveredText, it.begin, Pos.parse(it.pos))
+                WordData(it.coveredText, it.begin,
+                        pos = Pos.parse(it.pos),
+                        stem = it.stem,
+                        lemma = it.lemma
+                )
             }
             SentenceData(it.coveredText, it.begin, words)
         }
@@ -107,7 +111,9 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
                     .createEngineDescription(
                             SentenceAnnotator.getDescription(),
                             TokenizerAnnotator.getDescription(),
-                            PosTaggerAnnotator.getDescription())
+                            PosTagger.getDescription(),
+                            MpAnalyzer.getDescription()
+                    )
             ))
         }
 

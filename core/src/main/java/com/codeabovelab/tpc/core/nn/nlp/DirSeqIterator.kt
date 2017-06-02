@@ -1,10 +1,8 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
-import org.apache.uima.fit.factory.AnalysisEngineFactory
-import org.cleartk.opennlp.tools.SentenceAnnotator
-import org.deeplearning4j.text.sentenceiterator.BaseSentenceIterator
-import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator
-import org.deeplearning4j.text.uima.UimaResource
+import org.deeplearning4j.models.sequencevectors.interfaces.SequenceIterator
+import org.deeplearning4j.models.sequencevectors.sequence.Sequence
+import org.deeplearning4j.models.word2vec.VocabWord
 import org.slf4j.LoggerFactory
 import java.io.*
 
@@ -12,36 +10,25 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Collections
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Simple iterator for NN teaching on directory of sample data.
  */
-class DirSentenceIterator (
+class DirSeqIterator(
         private val dir: String
-): BaseSentenceIterator(), LabelAwareSentenceIterator {
+): SequenceIterator<VocabWord> {
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
-    private var sentenceIter: LabelAwareSentenceIterator? = null
-    private val ur = UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
-        .createEngineDescription(
-                SentenceAnnotator.getDescription()
-        )
-    ))
+    private var sentenceIter: SentenceIteratorImpl? = null
+    private val ur = SentenceIteratorImpl.uimaResource()
+    private val seqCounter = AtomicInteger(0)
 
     init {
         reset()
     }
 
-    override fun currentLabel(): String? {
-        return sentenceIter?.currentLabel()
-    }
-
-
-    override fun currentLabels(): List<String> {
-        return sentenceIter?.currentLabels() ?: Collections.emptyList()
-    }
-
-    override fun nextSentence(): String? {
+    override fun nextSequence(): Sequence<VocabWord> {
         var sentence: String? = null
         while(true) {
             if(sentenceIter == null || !sentenceIter?.hasNext()!!) {
@@ -59,10 +46,31 @@ class DirSentenceIterator (
             }
         }
         //println(sentence)
-        return sentence
+        if(sentence == null) {
+            return Sequence()
+        }
+        return toSeq()
     }
 
-    private fun nextSentenceIter(): LabelAwareSentenceIterator? {
+    private fun toSeq(): Sequence<VocabWord> {
+        val sequence = Sequence<VocabWord>()
+
+        val list = sentenceIter?.currentWords()!!
+
+        for (token in list) {
+            val str =token.lemma
+            if(str.isNullOrBlank()) {
+                continue
+            }
+            val word = VocabWord(1.0, str!!)
+            sequence.addElement(word)
+        }
+
+        sequence.sequenceId = seqCounter.getAndIncrement()
+        return sequence
+    }
+
+    private fun nextSentenceIter(): SentenceIteratorImpl? {
         if(!fileIter.hasNext()) {
             return null
         }
@@ -74,7 +82,7 @@ class DirSentenceIterator (
         }
     }
 
-    override fun hasNext(): Boolean {
+    override fun hasMoreSequences(): Boolean {
         return fileIter.hasNext()
     }
 

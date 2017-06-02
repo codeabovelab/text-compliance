@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.core.nn
 
-import com.codeabovelab.tpc.core.nn.nlp.DirSentenceIterator
+import com.codeabovelab.tpc.core.nn.nlp.DirSeqIterator
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl

@@ -34,8 +34,8 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
             if(sentence.isNullOrEmpty()) {
                 continue
             }
-            val words = si.currentWords()!!
-            val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
+            //val words = si.currentWords()!!
+            //val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
             //println(vws.map { it.word })
             //TODO commented code is produce incorrect vector (full of zeros)!!!! how to build vector for words?
             //val indArray = pv.inferVector(vws)
