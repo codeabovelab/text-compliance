@@ -3,9 +3,7 @@ package com.codeabovelab.tpc.doc
 import com.codeabovelab.tpc.text.TextConsumer
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.collect.ImmutableList
-import lombok.Data
-
-import java.util.ArrayList
+import java.util.*
 
 class DocumentImpl(b: DocumentImpl.Builder) : Document {
 
@@ -33,9 +31,6 @@ class DocumentImpl(b: DocumentImpl.Builder) : Document {
             return DocumentImpl(this)
         }
 
-        fun getFields(): List<DocumentField.Builder> {
-            return fields
-        }
     }
 
     override val id: String
