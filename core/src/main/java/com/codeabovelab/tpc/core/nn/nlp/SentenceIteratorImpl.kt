@@ -1,6 +1,5 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
-import org.apache.uima.analysis_engine.AnalysisEngineDescription
 import org.apache.uima.cas.CAS
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase
 import org.apache.uima.fit.factory.AnalysisEngineFactory

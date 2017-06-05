@@ -1,19 +1,14 @@
 package com.codeabovelab.tpc.core.nn
 
-import com.codeabovelab.tpc.core.nn.nlp.DirSeqIterator
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
-import org.deeplearning4j.models.word2vec.VocabWord
-import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache
 import org.junit.Test
 import org.junit.Ignore
 import org.slf4j.LoggerFactory
 
-import java.io.*
 import java.nio.charset.StandardCharsets
 
 /**
@@ -29,7 +24,12 @@ class TextClassifierTest {
         val filePath = workDir + "ParagraphVectors.zip"
 
 
-        val tc = TextClassifier(vectorsFile = filePath, maxLabels = 3)
+        val tc = TextClassifier(
+                vectorsFile = filePath,
+                maxLabels = 3,
+                uima = SentenceIteratorImpl.uimaResource(pos = false, morphological = false),
+                wordSupplier = {it.word.str}
+        )
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
         var i = 0

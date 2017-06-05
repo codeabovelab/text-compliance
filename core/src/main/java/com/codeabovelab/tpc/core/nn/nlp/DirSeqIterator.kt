@@ -57,12 +57,12 @@ class DirSeqIterator(
     private fun toSeq(): Sequence<VocabWord> {
         val sequence = Sequence<VocabWord>()
 
-        val wc = WordContext()
-        wc._sentece = sentenceIter?.current()
+        val wch = WordContext.create()
+        wch.sentence = sentenceIter?.current()
 
-        for (token in wc.sentence.words) {
-            wc._word = token
-            val str = wordSupplier(wc)
+        for (token in wch.sentence!!.words) {
+            wch.word = token
+            val str = wordSupplier(wch.context)
             if(str.isNullOrBlank()) {
                 continue
             }
@@ -107,14 +107,4 @@ class DirSeqIterator(
         }
     }
 
-    class WordContext {
-        internal var _sentece: SentenceData? = null
-        internal var _word: WordData? = null
-
-        val sentence: SentenceData
-            get() = this._sentece!!
-
-        val word: WordData
-            get() = this._word!!
-    }
 }

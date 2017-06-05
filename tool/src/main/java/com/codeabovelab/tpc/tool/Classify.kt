@@ -4,6 +4,7 @@ import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
+import com.codeabovelab.tpc.tool.learn.LearnConfig
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -12,13 +13,20 @@ import java.nio.file.Paths
  */
 class Classify(
         private val in_data: String,
-        private val in_learned: String
+        private val in_learned: String,
+        private val config: String?
 ) {
     fun run() {
         val texts = Files.readAllLines(Paths.get(in_data), StandardCharsets.UTF_8)
 
-
-        val tc = TextClassifier(vectorsFile = in_learned, maxLabels = 3)
+        val lc = LearnConfig()
+        lc.configure(config)
+        val tc = TextClassifier(
+                vectorsFile = in_learned,
+                maxLabels = 3,
+                uima = lc.createUimaResource(),
+                wordSupplier = lc.wordSupplier()
+        )
 
         var i = 0
         val pc = PredicateContext(document = DocumentImpl.Companion.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())

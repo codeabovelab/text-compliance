@@ -45,7 +45,10 @@ class Cmd {
             override fun create(cmd: Cmd): () -> Unit {
                 Objects.requireNonNull(cmd.in_path, "'i' is required")
                 Objects.requireNonNull(cmd.learned, "'l' is required")
-                return Classify(cmd.in_path!!, cmd.learned!!)::run
+                return Classify(
+                        in_data = cmd.in_path!!,
+                        in_learned = cmd.learned!!,
+                        config = cmd.config)::run
             }
 
         }

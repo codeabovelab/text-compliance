@@ -1,7 +1,6 @@
 package com.codeabovelab.tpc.core.nn
 
-import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
-import com.codeabovelab.tpc.core.nn.nlp.TextIterator
+import com.codeabovelab.tpc.core.nn.nlp.*
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.core.processor.PredicateResult
 import com.codeabovelab.tpc.core.processor.RulePredicate
@@ -10,16 +9,21 @@ import com.codeabovelab.tpc.text.TextCoordinates
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
+import org.deeplearning4j.text.uima.UimaResource
 import org.nd4j.linalg.ops.transforms.Transforms
 
 import java.util.stream.Collectors
 
 /**
  */
-class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate<TextClassifierResult> {
+class TextClassifier(
+        val vectorsFile: String,
+        val maxLabels: Int,
+        val uima: UimaResource,
+        val wordSupplier: (wc: WordContext) -> String?
+): RulePredicate<TextClassifierResult> {
 
     val pv: ParagraphVectors
-    val uima = SentenceIteratorImpl.uimaResource()
 
     init {
         pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile)
@@ -34,16 +38,14 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
             if(sentence.isNullOrEmpty()) {
                 continue
             }
-            //val words = si.currentWords()!!
+            val seq = si.current()
             //val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
             //println(vws.map { it.word })
-            //TODO commented code is produce incorrect vector (full of zeros)!!!! how to build vector for words?
-            //val indArray = pv.inferVector(vws)
-            val indArray = pv.inferVector(sentence)
+            val vws = toWordList(seq)
+            val indArray = pv.inferVector(vws)
             //println(indArray)
 
             val labels = pv.nearestLabels(indArray, maxLabels)
-            //val labels = pv.wordsNearest(indArray, maxLabels)
             val labelsWithSim = labels.stream().map {
                 val lm = pv.getWordVectorMatrix(it)
                 val similarity = Transforms.cosineSim(indArray, lm)
@@ -55,6 +57,22 @@ class TextClassifier(val vectorsFile: String, val maxLabels: Int): RulePredicate
             entries.add(resEntry)
         }
         return TextClassifierResult(entries = entries)
+    }
+
+    private fun toWordList(seq: SentenceData): List<VocabWord> {
+        val wch = WordContext.create()
+        wch.sentence = seq
+        val vws = ArrayList<VocabWord>()
+        for (word in seq.words) {
+            wch.word = word
+            val str = wordSupplier(wch.context)
+            if (str.isNullOrEmpty()) {
+                continue
+            }
+            val vw = pv.vocab.wordFor(str)
+            vws.add(vw)
+        }
+        return vws
     }
 }
 
