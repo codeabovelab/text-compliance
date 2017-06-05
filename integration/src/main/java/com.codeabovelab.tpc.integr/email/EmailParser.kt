@@ -89,7 +89,7 @@ class EmailParser {
     }
 
     private fun isStringEmpty(content: String): Boolean {
-        return content.trim().isNullOrBlank()
+        return content.isNullOrBlank()
     }
 
     class Context(val text: String, var fragment: Builder? = null, var fragments: MutableList<Fragment> = Lists.newArrayList())
