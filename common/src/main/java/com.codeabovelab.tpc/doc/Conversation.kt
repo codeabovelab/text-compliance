@@ -1,7 +1,7 @@
 package com.codeabovelab.tpc.doc
 
 /**
- * Created by pronto on 6/3/17.
+ * Container for related documents
  */
 interface Conversation {
     /**
