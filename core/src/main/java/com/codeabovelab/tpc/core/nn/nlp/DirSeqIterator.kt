@@ -3,6 +3,7 @@ package com.codeabovelab.tpc.core.nn.nlp
 import org.deeplearning4j.models.sequencevectors.interfaces.SequenceIterator
 import org.deeplearning4j.models.sequencevectors.sequence.Sequence
 import org.deeplearning4j.models.word2vec.VocabWord
+import org.deeplearning4j.text.uima.UimaResource
 import org.slf4j.LoggerFactory
 import java.io.*
 
@@ -16,12 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger
  * Simple iterator for NN teaching on directory of sample data.
  */
 class DirSeqIterator(
-        private val dir: String
+        private val ur: UimaResource,
+        private val dir: String,
+        private val wordSupplier: (wc: WordContext) -> String?
 ): SequenceIterator<VocabWord> {
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: SentenceIteratorImpl? = null
-    private val ur = SentenceIteratorImpl.uimaResource()
     private val seqCounter = AtomicInteger(0)
 
     init {
@@ -55,10 +57,12 @@ class DirSeqIterator(
     private fun toSeq(): Sequence<VocabWord> {
         val sequence = Sequence<VocabWord>()
 
-        val list = sentenceIter?.currentWords()!!
+        val wc = WordContext()
+        wc._sentece = sentenceIter?.current()
 
-        for (token in list) {
-            val str =token.lemma
+        for (token in wc.sentence.words) {
+            wc._word = token
+            val str = wordSupplier(wc)
             if(str.isNullOrBlank()) {
                 continue
             }
@@ -101,5 +105,16 @@ class DirSeqIterator(
         } catch (e: IOException) {
             log.error("On {}", dir, e)
         }
+    }
+
+    class WordContext {
+        internal var _sentece: SentenceData? = null
+        internal var _word: WordData? = null
+
+        val sentence: SentenceData
+            get() = this._sentece!!
+
+        val word: WordData
+            get() = this._word!!
     }
 }

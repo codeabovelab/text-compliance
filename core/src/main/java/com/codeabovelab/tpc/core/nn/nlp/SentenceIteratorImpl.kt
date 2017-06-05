@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
+import org.apache.uima.analysis_engine.AnalysisEngineDescription
 import org.apache.uima.cas.CAS
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase
 import org.apache.uima.fit.factory.AnalysisEngineFactory
@@ -97,8 +98,8 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         return curr?.offset
     }
 
-    fun currentWords(): List<WordData>? {
-        return curr?.words
+    fun current(): SentenceData {
+        return curr!!
     }
 
     @Synchronized private fun getReader(): CollectionReaderImpl {
@@ -106,15 +107,25 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
     }
 
     companion object {
-        fun uimaResource(): UimaResource {
-            return UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory
-                    .createEngineDescription(
-                            SentenceAnnotator.getDescription(),
-                            TokenizerAnnotator.getDescription(),
-                            PosTagger.getDescription(),
-                            MpAnalyzer.getDescription()
-                    )
-            ))
+        fun uimaResource(
+                pos: Boolean = true,
+                morphological: Boolean = true
+        ): UimaResource {
+            // note that MpAnalyzer require POS, therefore we must enable both them
+            val args = if(morphological) {
+                 arrayOf(SentenceAnnotator.getDescription(),
+                        TokenizerAnnotator.getDescription(),
+                        PosTagger.getDescription(),
+                        MpAnalyzer.getDescription())
+            } else if(pos) {
+                arrayOf(SentenceAnnotator.getDescription(),
+                        TokenizerAnnotator.getDescription(),
+                        PosTagger.getDescription())
+            } else {
+                arrayOf(SentenceAnnotator.getDescription(),
+                        TokenizerAnnotator.getDescription())
+            }
+            return UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory.createEngineDescription(*args)))
         }
 
         /**

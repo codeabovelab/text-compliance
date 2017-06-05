@@ -1,12 +1,12 @@
 package com.codeabovelab.tpc.tool.learn
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import org.deeplearning4j.models.embeddings.loader.VectorsConfiguration
 
 /**
  */
 class LearnConfig {
     var doc2vec = VectorsConfiguration()
+    var wordsConversion: WordConversion = WordConversion.RAW
 
     init {
         doc2vec.minWordFrequency = 5
@@ -22,4 +22,25 @@ class LearnConfig {
         doc2vec.negative = 0.0
         doc2vec.sampling = 1E-5
     }
+
+
+    enum class WordConversion {
+        /**
+         * No conversion
+         */
+        RAW,
+        /**
+         * Add POS to end of word
+         */
+        POS,
+        /**
+         * Use lemma instead of word
+         */
+        LEMMA,
+        /**
+         * Use lemma + POS
+         */
+        LEMMA_POS
+    }
 }
+

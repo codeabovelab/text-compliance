@@ -151,9 +151,12 @@ enum class Pos {
     UNKNOWN;
 
     companion object {
-        fun parse(str: String): Pos {
+        fun parse(str: String?): Pos {
+            if(str.isNullOrBlank()) {
+                return UNKNOWN
+            }
             try {
-                var s = str.toUpperCase()
+                var s = str!!.toUpperCase()
                 if (s.last() == '$') {
                     s = s.substring(0, s.length - 1) + "_S"
                 }
