@@ -70,7 +70,7 @@ class EmailParser {
     }
 
     private fun quoteHeader(line: String): Boolean {
-        val reversed = StringBuffer(line).reverse().toString()
+        val reversed = StringBuilder(line).reverse().toString()
         return QUOTE_HDR_REGEX.matcher(reversed).lookingAt()
     }
 
