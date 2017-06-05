@@ -31,9 +31,9 @@ internal class EmailParserTest {
         println("Visible: \n" + email.visibleText())
         assertThat(fragments, Matchers.hasSize(2))
         assertThat(fragments[0].content, containsString("Awesome"))
-        assertThat(fragments[0].isHidden, equalTo(false))
+        assertThat(fragments[0].hidden, equalTo(false))
         assertThat(fragments[1].content, containsString("On"))
-        assertThat(fragments[1].isHidden, equalTo(true))
+        assertThat(fragments[1].hidden, equalTo(true))
         assertThat(fragments[1].content, containsString("Loader"))
     }
 
@@ -45,9 +45,10 @@ internal class EmailParserTest {
         println("Visible: \n" + email.visibleText())
         assertThat(fragments, Matchers.hasSize(2))
         assertThat(fragments[0].content, containsString("Phillip"))
-        assertThat(fragments[0].isHidden, equalTo(false))
+        assertThat(fragments[0].hidden, equalTo(false))
         assertThat(fragments[1].content, containsString("As discussed"))
-        assertThat(fragments[1].isHidden, equalTo(true))
+        assertThat(fragments[1].quoted, equalTo(true))
+        assertThat(fragments[1].hidden, equalTo(true))
     }
 
 }

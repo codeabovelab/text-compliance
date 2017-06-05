@@ -19,6 +19,7 @@ public final class EmailToDocument {
     public static final String F_FROM = "from";
     public static final String F_RECIPIENTS = "recipients";
     public static final String F_SENT_DATE = "sentDate";
+    private final EmailParser emailParser = new EmailParser();
 
     public Document apply(InputStream is) throws Exception {
         Session session = null;
@@ -67,6 +68,6 @@ public final class EmailToDocument {
 
     private String getContent(MimeMessage msg) throws Exception {
         //here we must extract text from html
-        return (String) msg.getContent();
+        return emailParser.read((String) msg.getContent()).visibleText();
     }
 }

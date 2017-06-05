@@ -53,18 +53,18 @@ class EmailParser {
 
         if (context.fragment != null && isStringEmpty(line)) {
             if (SIG_REGEX.matcher(context.fragment!!.lines[context.fragment!!.lines.size - 1]).lookingAt()) {
-                context.fragment!!.isSignature(true)
+                context.fragment!!.signature(true)
                 finishFragment(context)
             }
         }
 
-        if (context.fragment != null && (context.fragment!!.isQuoted == isQuoted
-                || context.fragment!!.isQuoted
+        if (context.fragment != null && (context.fragment!!.quoted == isQuoted
+                || context.fragment!!.quoted
                 && (quoteHeader(line) || isStringEmpty(line)))) {
             context.fragment!!.lines.add(line)
         } else {
             finishFragment(context)
-            context.fragment = Fragment.Builder().isQuoted(isQuoted).line(line)
+            context.fragment = Fragment.build { quoted = isQuoted }.line(line)
         }
 
     }
@@ -76,10 +76,10 @@ class EmailParser {
 
     private fun finishFragment(context: Context) {
         if (context.fragment != null && !isStringEmpty(context.fragment!!.text())) {
-            if (context.fragment!!.isQuoted ||
-                    context.fragment!!.isSignature ||
+            if (context.fragment!!.quoted ||
+                    context.fragment!!.signature ||
                     context.fragment!!.lines.isEmpty()) {
-                context.fragment!!.isHidden(true)
+                context.fragment!!.hidden(true)
             }
             val build = context.fragment!!.build()
             context.fragments.add(build)

@@ -16,7 +16,7 @@ class Email(val fragments: List<Fragment> = ArrayList()) {
 
     private fun filter(hidden: Boolean): String {
         return fragments.stream()
-                .filter { f -> hidden == f.isHidden }
+                .filter { f -> hidden == f.hidden }
                 .map { f -> f.content }
                 .collect(Collectors.joining("\n"))
     }
