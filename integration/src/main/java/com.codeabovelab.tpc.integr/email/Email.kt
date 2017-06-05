@@ -20,5 +20,9 @@ class Email(val fragments: List<Fragment> = ArrayList()) {
                 .map { f -> f.content }
                 .collect(Collectors.joining("\n"))
     }
+
+    override fun toString(): String {
+        return "Email(fragments=$fragments)"
+    }
 }
 

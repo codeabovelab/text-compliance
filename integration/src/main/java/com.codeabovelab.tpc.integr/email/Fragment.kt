@@ -28,5 +28,8 @@ class Fragment(val content: String, val hidden: Boolean, val signature: Boolean,
         inline fun build(block: Builder.() -> Unit) = Builder().apply(block)
     }
 
+    override fun toString(): String {
+        return "Fragment(content='$content', hidden=$hidden, signature=$signature, quoted=$quoted)"
+    }
 
 }
