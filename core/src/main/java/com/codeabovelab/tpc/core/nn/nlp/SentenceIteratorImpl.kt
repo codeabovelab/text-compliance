@@ -1,13 +1,11 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
 import org.apache.uima.cas.CAS
-import org.apache.uima.fit.component.JCasCollectionReader_ImplBase
 import org.apache.uima.fit.factory.AnalysisEngineFactory
 import org.apache.uima.fit.util.JCasUtil
-import org.apache.uima.jcas.JCas
-import org.apache.uima.util.Progress
 import org.cleartk.clearnlp.MpAnalyzer
 import org.cleartk.clearnlp.PosTagger
+import org.cleartk.clearnlp.Tokenizer
 import org.cleartk.opennlp.tools.SentenceAnnotator
 import org.cleartk.token.type.Sentence
 import org.cleartk.token.type.Token
@@ -20,11 +18,10 @@ import java.util.Collections
 /**
  * Based on code from UimaSentenceIterator
  */
-class SentenceIteratorImpl(cr: CollectionReaderImpl,
+class SentenceIteratorImpl(private val iter: TextIterator,
                            private val resource: UimaResource):
         BaseSentenceIterator(null), LabelAwareSentenceIterator {
 
-    private val reader: CollectionReaderImpl = cr
     private var sentences: Iterator<SentenceData> = Collections.emptyIterator()
     private var curr: SentenceData? = null
 
@@ -52,14 +49,14 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
 
     private fun nextIter(): Boolean {
         //TODO improve this
-        if (!getReader().hasNext()) {
+        if (!iter.hasNext()) {
             return false
         }
         val cas = resource.retrieve()
         try {
             sentences = getSentences(cas)
             while (!sentences.hasNext()) {
-                if (!reader.hasNext()) {
+                if (!iter.hasNext()) {
                     return false
                 }
                 cas.reset()
@@ -72,7 +69,12 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
     }
 
     private fun getSentences(cas: CAS) : Iterator<SentenceData> {
-        getReader().getNext(cas)
+
+        val jCas = cas.jCas
+        val text = iter.next()
+        // set the document's text
+        jCas.documentText = text.data.toString()
+
         resource.analysisEngine.process(cas)
         val list = ArrayList<SentenceData>()
         JCasUtil.select(cas.jCas, Sentence::class.java).mapTo(list) {
@@ -90,7 +92,7 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
 
     @Synchronized
     override fun hasNext(): Boolean {
-        return getReader().hasNext() || sentences.hasNext()
+        return iter.hasNext() || sentences.hasNext()
     }
 
     fun currentOffset(): Int? {
@@ -101,10 +103,6 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
         return curr!!
     }
 
-    @Synchronized private fun getReader(): CollectionReaderImpl {
-        return reader
-    }
-
     companion object {
         fun uimaResource(
                 pos: Boolean = true,
@@ -113,16 +111,16 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
             // note that MpAnalyzer require POS, therefore we must enable both them
             val args = if(morphological) {
                  arrayOf(SentenceAnnotator.getDescription(),
-                        TokenizerAnnotator.getDescription(),
+                        Tokenizer.getDescription(),
                         PosTagger.getDescription(),
                         MpAnalyzer.getDescription())
             } else if(pos) {
                 arrayOf(SentenceAnnotator.getDescription(),
-                        TokenizerAnnotator.getDescription(),
+                        Tokenizer.getDescription(),
                         PosTagger.getDescription())
             } else {
                 arrayOf(SentenceAnnotator.getDescription(),
-                        TokenizerAnnotator.getDescription())
+                        Tokenizer.getDescription())
             }
             return UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory.createEngineDescription(*args)))
         }
@@ -131,13 +129,12 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
          * @see #uimaResource
          */
         fun create(ur: UimaResource, iter: TextIterator): SentenceIteratorImpl {
-            val cr = CollectionReaderImpl(iter)
-            return SentenceIteratorImpl(cr, ur)
+            return SentenceIteratorImpl(iter, ur)
         }
     }
 
     override fun reset() {
-        getReader().reset()
+        iter.reset()
     }
 
     override fun currentLabel(): String? {
@@ -145,32 +142,6 @@ class SentenceIteratorImpl(cr: CollectionReaderImpl,
     }
 
     override fun currentLabels(): List<String>? {
-        return getReader().getLabels()
-    }
-
-    class CollectionReaderImpl(private val iter: TextIterator): JCasCollectionReader_ImplBase() {
-
-        override fun hasNext(): Boolean {
-            return iter.hasNext()
-        }
-
-        override fun getProgress(): Array<out Progress>? {
-            return arrayOf()
-        }
-
-
-        override fun getNext(jCas: JCas) {
-            val text = iter.next()
-            // set the document's text
-            jCas.documentText = text.data.toString()
-        }
-
-        fun reset() {
-            iter.reset()
-        }
-
-        fun getLabels(): List<String>? {
-            return iter.labels
-        }
+        return iter.labels
     }
 }

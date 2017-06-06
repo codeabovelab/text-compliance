@@ -1,0 +1,71 @@
+package com.codeabovelab.tpc.tool.nlp
+
+import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
+import com.codeabovelab.tpc.core.nn.nlp.Pos
+import com.codeabovelab.tpc.core.nn.nlp.ReaderTextIterator
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
+import org.slf4j.LoggerFactory
+import java.io.*
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
+/**
+ * Do multiple tasks from NLP for prepare text for learn
+ */
+class Nlp(private val inDir: String,
+          private val outDir: String?
+) {
+    // slf4j has inefficient backend, which reduce performance
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
+    private val inDirPath = Paths.get(inDir)
+    private val outDirPath = Paths.get(outDir ?: inDir)
+    private val ur = SentenceIteratorImpl.uimaResource(true, true)
+
+    fun run() {
+        log.info("Start in {}", inDir)
+        Files.walk(inDirPath)
+                .filter { it.toString().endsWith(".txt") }
+                .forEach(this::processPath)
+    }
+
+    private fun processPath(srcPath: Path) {
+        log.info("Begin process {}", srcPath)
+        var dir = srcPath.parent
+        if(inDirPath != outDirPath)
+            dir = outDirPath.resolve(dir.relativize(inDirPath))
+        val srcFile = srcPath.toFile()
+        val destFile = File(dir.toString(), srcFile.nameWithoutExtension + ".nlptext")
+        InputStreamReader(FileInputStream(srcFile), StandardCharsets.UTF_8).use { src ->
+            OutputStreamWriter(FileOutputStream(destFile), StandardCharsets.UTF_8).use { dst ->
+                processStream(src, dst)
+                dst.flush()
+            }
+        }
+    }
+
+    private fun  processStream(reader: Reader, writer: Writer) {
+        val si = SentenceIteratorImpl.create(ur, ReaderTextIterator("", reader))
+        while(si.hasNext()) {
+            si.nextSentence()
+            val sd = si.current()
+            for(w in sd.words) {
+                writer.append(w.str)
+                val hasLemma = w.lemma != null && w.lemma != w.str
+                val hasPos = w.pos != Pos.UNKNOWN
+                if(hasPos) {
+                    writer.append("|p=")
+                    writer.append(w.pos.name)
+                }
+                if(hasLemma) {
+                    writer.append("|l=")
+                    writer.append(w.lemma)
+                }
+                writer.append(" ")
+            }
+            writer.append("\n")
+        }
+    }
+}

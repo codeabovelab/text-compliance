@@ -79,7 +79,7 @@ enum class Pos {
     /**
     Possessive pronoun
      */
-    PRP_S,
+    `PRP$`,
     /**
     Adverb
      */
@@ -143,7 +143,7 @@ enum class Pos {
     /**
     Possessive wh­pronoun
      */
-    WPS_S,
+    `WPS$`,
     /**
     Wh­adverb
      */
@@ -157,9 +157,6 @@ enum class Pos {
             }
             try {
                 var s = str!!.toUpperCase()
-                if (s.last() == '$') {
-                    s = s.substring(0, s.length - 1) + "_S"
-                }
                 return Pos.valueOf(s)
             } catch(e: Exception) {
                 return UNKNOWN

@@ -1,7 +1,7 @@
 package com.codeabovelab.tpc.tool
 
-import com.codeabovelab.tpc.tool.Classify
 import com.codeabovelab.tpc.tool.learn.Learning
+import com.codeabovelab.tpc.tool.nlp.Nlp
 import org.kohsuke.args4j.Argument
 import org.kohsuke.args4j.Option
 import java.util.*
@@ -48,6 +48,16 @@ class Cmd {
                 return Classify(
                         in_data = cmd.in_path!!,
                         in_learned = cmd.learned!!
+                )::run
+            }
+
+        },
+        nlp {
+            override fun create(cmd: Cmd): () -> Unit {
+                Objects.requireNonNull(cmd.in_path, "'i' is required")
+                return Nlp(
+                        inDir = cmd.in_path!!,
+                        outDir = cmd.out_path
                 )::run
             }
 
