@@ -21,7 +21,7 @@ dependencies {
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
-    compile 'org.slf4j:slf4j-jdk14'
+    compile 'ch.qos.logback:logback-classic'
 
     testCompile 'org.jetbrains.kotlin:kotlin-test'
     testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
