@@ -11,13 +11,14 @@ import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.deeplearning4j.text.uima.UimaResource
 import org.nd4j.linalg.ops.transforms.Transforms
+import java.nio.file.Path
 
 import java.util.stream.Collectors
 
 /**
  */
 class TextClassifier(
-        val vectorsFile: String,
+        val vectorsFile: Path,
         val maxLabels: Int,
         val uima: UimaResource,
         val wordSupplier: (wc: WordContext) -> String?
@@ -26,7 +27,7 @@ class TextClassifier(
     val pv: ParagraphVectors
 
     init {
-        pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile)
+        pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile.toFile())
         pv.tokenizerFactory = TokenizerFactoryImpl()
     }
 

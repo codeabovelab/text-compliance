@@ -36,7 +36,7 @@ class Cmd {
                 Objects.requireNonNull(cmd.out_path, "'o' is required")
                 return Learning(
                         srcDir = cmd.in_path!!,
-                        filePath = cmd.out_path!!,
+                        destDir = cmd.out_path!!,
                         config = cmd.config
                 )::run
             }
@@ -47,8 +47,8 @@ class Cmd {
                 Objects.requireNonNull(cmd.learned, "'l' is required")
                 return Classify(
                         in_data = cmd.in_path!!,
-                        in_learned = cmd.learned!!,
-                        config = cmd.config)::run
+                        in_learned = cmd.learned!!
+                )::run
             }
 
         }

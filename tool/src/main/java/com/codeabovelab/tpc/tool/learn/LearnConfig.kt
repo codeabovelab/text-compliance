@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  */
@@ -55,11 +57,11 @@ class LearnConfig {
         return SentenceIteratorImpl.uimaResource(pos = p, morphological = m)
     }
 
-    fun configure(config: String?) {
+    fun configure(config: Path?) {
         if (config == null) {
             return
         }
-        val cf = File(config)
+        val cf = config.toFile()
         if (cf.exists()) {
             log.info("Read config from $config")
             FileInputStream(cf).use {
@@ -118,5 +120,20 @@ class LearnConfig {
          */
         LEMMA_POS
     }
+
+    companion object {
+        fun learnedDir(dir: String): Files {
+            val root = Paths.get(dir)
+            return Files(
+                    config = root.resolve(Config.FILE),
+                    doc2vec = root.resolve("doc2vec.zip")
+            )
+        }
+    }
+
+    data class Files(
+            val config: Path,
+            val doc2vec: Path
+    )
 }
 

@@ -10,6 +10,8 @@ import java.io.OutputStream
  */
 object Config {
 
+    const val FILE = "config.yaml"
+
     val om = ObjectMapper(YAMLFactory())
     val woNulls = ObjectMapper(YAMLFactory())
             .setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))!!

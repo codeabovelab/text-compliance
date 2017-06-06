@@ -13,16 +13,15 @@ import java.nio.file.Paths
  */
 class Classify(
         private val in_data: String,
-        private val in_learned: String,
-        private val config: String?
+        private val in_learned: String
 ) {
     fun run() {
         val texts = Files.readAllLines(Paths.get(in_data), StandardCharsets.UTF_8)
-
+        val ld = LearnConfig.learnedDir(in_learned)
         val lc = LearnConfig()
-        lc.configure(config)
+        lc.configure(ld.config)
         val tc = TextClassifier(
-                vectorsFile = in_learned,
+                vectorsFile = ld.doc2vec,
                 maxLabels = 3,
                 uima = lc.createUimaResource(),
                 wordSupplier = lc.wordSupplier()

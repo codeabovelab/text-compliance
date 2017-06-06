@@ -10,6 +10,7 @@ import org.junit.Ignore
 import org.slf4j.LoggerFactory
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
 
 /**
  */
@@ -25,7 +26,7 @@ class TextClassifierTest {
 
 
         val tc = TextClassifier(
-                vectorsFile = filePath,
+                vectorsFile = Paths.get(filePath),
                 maxLabels = 3,
                 uima = SentenceIteratorImpl.uimaResource(pos = false, morphological = false),
                 wordSupplier = {it.word.str}
