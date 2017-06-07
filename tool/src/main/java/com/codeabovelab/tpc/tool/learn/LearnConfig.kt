@@ -1,6 +1,5 @@
 package com.codeabovelab.tpc.tool.learn
 
-import com.codeabovelab.tpc.core.nn.nlp.DirSeqIterator
 import com.codeabovelab.tpc.core.nn.nlp.Pos
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.nn.nlp.WordContext
@@ -8,7 +7,6 @@ import com.codeabovelab.tpc.tool.util.Config
 import org.deeplearning4j.models.embeddings.loader.VectorsConfiguration
 import org.deeplearning4j.text.uima.UimaResource
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Path

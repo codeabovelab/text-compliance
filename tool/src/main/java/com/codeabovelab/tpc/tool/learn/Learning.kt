@@ -1,15 +1,15 @@
 package com.codeabovelab.tpc.tool.learn
 
 import com.codeabovelab.tpc.core.nn.TokenizerFactoryImpl
-import com.codeabovelab.tpc.core.nn.nlp.DirSeqIterator
-import com.codeabovelab.tpc.tool.util.Config
+import com.codeabovelab.tpc.core.nn.nlp.*
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache
 import org.slf4j.LoggerFactory
-import java.io.File
+import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
@@ -45,9 +45,12 @@ class Learning(
     }
 
     private fun learn(lc: LearnConfig): ParagraphVectors {
-        val ur = lc.createUimaResource()
         val ws = lc.wordSupplier()
-        val iter = DirSeqIterator(ur, srcDir, ws)
+        val iter = DirSeqIterator(
+                dir = srcDir,
+                wordSupplier = ws,
+                fileSupport = fileSupport(lc)
+        )
         val cache = AbstractCache<VocabWord>()
         val t = TokenizerFactoryImpl()
         val pv = ParagraphVectors.Builder(lc.doc2vec)
@@ -58,6 +61,22 @@ class Learning(
         pv.setSequenceIterator(iter)
         pv.fit()
         return pv
+    }
+
+    private fun fileSupport(lc: LearnConfig): Map<String, (Path) -> SentenceIterator?> {
+        val ur = lc.createUimaResource()
+        return mapOf(
+            Pair("txt", { path ->
+                try {
+                    SentenceIteratorImpl.create(ur, FileTextIterator(path))
+                } catch (e: IOException) {
+                    throw RuntimeException("On read " + path,  e)
+                }
+            }),
+            Pair(NlpParser.EXT, { path ->
+                NlpTextSentenceIter.create(path)
+            })
+        )
     }
 
 }

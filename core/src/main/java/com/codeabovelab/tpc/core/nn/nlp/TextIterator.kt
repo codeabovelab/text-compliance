@@ -10,8 +10,6 @@ interface TextIterator : Iterator<Text> {
     val labels: List<String>?
     val index: Int
 
-    fun reset()
-
     companion object {
         fun singleton(src: Text): TextIterator {
             return object : TextIterator {
@@ -24,10 +22,6 @@ interface TextIterator : Iterator<Text> {
                     get() = null
                 override val index: Int
                     get() = _index
-
-                override fun reset() {
-                    _index = 0
-                }
 
                 override fun hasNext() = _index < count
 

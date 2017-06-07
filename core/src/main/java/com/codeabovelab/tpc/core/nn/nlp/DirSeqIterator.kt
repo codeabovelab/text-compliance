@@ -17,14 +17,20 @@ import java.util.concurrent.atomic.AtomicInteger
  * Simple iterator for NN teaching on directory of sample data.
  */
 class DirSeqIterator(
-        private val ur: UimaResource,
         private val dir: String,
-        private val wordSupplier: (wc: WordContext) -> String?
+        private val wordSupplier: (wc: WordContext) -> String?,
+        private val fileSupport: Map<String, (Path) -> SentenceIterator?>
 ): SequenceIterator<VocabWord> {
+
+    companion object {
+        private val TXT = "txt"
+    }
+
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: SentenceIterator? = null
     private val seqCounter = AtomicInteger(0)
+    private val supportedExts: Set<String> = Collections.unmodifiableSet(fileSupport.keys.mapTo(HashSet()) { ".$it" })
 
     init {
         reset()
@@ -85,11 +91,12 @@ class DirSeqIterator(
             return null
         }
         val path = fileIter.next()
-        try {
-            return SentenceIteratorImpl.create(ur, FileTextIterator(path))
-        } catch (e: IOException) {
-            throw RuntimeException("On read " + path,  e)
+        val ext = path.toFile().extension
+        val iterSupplier = fileSupport[ext]
+        if(iterSupplier == null) {
+            throw IllegalArgumentException("Unsupported file type $path")
         }
+        return iterSupplier(path)
     }
 
     override fun hasMoreSequences(): Boolean {
@@ -100,10 +107,7 @@ class DirSeqIterator(
         log.warn("Call reset on $dir")
         try {
             val stream = Files.walk(Paths.get(dir))
-              .filter{
-                  val pathStr = it.toString()
-                  pathStr.endsWith(NlpParser.EXT) || pathStr.endsWith(".txt")
-              }.sorted()
+              .filter {supportedExts.contains(it.toString().substringAfterLast('.'))}.sorted()
             this.fileIter = stream.iterator()
         } catch (e: IOException) {
             log.error("On {}", dir, e)

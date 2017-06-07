@@ -21,11 +21,6 @@ class ReaderTextIterator(
     override val index: Int
         get() = _index
 
-    override fun reset() {
-        //TODO we must refactor ifaces
-        throw UnsupportedOperationException("This iterator does not support reset")
-    }
-
     override fun hasNext(): Boolean {
         return reader.hasNext()
     }

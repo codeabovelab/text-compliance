@@ -33,7 +33,7 @@ class Nlp(private val inDir: String,
         if(inDirPath != outDirPath)
             dir = outDirPath.resolve(dir.relativize(inDirPath))
         val srcFile = srcPath.toFile()
-        val destFile = File(dir.toString(), srcFile.nameWithoutExtension + NlpParser.EXT)
+        val destFile = File(dir.toString(), srcFile.nameWithoutExtension + "." + NlpParser.EXT)
         InputStreamReader(FileInputStream(srcFile), StandardCharsets.UTF_8).use { src ->
             OutputStreamWriter(FileOutputStream(destFile), StandardCharsets.UTF_8).use { dst ->
                 processStream(src, dst)

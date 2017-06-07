@@ -11,21 +11,28 @@ import java.util.regex.Pattern
  */
 class FileTextIterator(private val filePath: Path) : TextIterator {
 
-    private val pattern = Pattern.compile("\\[(\\w+)(?:,?(\\w+))*\\]")
+    companion object {
+
+        private val pattern = Pattern.compile("\\[(\\w+)(?:,?(\\w+))*\\]")
+
+        fun extractLabels(filePath: Path): List<String> {
+            val m = pattern.matcher(filePath.fileName.toString())
+            if (m.find()) {
+                return (1 until m.groupCount()).map { "#" + m.group(it) }
+            } else {
+                return Collections.emptyList()
+            }
+        }
+    }
     private var reader: Iterator<String> = Collections.emptyIterator()
     private var id: String = filePath.toAbsolutePath().toString()
     private var _index: Int = 0
     private val _labels: List<String>
 
     init {
-        val m = pattern.matcher(filePath.fileName.toString())
-        if (m.find()) {
-            _labels = (1 until m.groupCount()).map { "#" + m.group(it) }
-        } else {
-            _labels = Collections.emptyList()
-        }
+        _labels = extractLabels(filePath)
         println("Load $id with labels: $_labels")
-        reset()
+        this.reader = Files.lines(filePath).iterator()
     }
 
     override val count: Int
@@ -34,10 +41,6 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
         get() = _labels
     override val index: Int
         get() = _index
-
-    override fun reset() {
-        this.reader = Files.lines(filePath).iterator()
-    }
 
     override fun hasNext(): Boolean {
         try {

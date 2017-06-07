@@ -109,10 +109,6 @@ class SentenceIteratorImpl(
         }
     }
 
-    override fun reset() {
-        iter.reset()
-    }
-
     override fun currentLabels(): List<String>? {
         return iter.labels
     }
