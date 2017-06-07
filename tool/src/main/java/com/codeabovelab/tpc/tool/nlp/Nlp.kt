@@ -53,22 +53,21 @@ class Nlp(private val inDir: String,
             if(sd.isNullOrEmpty()) {
                 continue
             }
-            for(w in sd!!.words) {
-                val str = w.str
+            for((str, _, _, lemma, pos) in sd!!.words) {
                 if(str.isBlank()) {
                     // it produce token for space and some other unprinted symbols
                     continue
                 }
                 writer.append(escape(str))
-                val hasLemma = w.lemma != null && str.equals(w.lemma, true)
-                val hasPos = w.pos != Pos.UNKNOWN
+                val hasLemma = lemma != null && str.equals(lemma, true)
+                val hasPos = pos != Pos.UNKNOWN
                 if(hasPos) {
                     writer.append("|p=")
-                    writer.append(w.pos.name)
+                    writer.append(pos.name)
                 }
                 if(hasLemma) {
                     writer.append("|l=")
-                    writer.append(escape(w.lemma!!))
+                    writer.append(escape(lemma!!))
                 }
                 writer.append(" ")
             }

@@ -156,7 +156,7 @@ enum class Pos {
                 return UNKNOWN
             }
             try {
-                var s = str!!.toUpperCase()
+                val s = str!!.toUpperCase()
                 return Pos.valueOf(s)
             } catch(e: Exception) {
                 return UNKNOWN

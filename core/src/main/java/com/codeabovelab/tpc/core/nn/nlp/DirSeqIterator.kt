@@ -4,12 +4,11 @@ import org.deeplearning4j.models.sequencevectors.interfaces.SequenceIterator
 import org.deeplearning4j.models.sequencevectors.sequence.Sequence
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.slf4j.LoggerFactory
-import java.io.*
-
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.Collections
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -70,12 +69,9 @@ class DirSeqIterator(
             sequence.addElement(word)
         }
         val labels = sentenceIter?.currentLabels() ?: Collections.emptyList()
-        for (label in labels) {
-            if (label.isEmpty()) {
-                continue
-            }
-            sequence.addSequenceLabel(VocabWord(1.0, label))
-        }
+        labels
+                .filterNot { it.isEmpty() }
+                .forEach { sequence.addSequenceLabel(VocabWord(1.0, it)) }
         sequence.sequenceId = seqCounter.getAndIncrement()
         return sequence
     }
@@ -87,10 +83,7 @@ class DirSeqIterator(
         val path = fileIter.next()
         log.info("Process {}", path)
         val ext = path.toFile().extension
-        val iterSupplier = fileSupport[ext]
-        if(iterSupplier == null) {
-            throw IllegalArgumentException("Unsupported file type $path")
-        }
+        val iterSupplier = fileSupport[ext] ?: throw IllegalArgumentException("Unsupported file type $path")
         return iterSupplier(path)
     }
 
