@@ -15,8 +15,8 @@ class EmailParser {
 
     private val SIG_REGEX = Pattern.compile("(\u2014|--|__|-\\w)|(^Sent from my (\\w+\\s*){1,3})")
     private val QUOTE_HDR_REGEX = Pattern.compile("^:etorw.*nO")
-    private val MULTI_QUOTE_HDR_REGEX = Pattern.compile("(?!On.*On\\s.+?wrote:)(On\\s(.+?)wrote:)", Pattern.MULTILINE or Pattern.DOTALL)
     private val QUOTED_REGEX = Pattern.compile("(>+)")
+    private val MULTI_QUOTE_HDR_REGEX = Pattern.compile("(?!On.*On\\s.+?wrote:)(On\\s(.+?)wrote:)", Pattern.MULTILINE or Pattern.DOTALL)
 
     fun read(content: String): Email {
         val context = Context(text = CRLF.replaceFrom(content, "\n"))
@@ -45,22 +45,20 @@ class EmailParser {
 
     private fun scanLine(line: String, context: Context) {
         var content = NEW_LINE.trimFrom(line)
+        val fragment = context.fragment
         if (SIG_REGEX.matcher(content).lookingAt()) {
             content = NEW_LINE.trimLeadingFrom(content)
         }
         val isQuoted = QUOTED_REGEX.matcher(content).lookingAt()
 
-        if (context.fragment != null && isStringEmpty(content)) {
-            if (SIG_REGEX.matcher(context.fragment!!.lines[context.fragment!!.lines.size - 1]).lookingAt()) {
-                context.fragment!!.signature(true)
-                finishFragment(context)
-            }
+        if (fragment != null && isStringEmpty(content) &&
+                SIG_REGEX.matcher(fragment.lines[fragment.lines.size - 1]).lookingAt()) {
+            fragment.signature(true)
+            finishFragment(context)
         }
-
-        if (context.fragment != null && (context.fragment!!.quoted == isQuoted
-                || context.fragment!!.quoted
-                && (quoteHeader(content) || isStringEmpty(content)))) {
-            context.fragment!!.lines.add(content)
+        if (fragment != null &&
+                (fragment.quoted == isQuoted || fragment.quoted && (quoteHeader(content) || isStringEmpty(content)))) {
+            fragment.lines.add(content)
         } else {
             finishFragment(context)
             context.fragment = Fragment.build { quoted = isQuoted }.line(content)
@@ -75,13 +73,11 @@ class EmailParser {
 
     private fun finishFragment(context: Context) {
         if (context.fragment != null && !isStringEmpty(context.fragment!!.text())) {
-            if (context.fragment!!.quoted ||
-                    context.fragment!!.signature ||
-                    context.fragment!!.lines.isEmpty()) {
-                context.fragment!!.hidden(true)
+            val fragment = context.fragment!!
+            if (fragment.quoted || fragment.signature || fragment.lines.isEmpty()) {
+                fragment.hidden(true)
             }
-            val build = context.fragment!!.build()
-            context.fragments.add(build)
+            context.fragments.add(fragment.build())
         }
 
         context.fragment = null
