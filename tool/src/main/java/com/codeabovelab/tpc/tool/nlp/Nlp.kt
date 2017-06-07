@@ -1,6 +1,7 @@
 package com.codeabovelab.tpc.tool.nlp
 
 import com.codeabovelab.tpc.core.nn.nlp.*
+import com.google.common.escape.CharEscaperBuilder
 import org.slf4j.LoggerFactory
 import java.io.*
 import java.nio.charset.StandardCharsets
@@ -19,6 +20,9 @@ class Nlp(private val inDir: String,
     private val inDirPath = Paths.get(inDir)
     private val outDirPath = Paths.get(outDir ?: inDir)
     private val ur = SentenceIteratorImpl.uimaResource(true, true)
+    private val escaper = CharEscaperBuilder()
+            .addEscapes("|=".toCharArray(), "_")
+            .toEscaper()
 
     fun run() {
         log.info("Start in {}", inDir)
@@ -55,7 +59,7 @@ class Nlp(private val inDir: String,
                     // it produce token for space and some other unprinted symbols
                     continue
                 }
-                writer.append(str)
+                writer.append(escape(str))
                 val hasLemma = w.lemma != null && str.equals(w.lemma, true)
                 val hasPos = w.pos != Pos.UNKNOWN
                 if(hasPos) {
@@ -64,11 +68,15 @@ class Nlp(private val inDir: String,
                 }
                 if(hasLemma) {
                     writer.append("|l=")
-                    writer.append(w.lemma)
+                    writer.append(escape(w.lemma!!))
                 }
                 writer.append(" ")
             }
             writer.append("\n")
         }
+    }
+
+    private fun escape(str: String): String {
+        return escaper.escape(str)
     }
 }
