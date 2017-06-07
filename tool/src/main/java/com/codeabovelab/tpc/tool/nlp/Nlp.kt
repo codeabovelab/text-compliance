@@ -50,8 +50,13 @@ class Nlp(private val inDir: String,
                 continue
             }
             for(w in sd!!.words) {
-                writer.append(w.str)
-                val hasLemma = w.lemma != null && w.str.equals(w.lemma, true)
+                val str = w.str
+                if(str.isBlank()) {
+                    // it produce token for space and some other unprinted symbols
+                    continue
+                }
+                writer.append(str)
+                val hasLemma = w.lemma != null && str.equals(w.lemma, true)
                 val hasPos = w.pos != Pos.UNKNOWN
                 if(hasPos) {
                     writer.append("|p=")
