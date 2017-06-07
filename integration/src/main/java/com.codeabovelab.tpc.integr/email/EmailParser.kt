@@ -44,14 +44,13 @@ class EmailParser {
     }
 
     private fun scanLine(line: String, context: Context) {
-        var line = line
-        line = NEW_LINE.trimFrom(line)
-        if (SIG_REGEX.matcher(line).lookingAt()) {
-            line = NEW_LINE.trimLeadingFrom(line)
+        var content = NEW_LINE.trimFrom(line)
+        if (SIG_REGEX.matcher(content).lookingAt()) {
+            content = NEW_LINE.trimLeadingFrom(content)
         }
-        val isQuoted = QUOTED_REGEX.matcher(line).lookingAt()
+        val isQuoted = QUOTED_REGEX.matcher(content).lookingAt()
 
-        if (context.fragment != null && isStringEmpty(line)) {
+        if (context.fragment != null && isStringEmpty(content)) {
             if (SIG_REGEX.matcher(context.fragment!!.lines[context.fragment!!.lines.size - 1]).lookingAt()) {
                 context.fragment!!.signature(true)
                 finishFragment(context)
@@ -60,11 +59,11 @@ class EmailParser {
 
         if (context.fragment != null && (context.fragment!!.quoted == isQuoted
                 || context.fragment!!.quoted
-                && (quoteHeader(line) || isStringEmpty(line)))) {
-            context.fragment!!.lines.add(line)
+                && (quoteHeader(content) || isStringEmpty(content)))) {
+            context.fragment!!.lines.add(content)
         } else {
             finishFragment(context)
-            context.fragment = Fragment.build { quoted = isQuoted }.line(line)
+            context.fragment = Fragment.build { quoted = isQuoted }.line(content)
         }
 
     }
