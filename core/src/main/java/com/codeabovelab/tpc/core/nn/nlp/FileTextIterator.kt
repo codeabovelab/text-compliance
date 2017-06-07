@@ -31,7 +31,6 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
 
     init {
         _labels = extractLabels(filePath)
-        println("Load $id with labels: $_labels")
         this.reader = Files.lines(filePath).iterator()
     }
 

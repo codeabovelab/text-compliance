@@ -28,6 +28,9 @@ object NlpParser {
         while(wi.hasNext()) {
             val kv = wi.next()
             val eqpos = kv.indexOf('=')
+            if(eqpos <= 0) {
+                continue
+            }
             val k = kv.substring(0, eqpos)
             val v = kv.substring(eqpos + 1)
             when(k) {

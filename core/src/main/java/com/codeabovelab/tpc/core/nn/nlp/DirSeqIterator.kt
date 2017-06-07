@@ -3,7 +3,6 @@ package com.codeabovelab.tpc.core.nn.nlp
 import org.deeplearning4j.models.sequencevectors.interfaces.SequenceIterator
 import org.deeplearning4j.models.sequencevectors.sequence.Sequence
 import org.deeplearning4j.models.word2vec.VocabWord
-import org.deeplearning4j.text.uima.UimaResource
 import org.slf4j.LoggerFactory
 import java.io.*
 
@@ -26,7 +25,6 @@ class DirSeqIterator(
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: SentenceIterator? = null
     private val seqCounter = AtomicInteger(0)
-    private val supportedExts: Set<String> = Collections.unmodifiableSet(fileSupport.keys.mapTo(HashSet()) { ".$it" })
 
     init {
         reset()
@@ -87,6 +85,7 @@ class DirSeqIterator(
             return null
         }
         val path = fileIter.next()
+        log.info("Process {}", path)
         val ext = path.toFile().extension
         val iterSupplier = fileSupport[ext]
         if(iterSupplier == null) {
@@ -103,7 +102,7 @@ class DirSeqIterator(
         log.warn("Call reset on $dir")
         try {
             val stream = Files.walk(Paths.get(dir))
-              .filter {supportedExts.contains(it.toString().substringAfterLast('.'))}.sorted()
+              .filter {fileSupport.containsKey(it.toString().substringAfterLast('.'))}.sorted()
             this.fileIter = stream.iterator()
         } catch (e: IOException) {
             log.error("On {}", dir, e)
