@@ -22,10 +22,6 @@ class DirSeqIterator(
         private val fileSupport: Map<String, (Path) -> SentenceIterator?>
 ): SequenceIterator<VocabWord> {
 
-    companion object {
-        private val TXT = "txt"
-    }
-
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: SentenceIterator? = null
