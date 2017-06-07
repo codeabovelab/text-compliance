@@ -23,7 +23,7 @@ class DirSeqIterator(
 ): SequenceIterator<VocabWord> {
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
-    private var sentenceIter: SentenceIteratorImpl? = null
+    private var sentenceIter: SentenceIterator? = null
     private val seqCounter = AtomicInteger(0)
 
     init {
@@ -31,7 +31,7 @@ class DirSeqIterator(
     }
 
     override fun nextSequence(): Sequence<VocabWord> {
-        var sentence: String? = null
+        var sentence: SentenceData? = null
         while(true) {
             if(sentenceIter == null || !sentenceIter?.hasNext()!!) {
                 if(fileIter.hasNext()) {
@@ -41,24 +41,24 @@ class DirSeqIterator(
                 }
             }
             if(sentenceIter != null && sentenceIter?.hasNext()!!) {
-                sentence = sentenceIter?.nextSentence()
-                if(sentence != null) {
+                sentence = sentenceIter?.next()
+                if(!sentence.isNullOrEmpty()) {
                     break
                 }
             }
         }
         //println(sentence)
-        if(sentence == null) {
+        if(sentence.isNullOrEmpty()) {
             return Sequence()
         }
-        return toSeq()
+        return toSeq(sentence!!)
     }
 
-    private fun toSeq(): Sequence<VocabWord> {
+    private fun toSeq(sentence: SentenceData): Sequence<VocabWord> {
         val sequence = Sequence<VocabWord>()
 
         val wch = WordContext.create()
-        wch.sentence = sentenceIter?.current()
+        wch.sentence = sentence
 
         for (token in wch.sentence!!.words) {
             wch.word = token
@@ -80,7 +80,7 @@ class DirSeqIterator(
         return sequence
     }
 
-    private fun nextSentenceIter(): SentenceIteratorImpl? {
+    private fun nextSentenceIter(): SentenceIterator? {
         if(!fileIter.hasNext()) {
             return null
         }
@@ -100,7 +100,10 @@ class DirSeqIterator(
         log.warn("Call reset on $dir")
         try {
             val stream = Files.walk(Paths.get(dir))
-              .filter{ it.toString().endsWith(".txt") }.sorted()
+              .filter{
+                  val pathStr = it.toString()
+                  pathStr.endsWith(NlpParser.EXT) || pathStr.endsWith(".txt")
+              }.sorted()
             this.fileIter = stream.iterator()
         } catch (e: IOException) {
             log.error("On {}", dir, e)

@@ -35,11 +35,11 @@ class TextClassifier(
         val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(text))
         val entries = ArrayList<TextClassifierResult.Entry>()
         while(si.hasNext()) {
-            val sentence = si.nextSentence()
+            val sentence = si.next()
             if(sentence.isNullOrEmpty()) {
                 continue
             }
-            val seq = si.current()
+            val seq = sentence!!
             //val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
             //println(vws.map { it.word })
             val vws = toWordList(seq)
@@ -53,7 +53,7 @@ class TextClassifier(
                 TextClassifierResult.Label(it, similarity)
             }.collect(Collectors.toList())
             val resEntry = TextClassifierResult.Entry(
-                    coordinates = text.getCoordinates(si.currentOffset()!!, sentence!!.length),
+                    coordinates = text.getCoordinates(seq.offset, seq.str.length),
                     labels = labelsWithSim)
             entries.add(resEntry)
         }

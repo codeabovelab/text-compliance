@@ -9,42 +9,27 @@ import org.cleartk.clearnlp.Tokenizer
 import org.cleartk.opennlp.tools.SentenceAnnotator
 import org.cleartk.token.type.Sentence
 import org.cleartk.token.type.Token
-import org.deeplearning4j.text.annotator.TokenizerAnnotator
-import org.deeplearning4j.text.sentenceiterator.BaseSentenceIterator
-import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator
 import org.deeplearning4j.text.uima.UimaResource
 import java.util.Collections
 
 /**
  * Based on code from UimaSentenceIterator
  */
-class SentenceIteratorImpl(private val iter: TextIterator,
-                           private val resource: UimaResource):
-        BaseSentenceIterator(null), LabelAwareSentenceIterator {
+class SentenceIteratorImpl(
+        private val iter: TextIterator,
+        private val resource: UimaResource
+): SentenceIterator {
 
     private var sentences: Iterator<SentenceData> = Collections.emptyIterator()
-    private var curr: SentenceData? = null
 
 
-    @Synchronized override fun nextSentence(): String? {
+    override fun next(): SentenceData? {
         if (!sentences.hasNext()) {
             if(!nextIter()) {
                 return null
             }
         }
-        return doNext()
-    }
-
-
-    private fun doNext(): String  {
-        val sd = sentences.next()
-        this.curr = sd
-        var ret = sd.str
-        val pp = this.getPreProcessor()
-        if (pp != null) {
-            ret = pp.preProcess(ret)
-        }
-        return ret
+        return sentences.next()
     }
 
     private fun nextIter(): Boolean {
@@ -90,17 +75,8 @@ class SentenceIteratorImpl(private val iter: TextIterator,
         return list.iterator()
     }
 
-    @Synchronized
     override fun hasNext(): Boolean {
         return iter.hasNext() || sentences.hasNext()
-    }
-
-    fun currentOffset(): Int? {
-        return curr?.offset
-    }
-
-    fun current(): SentenceData {
-        return curr!!
     }
 
     companion object {
@@ -128,17 +104,13 @@ class SentenceIteratorImpl(private val iter: TextIterator,
         /**
          * @see #uimaResource
          */
-        fun create(ur: UimaResource, iter: TextIterator): SentenceIteratorImpl {
+        fun create(ur: UimaResource, iter: TextIterator): SentenceIterator {
             return SentenceIteratorImpl(iter, ur)
         }
     }
 
     override fun reset() {
         iter.reset()
-    }
-
-    override fun currentLabel(): String? {
-        return null
     }
 
     override fun currentLabels(): List<String>? {
