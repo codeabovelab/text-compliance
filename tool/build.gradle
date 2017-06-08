@@ -32,4 +32,4 @@ distributions {
 }
 
 // otherwise system invoke dist on each rebuild, it consume time
-startScripts.dependsOn.remove(jar)
+assemble.dependsOn.clear()
