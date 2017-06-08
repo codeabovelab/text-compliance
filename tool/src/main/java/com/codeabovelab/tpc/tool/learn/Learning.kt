@@ -12,6 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.stream.Stream
 
 /**
  */
@@ -63,19 +64,41 @@ class Learning(
         return pv
     }
 
-    private fun fileSupport(lc: LearnConfig): Map<String, (Path) -> SentenceIterator?> {
+    private fun fileSupport(lc: LearnConfig): DirSeqIterator.FileSupport {
         val ur = lc.createUimaResource()
-        return mapOf(
-            Pair("txt", { path ->
-                try {
-                    SentenceIteratorImpl.create(ur, FileTextIterator(path))
-                } catch (e: IOException) {
-                    throw RuntimeException("On read " + path,  e)
+        val map = mapOf<String, (Path) -> SentenceIterator?>(
+                Pair("txt", { path ->
+                    try {
+                        SentenceIteratorImpl.create(ur, FileTextIterator(path))
+                    } catch (e: IOException) {
+                        throw RuntimeException("On read " + path,  e)
+                    }
+                }),
+                Pair(NlpParser.EXT, { path ->
+                    NlpTextSentenceIter.create(path)
+                })
+        )
+        val fi = { stream: Stream<Path> ->
+            val files = stream.reduce(HashMap<String, Path>(), { map, path ->
+                val pathStr = path.toString()
+                val ext = pathStr.substringAfterLast('.')
+                val str = pathStr.substringBeforeLast('.')
+                if (ext == NlpParser.EXT) {
+                    // we must prefer NlpParser.EXT to other
+                    map.put(str, path)
+                } else {
+                    map.putIfAbsent(str, path)
                 }
-            }),
-            Pair(NlpParser.EXT, { path ->
-                NlpTextSentenceIter.create(path)
-            })
+                map
+            }, { left, _ ->
+                //we suppose that 'left' same as '_'
+                left
+            }).values
+            files.stream().sorted().iterator()
+        }
+        return DirSeqIterator.FileSupport(
+                map = map,
+                filesIterator = fi
         )
     }
 

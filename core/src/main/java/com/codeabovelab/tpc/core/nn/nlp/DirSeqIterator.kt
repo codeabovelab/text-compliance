@@ -10,6 +10,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.stream.Stream
 
 /**
  * Simple iterator for NN teaching on directory of sample data.
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class DirSeqIterator(
         private val dir: String,
         private val wordSupplier: (wc: WordContext) -> String?,
-        private val fileSupport: Map<String, (Path) -> SentenceIterator?>
+        private val fileSupport: FileSupport
 ): SequenceIterator<VocabWord> {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -83,7 +84,7 @@ class DirSeqIterator(
         val path = fileIter.next()
         log.info("Process {}", path)
         val ext = path.toFile().extension
-        val iterSupplier = fileSupport[ext] ?: throw IllegalArgumentException("Unsupported file type $path")
+        val iterSupplier = fileSupport.map[ext] ?: throw IllegalArgumentException("Unsupported file type $path")
         return iterSupplier(path)
     }
 
@@ -95,11 +96,15 @@ class DirSeqIterator(
         log.warn("Call reset on $dir")
         try {
             val stream = Files.walk(Paths.get(dir))
-              .filter {fileSupport.containsKey(it.toString().substringAfterLast('.'))}.sorted()
-            this.fileIter = stream.iterator()
+              .filter {fileSupport.map.containsKey(it.toString().substringAfterLast('.'))}
+            this.fileIter = fileSupport.filesIterator(stream)
         } catch (e: IOException) {
-            log.error("On {}", dir, e)
+            throw IOException("On $dir", e)
         }
     }
 
+    data class FileSupport(
+        val map: Map<String, (Path) -> SentenceIterator?>,
+        val filesIterator: (Stream<Path>) -> Iterator<Path> = {it.iterator()}
+    )
 }
