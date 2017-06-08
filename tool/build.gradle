@@ -30,3 +30,6 @@ distributions {
         baseName = 'text-compliance'
     }
 }
+
+// otherwise system invoke dist on each rebuild, it consume time
+startScripts.dependsOn.remove(jar)
