@@ -5,6 +5,8 @@ import com.codeabovelab.tpc.tool.nlp.Nlp
 import org.kohsuke.args4j.Argument
 import org.kohsuke.args4j.Option
 import java.util.*
+import kotlin.reflect.KProperty
+import kotlin.reflect.jvm.javaField
 
 /**
  */
@@ -32,8 +34,7 @@ class Cmd {
     enum class Command {
         learn {
             override fun create(cmd: Cmd): () -> Unit {
-                Objects.requireNonNull(cmd.in_path, "'i' is required")
-                Objects.requireNonNull(cmd.out_path, "'o' is required")
+                require(cmd::in_path, cmd::out_path)
                 return Learning(
                         srcDir = cmd.in_path!!,
                         destDir = cmd.out_path!!,
@@ -43,8 +44,7 @@ class Cmd {
         },
         classify {
             override fun create(cmd: Cmd): () -> Unit {
-                Objects.requireNonNull(cmd.in_path, "'i' is required")
-                Objects.requireNonNull(cmd.learned, "'l' is required")
+                require(cmd::in_path, cmd::learned)
                 return Classify(
                         in_data = cmd.in_path!!,
                         in_learned = cmd.learned!!
@@ -52,9 +52,19 @@ class Cmd {
             }
 
         },
+        process {
+            override fun create(cmd: Cmd): () -> Unit {
+                require(cmd::in_path, cmd::out_path, cmd::learned)
+                return Process(
+                        inData = cmd.in_path!!,
+                        outData = cmd.out_path!!,
+                        learned = cmd.learned!!
+                )::run
+            }
+        },
         nlp {
             override fun create(cmd: Cmd): () -> Unit {
-                Objects.requireNonNull(cmd.in_path, "'i' is required")
+                require(cmd::in_path)
                 return Nlp(
                         inDir = cmd.in_path!!,
                         outDir = cmd.out_path
@@ -63,6 +73,17 @@ class Cmd {
 
         }
         ;
+
         abstract fun create(cmd: Cmd): () -> Unit
+    }
+
+    companion object {
+        fun require(vararg props: KProperty<*>) {
+            props.forEach { prop ->
+                val value = prop.getter.call()
+                val ann = prop.javaField!!.getAnnotation(Option::class.java)
+                Objects.requireNonNull(value, "'${ann!!.name}' is required")
+            }
+        }
     }
 }

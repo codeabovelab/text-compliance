@@ -1,7 +1,6 @@
 package com.codeabovelab.tpc.core.processor
 
 import com.codeabovelab.tpc.doc.Document
-import com.codeabovelab.tpc.text.TextConsumer
 
 import java.util.ArrayList
 import java.util.Collections

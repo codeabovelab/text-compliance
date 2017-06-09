@@ -43,6 +43,9 @@ class TextClassifier(
             //val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
             //println(vws.map { it.word })
             val vws = toWordList(seq)
+            if(vws.isEmpty()) {
+                continue
+            }
             val indArray = pv.inferVector(vws)
             //println(indArray)
 

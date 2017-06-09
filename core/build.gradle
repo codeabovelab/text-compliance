@@ -10,6 +10,7 @@ dependencies {
     compile project(':integration')
 
     compile 'com.google.guava:guava'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.8'
     compile 'org.projectlombok:lombok'
 
     compile "org.nd4j:nd4j-native-platform:${nd4j}"

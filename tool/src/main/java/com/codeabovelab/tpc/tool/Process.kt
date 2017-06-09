@@ -4,13 +4,15 @@ import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.processor.Processor
 import com.codeabovelab.tpc.core.processor.Rule
 import com.codeabovelab.tpc.doc.Document
-import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.doc.TextDocumentReader
 import com.codeabovelab.tpc.integr.email.EmailDocumentReader
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.util.PathUtils
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import org.slf4j.LoggerFactory
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -19,6 +21,7 @@ import java.nio.file.Paths
  */
 class Process(
         private val inData: String,
+        private val outData: String,
         private val learned: String
 ) {
 
@@ -29,9 +32,12 @@ class Process(
             Pair("txt", TextDocumentReader()),
             Pair("eml", EmailDocumentReader())
     )
-
+    private val om = ObjectMapper(YAMLFactory()).enable(SerializationFeature.INDENT_OUTPUT)
+    private val outPath = Paths.get(outData)
+    private val inPath = Paths.get(inData)
     init {
         learnedConfig.configure(learnedDir.config)
+        Files.createDirectories(outPath)
     }
 
     fun run() {
@@ -39,12 +45,11 @@ class Process(
         val proc = Processor()
         configureProcessor(learnedDir, learnedConfig, proc)
 
-        val pathIter = Files.walk(Paths.get(inData)).filter {
+        val pathIter = Files.walk(inPath).filter {
             docReaders.containsKey(PathUtils.extension(it))
         } .iterator()
         while(pathIter.hasNext()) {
             val path = pathIter.next()
-            log.info("Process {}", path)
             processDoc(proc, path)
         }
     }
@@ -60,17 +65,25 @@ class Process(
     }
 
     private fun processDoc(proc: Processor, path: Path) {
+        log.info("Process {}", path)
         val doc = readDoc(path)
         val report = proc.process(doc)
-        //TODO save to file
-        log.info("Report {}", report)
+
+        var relPath = if (path.equals(inPath)) path.fileName else inPath.relativize(path)
+        val reportPath = outPath.resolve(PathUtils.withoutExtension(relPath) + "-report.yaml")
+        Files.createDirectories(reportPath.parent)
+        Files.newOutputStream(reportPath).use {
+            om.writeValue(it, report)
+        }
     }
 
     private fun readDoc(path: Path): Document {
         val ext = PathUtils.extension(path)
         val reader = docReaders[ext]!!
         Files.newInputStream(path).use {
-            return reader.read(it).build()
+            val db = reader.read(it)
+            db.id = path.toString()
+            return db.build()
         }
     }
 }
