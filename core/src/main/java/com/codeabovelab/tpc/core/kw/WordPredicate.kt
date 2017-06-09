@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.sw
+package com.codeabovelab.tpc.core.kw
 
 import com.codeabovelab.tpc.core.nn.nlp.*
 import com.codeabovelab.tpc.core.processor.PredicateContext

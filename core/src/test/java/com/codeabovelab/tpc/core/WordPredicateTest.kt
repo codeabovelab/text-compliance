@@ -1,9 +1,9 @@
 package com.codeabovelab.tpc.core
 
-import com.codeabovelab.tpc.core.sw.WordPredicate
+import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.PredicateContext
-import com.codeabovelab.tpc.core.sw.KeywordHashMatcher
+import com.codeabovelab.tpc.core.kw.KeywordHashMatcher
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
