@@ -71,7 +71,10 @@ class TextClassifier(
                 continue
             }
             val vw = pv.vocab.wordFor(str)
-            vws.add(vw)
+            // when null - the word is unknown
+            if (vw != null) {
+                vws.add(vw)
+            }
         }
         return vws
     }
