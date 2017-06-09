@@ -16,14 +16,14 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  */
-public class EmailToDocumentTest {
+public class EmailDocumentReaderTest {
 
     private static final List<String> FIELDS = ImmutableList.of(
-      EmailToDocument.F_FROM,
-      EmailToDocument.F_RECIPIENTS,
-      EmailToDocument.F_SENDER,
-      EmailToDocument.F_SUBJECT,
-      EmailToDocument.F_SENT_DATE
+      EmailDocumentReader.F_FROM,
+      EmailDocumentReader.F_RECIPIENTS,
+      EmailDocumentReader.F_SENDER,
+      EmailDocumentReader.F_SUBJECT,
+      EmailDocumentReader.F_SENT_DATE
     );
 
     @Test
@@ -70,7 +70,7 @@ public class EmailToDocumentTest {
           "s to the repository.\n" +
           "\n" +
           "Thanks!\n";
-        EmailToDocument etd = new EmailToDocument();
+        EmailDocumentReader etd = new EmailDocumentReader();
         DocumentImpl doc = (DocumentImpl) etd.apply(new ByteArrayInputStream(msg.getBytes()));
         System.out.println(doc);
         assertNotNull(doc.getBody().getData());

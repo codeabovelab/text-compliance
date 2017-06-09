@@ -2,7 +2,7 @@ package com.codeabovelab.tpc.core.nn;
 
 import com.codeabovelab.tpc.doc.Document;
 import com.codeabovelab.tpc.doc.DocumentImpl;
-import com.codeabovelab.tpc.integr.email.EmailToDocument;
+import com.codeabovelab.tpc.integr.email.EmailDocumentReader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 class DocIter {
 
     private static final Pattern SKIP_HTML = Pattern.compile("<[\\S][^>]*>", Pattern.DOTALL);
-    private final EmailToDocument etd = new EmailToDocument();
+    private final EmailDocumentReader etd = new EmailDocumentReader();
     private final String dir;
     private Document doc;
     private Iterator<Path> fileIter;
