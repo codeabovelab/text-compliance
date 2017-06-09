@@ -6,7 +6,7 @@ import com.codeabovelab.tpc.text.Textual
  */
 interface Document : Textual {
     interface Builder {
-        val id: String?
+        var id: String?
         fun build(): Document
     }
 }

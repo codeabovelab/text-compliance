@@ -71,7 +71,7 @@ public class EmailDocumentReaderTest {
           "\n" +
           "Thanks!\n";
         EmailDocumentReader etd = new EmailDocumentReader();
-        DocumentImpl doc = (DocumentImpl) etd.apply(new ByteArrayInputStream(msg.getBytes()));
+        DocumentImpl doc = (DocumentImpl) etd.read(new ByteArrayInputStream(msg.getBytes())).build();
         System.out.println(doc);
         assertNotNull(doc.getBody().getData());
         Map<String, DocumentField> fields = doc.getFields().stream().collect(Collectors.toMap(DocumentField::getName, Function.identity()));

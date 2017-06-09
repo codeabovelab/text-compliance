@@ -3,8 +3,12 @@ package com.codeabovelab.tpc.tool
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.processor.Processor
 import com.codeabovelab.tpc.core.processor.Rule
+import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentImpl
+import com.codeabovelab.tpc.doc.TextDocumentReader
+import com.codeabovelab.tpc.integr.email.EmailDocumentReader
 import com.codeabovelab.tpc.tool.learn.LearnConfig
+import com.codeabovelab.tpc.util.PathUtils
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -21,6 +25,10 @@ class Process(
     private val log = LoggerFactory.getLogger(this.javaClass)
     private val learnedDir = LearnConfig.learnedDir(learned)
     private val learnedConfig = LearnConfig()
+    private val docReaders = mapOf(
+            Pair("txt", TextDocumentReader()),
+            Pair("eml", EmailDocumentReader())
+    )
 
     init {
         learnedConfig.configure(learnedDir.config)
@@ -32,8 +40,7 @@ class Process(
         configureProcessor(learnedDir, learnedConfig, proc)
 
         val pathIter = Files.walk(Paths.get(inData)).filter {
-            val ext = it.toString().substringAfterLast('.')
-            ext == "txt" || ext == "eml"
+            docReaders.containsKey(PathUtils.extension(it))
         } .iterator()
         while(pathIter.hasNext()) {
             val path = pathIter.next()
@@ -53,14 +60,17 @@ class Process(
     }
 
     private fun processDoc(proc: Processor, path: Path) {
-        val file = path.toFile()
-        val str = com.google.common.io.Files.asCharSource(file, StandardCharsets.UTF_8).read()
-        val doc = DocumentImpl.builder()
-                .id(file.canonicalPath)
-                .body(str)
-                .build()
+        val doc = readDoc(path)
         val report = proc.process(doc)
         //TODO save to file
         log.info("Report {}", report)
+    }
+
+    private fun readDoc(path: Path): Document {
+        val ext = PathUtils.extension(path)
+        val reader = docReaders[ext]!!
+        Files.newInputStream(path).use {
+            return reader.read(it).build()
+        }
     }
 }

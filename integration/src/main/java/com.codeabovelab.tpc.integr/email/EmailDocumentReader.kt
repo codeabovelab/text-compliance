@@ -13,7 +13,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-class EmailDocumentReader: DocumentReader {
+/**
+ *
+ */
+class EmailDocumentReader:
+//we use raw document as return type, because in future it may be changed to more specific type
+        DocumentReader<Document.Builder> {
 
     companion object {
         const val F_SUBJECT = "subject"
@@ -25,7 +30,7 @@ class EmailDocumentReader: DocumentReader {
 
     private val emailParser = EmailParser()
 
-    override fun read(istr: InputStream): Document {
+    override fun read(istr: InputStream): Document.Builder {
         var session: Session? = null
         val msg = MimeMessage(session, istr)
         val db = DocumentImpl.builder()
@@ -38,7 +43,7 @@ class EmailDocumentReader: DocumentReader {
         // on any address with _ and may other symbols
         addField(db, F_RECIPIENTS, msg.allRecipients)
         addField(db, F_SENT_DATE, msg.sentDate)
-        return db.build()
+        return db
     }
 
     private fun addField(db: DocumentImpl.Builder, name: String, value: Any?) {

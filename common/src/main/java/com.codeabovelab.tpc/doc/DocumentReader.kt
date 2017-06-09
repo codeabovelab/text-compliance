@@ -4,9 +4,9 @@ import java.io.InputStream
 
 /**
  */
-interface DocumentReader {
+interface DocumentReader<out T : Document.Builder> {
     /**
      * read document from specified stream
      */
-    fun read(istr: InputStream): Document
+    fun read(istr: InputStream): T
 }
