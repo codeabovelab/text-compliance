@@ -11,7 +11,6 @@ import com.codeabovelab.tpc.util.PathUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
@@ -69,7 +68,7 @@ class Process(
         val doc = readDoc(path)
         val report = proc.process(doc)
 
-        var relPath = if (path.equals(inPath)) path.fileName else inPath.relativize(path)
+        var relPath = if (path == inPath) path.fileName else inPath.relativize(path)
         val reportPath = outPath.resolve(PathUtils.withoutExtension(relPath) + "-report.yaml")
         Files.createDirectories(reportPath.parent)
         Files.newOutputStream(reportPath).use {
