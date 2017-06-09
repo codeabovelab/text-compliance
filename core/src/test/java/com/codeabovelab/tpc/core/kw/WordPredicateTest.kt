@@ -1,16 +1,16 @@
-package com.codeabovelab.tpc.core
+package com.codeabovelab.tpc.core.kw
 
-import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.PredicateContext
-import com.codeabovelab.tpc.core.kw.KeywordHashMatcher
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
-import org.junit.Test
+import org.hamcrest.CoreMatchers
+import org.hamcrest.Matcher
+import org.junit.Assert
 import org.junit.Ignore
+import org.junit.Test
 import org.slf4j.LoggerFactory
-
 import java.nio.charset.StandardCharsets
 
 /**
@@ -23,22 +23,25 @@ class WordPredicateTest {
     @Test
     fun test() {
 
+        val keyWord : String ="hell"
         val tc = WordPredicate(
-                uima = SentenceIteratorImpl.uimaResource(pos = true, morphological = true),
-                wordSupplier = {it.word.str},
-                keywordMatcher = KeywordHashMatcher(setOf("hell"))
+                uima = SentenceIteratorImpl.Companion.uimaResource(pos = true, morphological = true),
+                wordSupplier = { it.word.str },
+                keywordMatcher = KeywordHashMatcher(setOf(keyWord))
         )
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
-        for(text in texts) {
+        val pc = PredicateContext(document = DocumentImpl.Companion.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
+        for (text in texts) {
             println(i++)
             val res = tc.test(pc, TextImpl("sample_" + i, text))
             res.entries.forEach {
                 val offset = it.coordinates.offset
                 val sentence = text.substring(offset, offset + it.coordinates.length)
                 log.info(sentence + ": " + it.word)
+                Assert.assertNotNull(it.word)
+                Assert.assertThat(it.word, CoreMatchers.hasItem(WordSearchResult.Label(keyWord, keyWord)))
             }
         }
     }

@@ -26,4 +26,5 @@ dependencies {
     testCompile 'org.jetbrains.kotlin:kotlin-test'
     testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
     testCompile 'junit:junit'
+    testCompile 'org.hamcrest:hamcrest-junit'
 }
