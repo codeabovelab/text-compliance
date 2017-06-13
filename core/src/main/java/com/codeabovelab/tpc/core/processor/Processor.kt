@@ -20,10 +20,10 @@ class Processor {
         }
     }
 
-    fun process(doc: Document): ProcessorReport {
+    fun process(doc: Document, modifier: ProcessModifier = ProcessModifier.DEFAULT): ProcessorReport {
         val prb = ProcessorReport.Builder()
         prb.documentId = doc.id
-        val pc = ProcessingContext(doc, prb, selectRules())
+        val pc = ProcessingContext(doc, modifier, prb, selectRules())
         doc.read(pc::onText)
         return prb.build()
     }

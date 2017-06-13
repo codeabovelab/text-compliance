@@ -18,4 +18,4 @@ interface Textual {
     fun read(consumer: TextConsumer)
 }
 
-typealias TextConsumer = (Text) -> Unit
+typealias TextConsumer = (Textual, Text) -> Unit

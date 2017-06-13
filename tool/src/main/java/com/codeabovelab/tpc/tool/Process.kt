@@ -1,9 +1,11 @@
 package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.nn.TextClassifier
+import com.codeabovelab.tpc.core.processor.ProcessModifier
 import com.codeabovelab.tpc.core.processor.Processor
 import com.codeabovelab.tpc.core.processor.Rule
 import com.codeabovelab.tpc.doc.Document
+import com.codeabovelab.tpc.doc.DocumentField
 import com.codeabovelab.tpc.doc.TextDocumentReader
 import com.codeabovelab.tpc.integr.email.EmailDocumentReader
 import com.codeabovelab.tpc.tool.learn.LearnConfig
@@ -66,7 +68,8 @@ class Process(
     private fun processDoc(proc: Processor, path: Path) {
         log.info("Process {}", path)
         val doc = readDoc(path)
-        val report = proc.process(doc)
+        val modifier = ProcessModifier(filter = { it !is DocumentField })
+        val report = proc.process(doc, modifier)
 
         var relPath = if (path == inPath) path.fileName else inPath.relativize(path)
         val reportPath = outPath.resolve(PathUtils.withoutExtension(relPath) + "-report.yaml")

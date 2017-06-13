@@ -14,7 +14,7 @@ object TextualUtil {
             return null
         }
         val sb = StringBuilder()
-        textual.read { sb.append(it.data) }
+        textual.read { _, text -> sb.append(text.data) }
         return sb.toString()
     }
 }

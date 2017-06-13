@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.core.processor
 
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.text.Text
+import com.codeabovelab.tpc.text.Textual
 import com.google.common.collect.ImmutableMap
 
 /**
@@ -9,10 +10,14 @@ import com.google.common.collect.ImmutableMap
  * Must be thread save.
  */
 class ProcessingContext(val document: Document,
+                        val modifier: ProcessModifier,
                         val reportBuilder: ProcessorReport.Builder,
                         val rules: List<Rule<*>>) {
 
-    fun onText(text: Text) {
+    fun onText(textual: Textual, text: Text) {
+        if(!modifier.filter(textual)) {
+            return
+        }
         rules.forEach{
             applyRule(text, it)
         }
