@@ -54,10 +54,10 @@ class Cmd {
         },
         process {
             override fun create(cmd: Cmd): () -> Unit {
-                require(cmd::in_path, cmd::out_path, cmd::learned)
+                require(cmd::in_path, cmd::learned)
                 return Process(
                         inData = cmd.in_path!!,
-                        outData = cmd.out_path!!,
+                        outData = cmd.out_path,
                         learned = cmd.learned!!
                 )::run
             }

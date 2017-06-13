@@ -24,7 +24,7 @@ import java.nio.file.Paths
  */
 class Process(
         private val inData: String,
-        private val outData: String,
+        private val outData: String?,
         private val learned: String
 ) {
 
@@ -36,7 +36,7 @@ class Process(
             Pair("eml", EmailDocumentReader())
     )
     private val om = ObjectMapper(YAMLFactory()).enable(SerializationFeature.INDENT_OUTPUT)
-    private val outPath = Paths.get(outData)
+    private val outPath = Paths.get(outData?: inData)
     private val inPath = Paths.get(inData)
     init {
         learnedConfig.configure(learnedDir.config)
