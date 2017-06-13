@@ -1,8 +1,10 @@
 package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.nn.TextClassifier
+import com.codeabovelab.tpc.core.nn.TextClassifierResult
 import com.codeabovelab.tpc.core.processor.ProcessModifier
 import com.codeabovelab.tpc.core.processor.Processor
+import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.core.processor.Rule
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentField
@@ -51,7 +53,12 @@ class Process(
         } .iterator()
         while(pathIter.hasNext()) {
             val path = pathIter.next()
-            processDoc(proc, path)
+            try {
+                processDoc(proc, path)
+            } catch(e: Exception) {
+                log.error("Fail on {}", path)
+                throw e
+            }
         }
     }
 
@@ -66,17 +73,21 @@ class Process(
     }
 
     private fun processDoc(proc: Processor, path: Path) {
-        log.info("Process {}", path)
         val doc = readDoc(path)
         val modifier = ProcessModifier(filter = { it !is DocumentField })
         val report = proc.process(doc, modifier)
-
-        var relPath = if (path == inPath) path.fileName else inPath.relativize(path)
+        val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
+        log.info("{} labels: {}", relPath, printLabels(report))
         val reportPath = outPath.resolve(PathUtils.withoutExtension(relPath) + "-report.yaml")
         Files.createDirectories(reportPath.parent)
         Files.newOutputStream(reportPath).use {
             om.writeValue(it, report)
         }
+    }
+
+    private fun printLabels(report: ProcessorReport): String {
+        val labels = report.findRule<TextClassifierResult>()?.labels ?: return ""
+        return labels.joinToString { "${it.label}=${it.similarity}" }
     }
 
     private fun readDoc(path: Path): Document {
