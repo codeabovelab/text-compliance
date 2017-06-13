@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -74,12 +75,22 @@ class Process(
 
     private fun processDoc(proc: Processor, path: Path) {
         val doc = readDoc(path)
-        val modifier = ProcessModifier(filter = { it !is DocumentField })
+        val lines = ArrayList<String>()
+        val modifier = ProcessModifier(
+                filter = { it !is DocumentField },
+                textHandler = {
+                    lines += it.data.toString().replace("\n", " ")
+                    it
+                }
+        )
         val report = proc.process(doc, modifier)
         val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
         log.info("{} labels: {}", relPath, printLabels(report))
-        val reportPath = outPath.resolve(PathUtils.withoutExtension(relPath) + "-report.yaml")
+        val baseName = PathUtils.withoutExtension(relPath)
+        val reportPath = outPath.resolve(baseName + "-report.yaml")
+        val textPath = outPath.resolve(baseName + "-analyzed.txt")
         Files.createDirectories(reportPath.parent)
+        Files.write(textPath, lines, StandardCharsets.UTF_8)
         Files.newOutputStream(reportPath).use {
             om.writeValue(it, report)
         }
