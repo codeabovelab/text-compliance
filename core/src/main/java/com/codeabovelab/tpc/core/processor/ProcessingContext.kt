@@ -18,8 +18,9 @@ class ProcessingContext(val document: Document,
         if(!modifier.filter(textual)) {
             return
         }
+        val handledText = modifier.textHandler(text)
         rules.forEach{
-            applyRule(text, it)
+            applyRule(handledText, it)
         }
     }
 

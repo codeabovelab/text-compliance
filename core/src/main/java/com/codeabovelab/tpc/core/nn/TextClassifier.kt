@@ -10,6 +10,8 @@ import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.deeplearning4j.text.uima.UimaResource
+import org.nd4j.linalg.api.ndarray.INDArray
+import org.nd4j.linalg.cpu.nativecpu.NDArray
 import org.nd4j.linalg.ops.transforms.Transforms
 import java.nio.file.Path
 
@@ -34,33 +36,41 @@ class TextClassifier(
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {
         val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(text))
         val entries = ArrayList<TextClassifierResult.Entry>()
+        var count = 0
+        var sum: INDArray? = null
         while(si.hasNext()) {
             val sentence = si.next()
             if(sentence.isNullOrEmpty()) {
                 continue
             }
             val seq = sentence!!
-            //val vws = words.stream().filter { true || it.pos.isNoun || it.pos.isVerb }.map { VocabWord(1.0, it.str) }.collect(Collectors.toList())
-            //println(vws.map { it.word })
             val vws = toWordList(seq)
             if(vws.isEmpty()) {
                 continue
             }
+            count++
             val indArray = pv.inferVector(vws)
-            //println(indArray)
-
-            val labels = pv.nearestLabels(indArray, maxLabels)
-            val labelsWithSim = labels.stream().map {
-                val lm = pv.getWordVectorMatrix(it)
-                val similarity = Transforms.cosineSim(indArray, lm)
-                TextClassifierResult.Label(it, similarity)
-            }.collect(Collectors.toList())
+            sum = if(sum == null) indArray.dup() else sum.addi(indArray)
+            val seqLabels = extractLabels(indArray)
             val resEntry = TextClassifierResult.Entry(
                     coordinates = text.getCoordinates(seq.offset, seq.str.length),
-                    labels = labelsWithSim)
+                    labels = seqLabels)
             entries.add(resEntry)
         }
-        return TextClassifierResult(entries = entries)
+        // we compute average value of all sentence vectors, it is differ
+        // from simple vector of all text
+        val textLabels = if(sum == null) listOf() else extractLabels(sum.div(count))
+        return TextClassifierResult(entries = entries, labels = textLabels)
+    }
+
+    private fun extractLabels(indArray: INDArray): List<TextClassifierResult.Label> {
+        val labels = pv.nearestLabels(indArray, maxLabels)
+        val labelsWithSim = labels.stream().map {
+            val lm = pv.getWordVectorMatrix(it)
+            val similarity = Transforms.cosineSim(indArray, lm)
+            TextClassifierResult.Label(it, similarity)
+        }.collect(Collectors.toList())
+        return labelsWithSim
     }
 
     private fun toWordList(seq: SentenceData): List<VocabWord> {
@@ -84,7 +94,11 @@ class TextClassifier(
 }
 
 class TextClassifierResult(
-        entries: List<Entry>
+        entries: List<Entry>,
+        /**
+         * Labels for all text
+         */
+        val labels: List<Label>
     ): PredicateResult<TextClassifierResult.Entry>(entries) {
 
     class Entry(coordinates: TextCoordinates,

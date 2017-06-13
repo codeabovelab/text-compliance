@@ -1,10 +1,8 @@
 package com.codeabovelab.tpc.core.processor
 
-import com.google.common.collect.ImmutableList
-import lombok.Data
-import lombok.Setter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.reflect.full.cast
 
 
 /**
@@ -38,5 +36,13 @@ class ProcessorReport(builder: Builder) {
 
     override fun toString(): String {
         return "ProcessorReport(documentId='$documentId', rules=$rules, attributes=$attributes)"
+    }
+
+    inline fun <reified T : PredicateResult<*>> findRule(): T? {
+        val type = T::class
+        val res = rules.find {
+            type.isInstance(it.result)
+        }
+        return if(res != null) type.cast(res.result) else null
     }
 }

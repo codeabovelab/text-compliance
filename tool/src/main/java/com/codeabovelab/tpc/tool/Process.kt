@@ -1,8 +1,10 @@
 package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.nn.TextClassifier
+import com.codeabovelab.tpc.core.nn.TextClassifierResult
 import com.codeabovelab.tpc.core.processor.ProcessModifier
 import com.codeabovelab.tpc.core.processor.Processor
+import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.core.processor.Rule
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentField
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -22,7 +25,7 @@ import java.nio.file.Paths
  */
 class Process(
         private val inData: String,
-        private val outData: String,
+        private val outData: String?,
         private val learned: String
 ) {
 
@@ -34,7 +37,7 @@ class Process(
             Pair("eml", EmailDocumentReader())
     )
     private val om = ObjectMapper(YAMLFactory()).enable(SerializationFeature.INDENT_OUTPUT)
-    private val outPath = Paths.get(outData)
+    private val outPath = Paths.get(outData?: inData)
     private val inPath = Paths.get(inData)
     init {
         learnedConfig.configure(learnedDir.config)
@@ -51,7 +54,12 @@ class Process(
         } .iterator()
         while(pathIter.hasNext()) {
             val path = pathIter.next()
-            processDoc(proc, path)
+            try {
+                processDoc(proc, path)
+            } catch(e: Exception) {
+                log.error("Fail on {}", path)
+                throw e
+            }
         }
     }
 
@@ -66,17 +74,31 @@ class Process(
     }
 
     private fun processDoc(proc: Processor, path: Path) {
-        log.info("Process {}", path)
         val doc = readDoc(path)
-        val modifier = ProcessModifier(filter = { it !is DocumentField })
+        val lines = ArrayList<String>()
+        val modifier = ProcessModifier(
+                filter = { it !is DocumentField },
+                textHandler = {
+                    lines += it.data.toString().replace("\n", " ")
+                    it
+                }
+        )
         val report = proc.process(doc, modifier)
-
-        var relPath = if (path == inPath) path.fileName else inPath.relativize(path)
-        val reportPath = outPath.resolve(PathUtils.withoutExtension(relPath) + "-report.yaml")
+        val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
+        log.info("{} labels: {}", relPath, printLabels(report))
+        val baseName = PathUtils.withoutExtension(relPath)
+        val reportPath = outPath.resolve(baseName + "-report.yaml")
+        val textPath = outPath.resolve(baseName + "-analyzed.txt")
         Files.createDirectories(reportPath.parent)
+        Files.write(textPath, lines, StandardCharsets.UTF_8)
         Files.newOutputStream(reportPath).use {
             om.writeValue(it, report)
         }
+    }
+
+    private fun printLabels(report: ProcessorReport): String {
+        val labels = report.findRule<TextClassifierResult>()?.labels ?: return ""
+        return labels.joinToString { "${it.label}=${it.similarity}" }
     }
 
     private fun readDoc(path: Path): Document {
