@@ -78,6 +78,9 @@ class EmailDocumentReader:
     private fun getContent(msg: MimeMessage): String {
         //here we must extract text from html
         val string = msg.content as String
+        if(HtmlParser.isOur(string)) {
+            return HtmlParser.toText(string)
+        }
         return emailParser.read(string).visibleText()
     }
 }
