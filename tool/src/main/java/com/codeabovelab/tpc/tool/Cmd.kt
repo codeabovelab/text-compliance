@@ -27,6 +27,9 @@ class Cmd {
     @field:Option(name = "-c", usage = "path to config file")
     var config: String? = null
 
+    @field:Option(name = "-w", usage = "list of words properties")
+    var words: String? = null
+
     fun run() {
         command!!.create(this)()
     }
@@ -55,10 +58,13 @@ class Cmd {
         process {
             override fun create(cmd: Cmd): () -> Unit {
                 require(cmd::in_path, cmd::learned)
+
                 return Process(
                         inData = cmd.in_path!!,
                         outData = cmd.out_path,
-                        learned = cmd.learned!!
+                        learned = cmd.learned!!,
+                        words = cmd.words,
+                        config = cmd.config
                 )::run
             }
         },

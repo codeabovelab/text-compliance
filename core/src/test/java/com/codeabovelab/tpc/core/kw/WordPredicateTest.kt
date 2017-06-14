@@ -6,7 +6,6 @@ import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
 import org.hamcrest.CoreMatchers
-import org.hamcrest.Matcher
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
@@ -26,7 +25,6 @@ class WordPredicateTest {
         val keyWord : String ="hell"
         val tc = WordPredicate(
                 uima = SentenceIteratorImpl.Companion.uimaResource(pos = true, morphological = true),
-                wordSupplier = { it.word.str },
                 keywordMatcher = KeywordHashMatcher(setOf(keyWord))
         )
 

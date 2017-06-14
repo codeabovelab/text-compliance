@@ -12,8 +12,7 @@ import org.deeplearning4j.text.uima.UimaResource
  */
 class WordPredicate(
         val keywordMatcher: KeywordMatcher,
-        val uima: UimaResource,
-        val wordSupplier: (wc: WordContext) -> String?
+        val uima: UimaResource
 ): RulePredicate<WordSearchResult> {
 
     override fun test(pc: PredicateContext, text: Text): WordSearchResult {
@@ -43,14 +42,14 @@ class WordPredicate(
         val vws = ArrayList<WordSearchResult.Label>()
         for (word in seq.words) {
             wch.word = word
-            val str = wordSupplier(wch.context)
-            if (str.isNullOrEmpty()) {
-                continue
-            }
             if (!keywordMatcher.test(wch.context)) {
                 continue
             }
-            vws.add(WordSearchResult.Label(str!!, word.lemma!!))
+            val str = wch.context.word.str
+            if (str.isNullOrEmpty()) {
+                continue
+            }
+            vws.add(WordSearchResult.Label(str, word.lemma!!))
         }
         return vws
     }
