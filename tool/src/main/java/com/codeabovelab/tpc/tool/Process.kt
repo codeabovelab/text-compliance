@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.text.NumberFormat
 
 /**
  */
@@ -75,30 +76,57 @@ class Process(
 
     private fun processDoc(proc: Processor, path: Path) {
         val doc = readDoc(path)
-        val lines = ArrayList<String>()
+        val text = StringBuilder()
         val modifier = ProcessModifier(
                 filter = { it !is DocumentField },
                 textHandler = {
-                    lines += it.data.toString().replace("\n", " ")
+                    text.append(it.data)
                     it
                 }
         )
         val report = proc.process(doc, modifier)
+
         val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
-        log.info("{} labels: {}", relPath, printLabels(report))
+        val tcr = report.findRule<TextClassifierResult>()
+        log.info("{} labels: {}", relPath, printLabels(tcr))
         val baseName = PathUtils.withoutExtension(relPath)
         val reportPath = outPath.resolve(baseName + "-report.yaml")
         val textPath = outPath.resolve(baseName + "-analyzed.txt")
         Files.createDirectories(reportPath.parent)
-        Files.write(textPath, lines, StandardCharsets.UTF_8)
+        if(tcr != null) {
+            val numFormat = NumberFormat.getInstance()
+            Files.newBufferedWriter(textPath, StandardCharsets.UTF_8).use {
+                for(entry in tcr.entries) {
+                    val coords = entry.coordinates
+                    it.append(text, coords.offset, coords.offset + coords.length)
+                    for(label in entry.labels) {
+                        it.append("\n \u26A0 ")
+                        it.append(label.label)
+                        it.append('=')
+                        it.append(numFormat.format(label.similarity))
+                    }
+                    it.appendln()
+                }
+            }
+        }
         Files.newOutputStream(reportPath).use {
             om.writeValue(it, report)
         }
     }
 
-    private fun printLabels(report: ProcessorReport): String {
-        val labels = report.findRule<TextClassifierResult>()?.labels ?: return ""
-        return labels.joinToString { "${it.label}=${it.similarity}" }
+    private fun printLabels(tcr: TextClassifierResult?): String {
+        if(tcr == null) {
+            return ""
+        }
+        val map = HashMap<String, Double>()
+        for(entry in tcr.entries) {
+            for(label in entry.labels) {
+                map.compute(label.label) { key, old ->
+                    if(old == null) label.similarity else Math.min(old, label.similarity)
+                }
+            }
+        }
+        return tcr.labels.joinToString { "${it.label}=${it.similarity} (min=${map[it.label]})" }
     }
 
     private fun readDoc(path: Path): Document {
