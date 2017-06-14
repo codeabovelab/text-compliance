@@ -62,9 +62,7 @@ class Cmd {
                 return Process(
                         inData = cmd.in_path!!,
                         outData = cmd.out_path,
-                        learned = cmd.learned!!,
-                        words = cmd.words,
-                        config = cmd.config
+                        learned = cmd.learned!!
                 )::run
             }
         },

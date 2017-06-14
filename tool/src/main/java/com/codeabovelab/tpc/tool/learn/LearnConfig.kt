@@ -18,6 +18,7 @@ class LearnConfig {
     private val log = LoggerFactory.getLogger(this.javaClass)
     var doc2vec = VectorsConfiguration()
     var wordsConversion: WordConversion = WordConversion.RAW
+    var thesaurus = ThesaurusConfiguration()
 
     init {
         doc2vec.minWordFrequency = 5
@@ -133,5 +134,9 @@ class LearnConfig {
             val config: Path,
             val doc2vec: Path
     )
+
+    data class ThesaurusConfiguration(
+            var jwnlurl: String? = null,
+            var words: Set<String>? = null)
 }
 

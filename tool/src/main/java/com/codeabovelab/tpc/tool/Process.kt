@@ -32,9 +32,7 @@ import java.util.stream.Collectors
 class Process(
         private val inData: String,
         private val outData: String?,
-        private val learned: String,
-        private val words: String?,
-        private val config: String?
+        private val learned: String
 ) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -56,7 +54,7 @@ class Process(
 
         val proc = Processor()
         configureTCProcessor(learnedDir, learnedConfig, proc)
-        configureWSProcessor(words, proc)
+        configureWSProcessor(learnedConfig, proc)
 
         val pathIter = Files.walk(inPath).filter {
             docReaders.containsKey(PathUtils.extension(it))
@@ -82,30 +80,25 @@ class Process(
         proc.addRule(Rule("classify", 0.0f, tc))
     }
 
-    private fun configureWSProcessor(words: String?, proc: Processor) {
-        if (!words.isNullOrBlank()) {
-            val wordSet = words!!.split(",").stream().collect(Collectors.toSet())
-            if (!wordSet.isEmpty()) {
-                initThesaurus()
-                val thesaurus = JWNLWordSynonyms()
-                val enrichedWords = wordSet.stream()
-                        .flatMap { w -> thesaurus.lookup(w).words.stream() }
-                        .collect(Collectors.toSet())
-                val sw = WordPredicate(
-                        keywordMatcher = KeywordHashMatcher(enrichedWords),
-                        uima = SentenceIteratorImpl.uimaResource(morphological = true))
-                proc.addRule(Rule("searchWords", 0.0f, sw))
-            }
+    private fun configureWSProcessor(lc: LearnConfig, proc: Processor) {
+        val thesaurusConfig = lc.thesaurus
+        val wordsSet = thesaurusConfig.words.orEmpty()
+        if (!wordsSet.isEmpty()) {
+            initThesaurus(thesaurusConfig)
+            val thesaurus = JWNLWordSynonyms()
+            val enrichedWords = wordsSet.stream()
+                    .flatMap { w -> thesaurus.lookup(w).words.stream() }
+                    .collect(Collectors.toSet())
+            val sw = WordPredicate(
+                    keywordMatcher = KeywordHashMatcher(enrichedWords),
+                    uima = SentenceIteratorImpl.uimaResource(morphological = true))
+            proc.addRule(Rule("searchWords", 0.0f, sw))
         }
     }
 
-    private fun initThesaurus() {
-        try {
-            val resource = Paths.get(config)
-            JWNL.initialize(resource.toFile().inputStream())
-        } catch (e: Exception) {
-            log.error("can't init Thesaurus", e)
-        }
+    private fun initThesaurus(thesaurus: LearnConfig.ThesaurusConfiguration) {
+        val resource = Paths.get(thesaurus.jwnlurl!!)
+        JWNL.initialize(resource.toFile().inputStream())
     }
 
     private fun processDoc(proc: Processor, path: Path) {
