@@ -1,92 +1,106 @@
 package com.codeabovelab.tpc.integr.email
 
-import com.codeabovelab.tpc.integr.email.Fragment.Builder
 import com.google.common.base.CharMatcher
-import com.google.common.base.Splitter
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Lists
+import java.util.*
 import java.util.regex.Pattern
 
 
 class EmailParser {
 
-    private val NEW_LINE = CharMatcher.anyOf("\n")
     private val CRLF = CharMatcher.anyOf("\r\n")
 
-    private val SIG_REGEX = Pattern.compile("(\u2014|--|__|-\\w)|(^Sent from my (\\w+\\s*){1,3})")
-    private val QUOTED_REGEX = Pattern.compile("(>+)")
-    private val MULTI_QUOTE_HDR_REGEX = Pattern.compile("(?!On.*On\\s.+?wrote:)(On\\s(.+?)wrote:)", Pattern.MULTILINE or Pattern.DOTALL)
+    // temporary disable signature detection
+    //private val SIG_REGEX = Pattern.compile("(\u2014|--|__|-\\w)|(^Sent from my (\\w+\\s*){1,3})")
+    private val HEADER_STR = "-+\\s*forwarded[^-]*-+|-+original\\s+message-+|On\\s(?:.+)wrote:|--+\n(from|to):"
+    private val LINE_HEADER_RX = Pattern.compile("^($HEADER_STR)", Pattern.MULTILINE or Pattern.DOTALL or Pattern.CASE_INSENSITIVE)
+    private val QUOTE_MARKER_RX = Pattern.compile("^(>|$HEADER_STR)", Pattern.MULTILINE or Pattern.DOTALL or Pattern.CASE_INSENSITIVE)
 
     fun read(content: String): Email {
-        val context = Context(text = CRLF.replaceFrom(content, "\n"))
-        read(context)
-        return Email(ImmutableList.copyOf(Lists.reverse(context.fragments)))
+        val context = Context()
+        val text = CRLF.replaceFrom(content, "\n")
+        read(text, context)
+        return Email(ImmutableList.copyOf(context.fragments))
     }
 
-    fun read(context: Context) {
-        var workingText = context.text
-        val multiQuote = MULTI_QUOTE_HDR_REGEX.matcher(workingText)
-
-        if (multiQuote.find()) {
-            val newQuoteHeader = NEW_LINE.replaceFrom(multiQuote.group(), "")
-            workingText = multiQuote.replaceAll(newQuoteHeader)
+    private fun read(text: String, context: Context) {
+        val m = QUOTE_MARKER_RX.matcher(text)
+        var offset = 0
+        while(m.find()) {
+            val start = m.start()
+            context.scanPart(text.substring(offset, start))
+            offset = start
         }
-
-        Lists.reverse(Splitter.on('\n').splitToList(workingText))
-                .stream()
-                .forEach { l -> scanLine(l, context) }
-
-        finishFragment(context)
-
+        context.scanPart(text.substring(offset))
+        context.finishFragment()
     }
 
-    private fun scanLine(line: String, context: Context) {
-        var content = NEW_LINE.trimFrom(line)
-        val fragment = context.fragment
-        if (SIG_REGEX.matcher(content).lookingAt()) {
-            content = NEW_LINE.trimLeadingFrom(content)
-        }
-        val isQuoted = QUOTED_REGEX.matcher(content).lookingAt()
+    private inner class Context {
+        val stack = ArrayDeque<Fragment.Builder>()
+        var fragments: MutableList<Fragment> = Lists.newArrayList()
+        val current: Fragment.Builder?
+            get() = stack.peekLast()
 
-        if (fragment != null && isStringEmpty(content) &&
-                SIG_REGEX.matcher(fragment.lines[fragment.lines.size - 1]).lookingAt()) {
-            fragment.signature(true)
-            finishFragment(context)
-        }
-        if (fragment != null &&
-                (fragment.quoted == isQuoted || fragment.quoted && (quoteHeader(content) || isStringEmpty(content)))) {
-            fragment.lines.add(content)
-        } else {
-            finishFragment(context)
-            context.fragment = Fragment.build { quoted = isQuoted }.line(content)
-        }
-
-    }
-
-    private fun quoteHeader(line: String): Boolean {
-        return MULTI_QUOTE_HDR_REGEX.matcher(line).lookingAt()
-    }
-
-    private fun finishFragment(context: Context) {
-        if (context.fragment != null && !isStringEmpty(context.fragment!!.text())) {
-            val fragment = context.fragment!!
-            if (fragment.quoted || fragment.signature || fragment.lines.isEmpty()) {
-                fragment.hidden(true)
+        var isQuoted: Boolean = false
+        var isHeader: Boolean = false
+        var currentLine: String = ""
+            set(value) {
+                field = value
+                isQuoted = isQuoted(field)
+                isHeader = isHeader(field)
             }
-            context.fragments.add(fragment.build())
+
+        private fun isQuoted(line: String) = line.first() == '>'
+        private fun isHeader(line: String): Boolean {
+            return LINE_HEADER_RX.matcher(line).lookingAt()
         }
 
-        context.fragment = null
-    }
+        /**
+         * test that current line is suitable with current fragment
+         */
+        fun isSuitable(): Boolean {
+            if(this.current == null) {
+                return false
+            }
+            if(isHeader) {
+                return false
+            }
+            return current!!.quoted == isQuoted || currentLine.isNullOrEmpty()
+        }
 
-    private fun isStringEmpty(content: String): Boolean {
-        return content.isNullOrBlank()
-    }
+        fun finishFragment() {
+            val builder = stack.pollLast()
+            if(builder == null) {
+                return
+            }
+            val frag = builder!!.build()
+            if (!frag.content.isNullOrEmpty()) {
+                fragments.add(frag)
+            }
+        }
 
-    class Context(
-            val text: String,
-            var fragment: Builder? = null,
-            var fragments: MutableList<Fragment> = Lists.newArrayList()
-    )
+        fun newFragment() {
+            stack.addLast(Fragment.builder {
+                quoted = isQuoted || isHeader
+                parts.append(currentLine)
+            })
+        }
+
+        fun scanPart(line: String) {
+            if(line.isEmpty()) {
+                return
+            }
+            currentLine = line
+            val fragment = current
+            if (fragment != null && isSuitable()) {
+                fragment.parts.append(currentLine)
+            } else {
+                finishFragment()
+                newFragment()
+            }
+        }
+
+    }
 
 }

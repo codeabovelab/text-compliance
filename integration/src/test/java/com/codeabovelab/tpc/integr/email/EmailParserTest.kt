@@ -25,25 +25,31 @@ internal class EmailParserTest {
             val sb = StringBuilder()
             val emails = ArrayList<EmailSource>()
             override fun getResult(): List<EmailSource> {
-
+                endSource()
                 return emails
             }
 
             override fun processLine(line: String): Boolean {
                 if(line.isNotEmpty() && line.first() == '#') {
-                    if(!sb.isEmpty()) {
-                        emails += EmailSource(
-                                str = sb.toString(),
-                                quotes = quotes
-                        )
-                        sb.setLength(0)
-                    }
+                    endSource()
                     val map = splitter.split(line.substring(1))
                     quotes = Integer.parseInt(map["quotes"])
                 } else {
                     sb.append(line).append('\n')
                 }
                 return true
+            }
+
+            private fun endSource() {
+                if (sb.isEmpty()) {
+                    return
+                }
+                emails += EmailSource(
+                        str = sb.toString(),
+                        quotes = quotes
+                )
+                sb.setLength(0)
+                quotes = 0
             }
 
         })

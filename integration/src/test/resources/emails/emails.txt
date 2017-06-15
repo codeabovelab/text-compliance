@@ -126,3 +126,28 @@ Sent: Monday, July 02, 2001 10:37  AM
 To: LaFontaine, Steve
 Subject: RE:
         what's you're new phone # ?
+#quotes=3
+The metering variables that we use in Kibana.
+
+----------
+From: *one two* <one@gmail.com>
+Date: Wed, Jan 6, 2016 at 11:03 AM
+To: three four <three@four.com>
+
+do you need some concrete indexes? (kibana has ~ 1k indexes)?
+btw host 10.0.1.146 with kibana is down
+
+----------
+From: *one two* <one@gmail.com>
+Date: Wed, Jan 6, 2016 at 11:07 AM
+To: three four <three@four.com>
+
+new prod machines were rebooted and not started
+I will try to group metrics
+
+----------
+From: *three four* <three@four.com>
+Date: Thu, Jan 7, 2016 at 4:20 AM
+To: one two <one@gmail.com>
+
+some text
