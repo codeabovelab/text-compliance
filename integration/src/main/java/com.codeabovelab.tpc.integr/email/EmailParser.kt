@@ -14,7 +14,6 @@ class EmailParser {
     private val CRLF = CharMatcher.anyOf("\r\n")
 
     private val SIG_REGEX = Pattern.compile("(\u2014|--|__|-\\w)|(^Sent from my (\\w+\\s*){1,3})")
-    private val QUOTE_HDR_REGEX = Pattern.compile("^:etorw.*nO")
     private val QUOTED_REGEX = Pattern.compile("(>+)")
     private val MULTI_QUOTE_HDR_REGEX = Pattern.compile("(?!On.*On\\s.+?wrote:)(On\\s(.+?)wrote:)", Pattern.MULTILINE or Pattern.DOTALL)
 
@@ -26,13 +25,11 @@ class EmailParser {
 
     fun read(context: Context) {
         var workingText = context.text
-        val multiQuote = Pattern.compile(MULTI_QUOTE_HDR_REGEX.pattern(), Pattern.MULTILINE or Pattern.DOTALL)
-                .matcher(workingText)
+        val multiQuote = MULTI_QUOTE_HDR_REGEX.matcher(workingText)
 
         if (multiQuote.find()) {
             val newQuoteHeader = NEW_LINE.replaceFrom(multiQuote.group(), "")
-            workingText = Pattern.compile(MULTI_QUOTE_HDR_REGEX.pattern(), Pattern.DOTALL).matcher(workingText).replaceAll(
-                    newQuoteHeader)
+            workingText = multiQuote.replaceAll(newQuoteHeader)
         }
 
         Lists.reverse(Splitter.on('\n').splitToList(workingText))
@@ -67,8 +64,7 @@ class EmailParser {
     }
 
     private fun quoteHeader(line: String): Boolean {
-        val reversed = StringBuilder(line).reverse().toString()
-        return QUOTE_HDR_REGEX.matcher(reversed).lookingAt()
+        return MULTI_QUOTE_HDR_REGEX.matcher(line).lookingAt()
     }
 
     private fun finishFragment(context: Context) {
