@@ -13,7 +13,14 @@ class EmailParser {
 
     // temporary disable signature detection
     //private val SIG_REGEX = Pattern.compile("(\u2014|--|__|-\\w)|(^Sent from my (\\w+\\s*){1,3})")
-    private val HEADER_STR = "-+\\s*forwarded[^-]*-+|-+original\\s+message-+|On\\s(?:.+)wrote:|--+\n(from|to):"
+    private val HEADER_STR ="-+\\s*forwarded[^-]*-+|" +
+            "-+original\\s+message-+|" +
+            "On\\s(?:.+)wrote:|" +
+            "(?:--+)\n(?:from|to):|" +
+            "[^<\n]+<.+@.+>\\s+on\\s+.+|" +
+    //TODO below regex must consume two previous string
+            "^to:.*^cc:.*^subject:"
+    //
     private val LINE_HEADER_RX = Pattern.compile("^($HEADER_STR)", Pattern.MULTILINE or Pattern.DOTALL or Pattern.CASE_INSENSITIVE)
     private val QUOTE_MARKER_RX = Pattern.compile("^(>|$HEADER_STR)", Pattern.MULTILINE or Pattern.DOTALL or Pattern.CASE_INSENSITIVE)
 
