@@ -4,8 +4,6 @@ import com.google.common.base.Splitter
 import com.google.common.io.LineProcessor
 import com.google.common.io.Resources
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.containsString
-import org.hamcrest.Matchers.equalTo
 import org.junit.Assert.assertThat
 import org.junit.Test
 

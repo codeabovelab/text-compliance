@@ -6,7 +6,7 @@ class Fragment(val content: String, val hidden: Boolean, val signature: Boolean,
         var hidden: Boolean = false
         var signature: Boolean = false
         var quoted: Boolean = false
-        val parts = StringBuilder()
+        var text: String? = null
 
         fun hidden(isHidden: Boolean) = apply { this.hidden = isHidden }
         fun signature(isSignature: Boolean) = apply { this.signature = isSignature }
@@ -16,7 +16,7 @@ class Fragment(val content: String, val hidden: Boolean, val signature: Boolean,
             if (quoted || signature) {
                 hidden = true
             }
-            return Fragment(parts.toString(), hidden, signature, quoted)
+            return Fragment(text!!, hidden, signature, quoted)
         }
     }
 

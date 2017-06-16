@@ -162,6 +162,8 @@ some text
 
 #quotes=1
 text
+//we do not detect below header, because can not distinguish it from signature
+// TODO try to find date & name when no 'From:' header
 Phil Clifford
 08/02/2000 04:25 PM
 To: John Arnold/HOU/ECT@ECT
