@@ -124,15 +124,19 @@ class LearnConfig {
         fun learnedDir(dir: String): Files {
             val root = Paths.get(dir)
             return Files(
+                    root = root,
                     config = root.resolve(Config.FILE),
-                    doc2vec = root.resolve("doc2vec.zip")
+                    doc2vec = root.resolve("doc2vec.zip"),
+                    keywords = root.resolve("keywords")
             )
         }
     }
 
     data class Files(
+            var root: Path,
             val config: Path,
-            val doc2vec: Path
+            val doc2vec: Path,
+            val keywords: Path
     )
 
     data class ThesaurusConfiguration(

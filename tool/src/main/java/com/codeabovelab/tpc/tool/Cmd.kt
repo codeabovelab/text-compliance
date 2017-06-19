@@ -27,9 +27,6 @@ class Cmd {
     @field:Option(name = "-c", usage = "path to config file")
     var config: String? = null
 
-    @field:Option(name = "-w", usage = "list of words properties")
-    var words: String? = null
-
     fun run() {
         command!!.create(this)()
     }

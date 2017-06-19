@@ -13,7 +13,7 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
 
     companion object {
 
-        private val pattern = Pattern.compile("\\[(\\w+)(?:,?(\\w+))*\\]")
+        private val pattern = Pattern.compile("\\[([^],/\\\\]+)(?:,?([^],/\\\\]+))*\\]")
 
         fun extractLabels(filePath: Path): List<String> {
             val m = pattern.matcher(filePath.fileName.toString())

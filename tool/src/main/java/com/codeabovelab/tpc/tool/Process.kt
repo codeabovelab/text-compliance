@@ -1,9 +1,10 @@
 package com.codeabovelab.tpc.tool
 
-import com.codeabovelab.tpc.core.kw.KeywordHashMatcher
+import com.codeabovelab.tpc.core.kw.KeywordSetMatcher
 import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.TextClassifierResult
+import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.ProcessModifier
 import com.codeabovelab.tpc.core.processor.Processor
@@ -20,12 +21,14 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import net.didion.jwnl.JWNL
 import org.slf4j.LoggerFactory
+import java.io.ByteArrayInputStream
+import java.io.StringReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.text.NumberFormat
-import java.util.stream.Collectors
+import java.util.*
 
 /**
  */
@@ -53,8 +56,8 @@ class Process(
     fun run() {
 
         val proc = Processor()
-        configureTCProcessor(learnedDir, learnedConfig, proc)
-        configureWSProcessor(learnedConfig, proc)
+        configureTextClassifier(proc)
+        configureKeyWord(proc)
 
         val pathIter = Files.walk(inPath).filter {
             docReaders.containsKey(PathUtils.extension(it))
@@ -70,35 +73,65 @@ class Process(
         }
     }
 
-    private fun configureTCProcessor(ld: LearnConfig.Files, lc: LearnConfig, proc: Processor) {
+    private fun configureTextClassifier(proc: Processor) {
         val tc = TextClassifier(
-                vectorsFile = ld.doc2vec,
+                vectorsFile = learnedDir.doc2vec,
                 maxLabels = 3,
-                uima = lc.createUimaResource(),
-                wordSupplier = lc.wordSupplier()
+                uima = learnedConfig.createUimaResource(),
+                wordSupplier = learnedConfig.wordSupplier()
         )
         proc.addRule(Rule("classify", 0.0f, tc))
     }
 
-    private fun configureWSProcessor(lc: LearnConfig, proc: Processor) {
-        val thesaurusConfig = lc.thesaurus
+    private fun configureKeyWord(proc: Processor) {
+        val keywordsDir = learnedDir.keywords
+        val thesaurusConfig = learnedConfig.thesaurus
         val wordsSet = thesaurusConfig.words.orEmpty()
-        if (!wordsSet.isEmpty()) {
-            initThesaurus(thesaurusConfig)
-            val thesaurus = JWNLWordSynonyms()
-            val enrichedWords = wordsSet.stream()
-                    .flatMap { w -> thesaurus.lookup(w).words.stream() }
-                    .collect(Collectors.toSet())
-            val sw = WordPredicate(
-                    keywordMatcher = KeywordHashMatcher(enrichedWords),
-                    uima = SentenceIteratorImpl.uimaResource(morphological = true))
-            proc.addRule(Rule("searchWords", 0.0f, sw))
+        val hasKeywordsDir = Files.exists(keywordsDir)
+        if (wordsSet.isEmpty() && !hasKeywordsDir) {
+            return
+        }
+        if(!initThesaurus(thesaurusConfig)) {
+            return
+        }
+        val thesaurus = JWNLWordSynonyms()
+        val ksmBuilder = KeywordSetMatcher.Builder()
+        val defaultLabel = Collections.singleton("key-word")
+        wordsSet.forEach {
+            ksmBuilder.add(it, defaultLabel)
+            thesaurus.lookup(it).words.forEach {
+                ksmBuilder.add(it, defaultLabel)
+            }
+        }
+        if(hasKeywordsDir) {
+            loadFromFiles(keywordsDir, ksmBuilder)
+        }
+        val sw = WordPredicate(
+                keywordMatcher = ksmBuilder.build(),
+                uima = SentenceIteratorImpl.uimaResource(morphological = true))
+        proc.addRule(Rule("searchWords", 0.0f, sw))
+    }
+
+    private fun loadFromFiles(keywordsDir: Path, ksmBuilder: KeywordSetMatcher.Builder) {
+        Files.walk(keywordsDir).filter {
+            "txt" == PathUtils.extension(it)
+        }.forEach {
+            val labels = FileTextIterator.extractLabels(it)
+            Files.lines(it).forEach {
+                ksmBuilder.add(it, labels)
+            }
         }
     }
 
-    private fun initThesaurus(thesaurus: LearnConfig.ThesaurusConfiguration) {
-        val resource = Paths.get(thesaurus.jwnlurl!!)
-        JWNL.initialize(resource.toFile().inputStream())
+    private fun initThesaurus(thesaurus: LearnConfig.ThesaurusConfiguration): Boolean {
+        if(thesaurus.jwnlurl == null) {
+            return false
+        }
+        val resource = learnedDir.root.resolve(thesaurus.jwnlurl!!)
+        //below we use hack to define relative dir into JWNL xml config, wee need rewrite it
+        val xml = resource.toFile().readText(StandardCharsets.UTF_8).replace("\${DIR}", learnedDir.root.toString())
+        JWNL.initialize(ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8)))
+        return true
     }
 
     private fun processDoc(proc: Processor, path: Path) {
@@ -148,7 +181,7 @@ class Process(
         val map = HashMap<String, Double>()
         for(entry in tcr.entries) {
             for(label in entry.labels) {
-                map.compute(label.label) { key, old ->
+                map.compute(label.label) { _, old ->
                     if(old == null) label.similarity else Math.min(old, label.similarity)
                 }
             }

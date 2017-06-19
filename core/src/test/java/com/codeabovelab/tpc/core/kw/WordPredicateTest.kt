@@ -25,7 +25,7 @@ class WordPredicateTest {
         val keyWord : String ="hell"
         val tc = WordPredicate(
                 uima = SentenceIteratorImpl.Companion.uimaResource(pos = true, morphological = true),
-                keywordMatcher = KeywordHashMatcher(setOf(keyWord))
+                keywordMatcher = KeywordSetMatcher(setOf(keyWord))
         )
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)

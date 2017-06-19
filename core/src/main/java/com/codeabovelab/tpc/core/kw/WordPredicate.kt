@@ -24,34 +24,35 @@ class WordPredicate(
                 continue
             }
             val seq = sentence!!
-            val vws = toWordList(seq)
-            if(vws.isEmpty()) {
+            val labels = extractLabels(seq)
+            if(labels.isEmpty()) {
                 return WordSearchResult(entries = emptyList())
             }
             val resEntry = WordSearchResult.Entry(
                     coordinates = text.getCoordinates(seq.offset, seq.str.length),
-                    word = vws)
+                    word = labels)
             entries.add(resEntry)
         }
         return WordSearchResult(entries = entries)
     }
 
-    private fun toWordList(seq: SentenceData): List<WordSearchResult.Label> {
-        val wch = WordContext.create()
-        wch.sentence = seq
-        val vws = ArrayList<WordSearchResult.Label>()
+    private fun extractLabels(seq: SentenceData): List<WordSearchResult.Label> {
+        val wordContext = WordContext.create()
+        wordContext.sentence = seq
+        val resultList = ArrayList<WordSearchResult.Label>()
         for (word in seq.words) {
-            wch.word = word
-            if (!keywordMatcher.test(wch.context)) {
-                continue
-            }
-            val str = wch.context.word.str
+            wordContext.word = word
+            val str = wordContext.context.word.str
             if (str.isNullOrEmpty()) {
                 continue
             }
-            vws.add(WordSearchResult.Label(str, word.lemma!!))
+            val labels = keywordMatcher.test(wordContext.context)
+            if (labels.isEmpty()) {
+                continue
+            }
+            resultList.add(WordSearchResult.Label(str, labels))
         }
-        return vws
+        return resultList
     }
 }
 
@@ -62,6 +63,6 @@ class WordSearchResult(
     class Entry(coordinates: TextCoordinates,
                 val word: List<Label>):
             PredicateResult.Entry(coordinates)
-    data class Label(val word: String, val stopWord: String)
+    data class Label(val word: String, val labels: Set<String>)
 
 }

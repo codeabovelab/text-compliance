@@ -7,5 +7,8 @@ import com.codeabovelab.tpc.core.nn.nlp.WordContext
  */
 interface KeywordMatcher {
 
-    fun test(word: WordContext): Boolean
+    /**
+     * Return labels set for specified words
+     */
+    fun test(word: WordContext): Set<String>
 }
