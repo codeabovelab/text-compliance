@@ -25,7 +25,7 @@ class WordPredicateTest {
         val keyWord : String ="hell"
         val tc = WordPredicate(
                 uima = SentenceIteratorImpl.Companion.uimaResource(pos = true, morphological = true),
-                keywordMatcher = KeywordSetMatcher(setOf(keyWord))
+                keywordMatcher = KeywordSetMatcher.Builder().add(keyWord, setOf(keyWord)).build()
         )
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
@@ -39,7 +39,7 @@ class WordPredicateTest {
                 val sentence = text.substring(offset, offset + it.coordinates.length)
                 log.info(sentence + ": " + it.word)
                 Assert.assertNotNull(it.word)
-                Assert.assertThat(it.word, CoreMatchers.hasItem(WordSearchResult.Label(keyWord, keyWord)))
+                Assert.assertThat(it.word, CoreMatchers.hasItem(WordSearchResult.Label(keyWord, setOf(keyWord))))
             }
         }
     }
