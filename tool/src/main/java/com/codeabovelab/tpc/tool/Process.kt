@@ -3,7 +3,6 @@ package com.codeabovelab.tpc.tool
 import com.codeabovelab.tpc.core.kw.KeywordSetMatcher
 import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.TextClassifier
-import com.codeabovelab.tpc.core.nn.TextClassifierResult
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.*
@@ -193,7 +192,7 @@ class Process(
                     max.compute(label.label) { _, old ->
                         if (old == null) label.similarity else Math.max(old, label.similarity)
                     }
-                    entries.compute(entry.coordinates) { key, old ->
+                    entries.compute(entry.coordinates) { _, old ->
                         val set = old ?: HashSet<LabelEntry>()
                         set.add(LabelEntry(rr.ruleId, label))
                         set

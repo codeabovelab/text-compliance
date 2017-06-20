@@ -33,8 +33,8 @@ class KeywordSetMatcher private constructor(
         return map
     }
 
-    override fun test(word: WordContext): Set<String> {
-        var word = word.word.lemma?: word.word.str
+    override fun test(wc: WordContext): Set<String> {
+        var word = wc.word.lemma?: wc.word.str
         word = clear(word)
         val res = map[word]
         return res ?: Collections.emptySet()
@@ -70,7 +70,7 @@ class KeywordSetMatcher private constructor(
         internal val map = TreeMap<String, TreeSet<String>>(String.CASE_INSENSITIVE_ORDER)
 
         fun add(word: String, labels: Iterable<String>) = apply {
-            map.compute(word) { key, old ->
+            map.compute(word) { _, old ->
                 val set = old ?: TreeSet<String>(String.CASE_INSENSITIVE_ORDER)
                 set.addAll(labels)
                 set

@@ -10,5 +10,5 @@ interface KeywordMatcher {
     /**
      * Return labels set for specified words
      */
-    fun test(word: WordContext): Set<String>
+    fun test(wc: WordContext): Set<String>
 }
