@@ -34,6 +34,8 @@ class WordPredicate(
                     coordinates = text.getCoordinates(seq.offset, seq.str.length),
                     keywords = ImmutableList.copyOf(keywords),
                     labels = ImmutableSet.copyOf(labelsSet))
+            keywords.clear()
+            labelsSet.clear()
             entries.add(resEntry)
         }
         return WordSearchResult(entries = entries)
