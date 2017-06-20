@@ -7,14 +7,12 @@ import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
-import org.junit.Ignore
 import org.junit.Test
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 
 /**
  */
-@Ignore
 class WordPredicateTest {
 
     val log = LoggerFactory.getLogger(this.javaClass)!!
@@ -37,9 +35,9 @@ class WordPredicateTest {
             res.entries.forEach {
                 val offset = it.coordinates.offset
                 val sentence = text.substring(offset, offset + it.coordinates.length)
-                log.info(sentence + ": " + it.words)
-                Assert.assertNotNull(it.words)
-                Assert.assertThat(it.words, CoreMatchers.hasItem(WordSearchResult.Label(keyWord, setOf(keyWord))))
+                log.info(sentence + ": " + it.keywords)
+                Assert.assertNotNull(it.keywords)
+                Assert.assertThat(it.keywords, CoreMatchers.hasItem(keyWord))
             }
         }
     }
