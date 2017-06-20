@@ -1,17 +1,19 @@
-#quotes=2
+#parts=1
+test text
+#parts=2
 Phillip,
 
 > As discussed  during our phone conversation, In a Parallon 75 microturbine
 > power generation deal for a national accounts customer, I am developing a
 >> third level
 > second
-#quotes=1
+#parts=2
 Awesome! I haven't had another problem with it.
 
 On Aug 22, 2011, at 7:37 PM, defunkt<reply@reply.github.com> wrote:
 
 > Loader seems to be working well.
-#quotes=1
+#parts=2
 Thx
 John
 ---------------------- Forwarded by John Arnold/HOU/ECT on 09/29/2000 04:55
@@ -25,7 +27,7 @@ Jessica Ramirez/HOU/ECT@ECT
 Subject: Nigel Patterson
 Below please find a copy of the resume and the itinerary for Nigel
 Patterson.
-#quotes=4
+#parts=4
 ---------------------- Forwarded by Sarah-Joy Hunter/NA/Enron on 12/13/2000
 12:27 PM ---------------------------
 "Peter Eichler" <peichler@pccflow.com> on 12/13/2000 12:15:35 PM
@@ -76,7 +78,7 @@ Subject:     Update
 John....
 Since we last met, a  letter of Intent has been signed by PCC with EES
 (Enron Energy  Services)....
-#quotes=2
+#parts=3
 my plan worked
 -----Original Message-----
 From:   Allen, Margaret
@@ -84,6 +86,7 @@ Sent:   Wednesday, June 13, 2001 5:32 PM
 To:     Arnold, John
 Subject:        RE: Bryce Schneider
 Actually ... attitude!
+//TODO below not detected
 John Arnold/ENRON@enronXgate 06/13/2001 04:58 PM           To: Margaret Allen/Corp/Enron@ENRON  cc:   Subject: RE: Bryce Schneider
 yea, i interviewed him.
 i gave him a thumbs up.
@@ -94,7 +97,7 @@ Sent:   Wednesday, June 13, 2001 4:09 PM
 To:     Arnold, John
 Subject:        Bryce Schneider
 Hey - -did you meet this guy?!
-#quotes=2
+#parts=3
 you're right about the email address.
 -----Original Message-----
 From:   "Kevin Collins" <kevin.collins@db.com>@ENRON
@@ -111,22 +114,7 @@ Kevin Collins
 John,
 Regards,
 Kevin
-#quotes=2
-will talk to you when i get back and we'll figure out what to do then.
------Original Message-----
-From:   "Lafontaine, Steve" <steve.lafontaine@bankofamerica.com>@ENRON [mailto:IMCEANOTES-+22Lafontaine+2C+20Steve+22+20+3Csteve+2Elafontaine+40bankofamerica+2Ecom+3E+40ENRON@ENRON.com]
-Sent:   Monday, July 02, 2001 1:25 PM
-To:     Arnold, John
-Subject:        RE:
-on  vacation my man.
-feel free to call cell this week
------Original Message-----
-From: Arnold, John  [mailto:John.Arnold@enron.com]
-Sent: Monday, July 02, 2001 10:37  AM
-To: LaFontaine, Steve
-Subject: RE:
-        what's you're new phone # ?
-#quotes=3
+#parts=3
 The metering variables that we use in Kibana.
 
 ----------
@@ -138,21 +126,13 @@ do you need some concrete indexes? (kibana has ~ 1k indexes)?
 btw host 10.0.1.146 with kibana is down
 
 ----------
-From: *one two* <one@gmail.com>
-Date: Wed, Jan 6, 2016 at 11:07 AM
-To: three four <three@four.com>
-
-new prod machines were rebooted and not started
-I will try to group metrics
-
-----------
 From: *three four* <three@four.com>
 Date: Thu, Jan 7, 2016 at 4:20 AM
 To: one two <one@gmail.com>
 
 some text
 
-#quotes=1
+#parts=2
 some text
 Heather Robertson <hrobertson@hbk.com> on 09/25/2000 06:09:01 PM
 To: John.Arnold@enron.com
@@ -160,7 +140,7 @@ cc:
 Subject: RE: Young John?
 some text
 
-#quotes=1
+#parts=2
 text
 //we do not detect below header, because can not distinguish it from signature
 // TODO try to find date & name when no 'From:' header

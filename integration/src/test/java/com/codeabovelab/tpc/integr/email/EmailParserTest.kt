@@ -31,7 +31,7 @@ internal class EmailParserTest {
                 if(line.isNotEmpty() && line.first() == '#') {
                     endSource()
                     val map = splitter.split(line.substring(1))
-                    quotes = Integer.parseInt(map["quotes"])
+                    quotes = Integer.parseInt(map["parts"])
                 } else {
                     sb.append(line).append('\n')
                 }
@@ -65,9 +65,7 @@ internal class EmailParserTest {
                 println("# hidden=${it.hidden}\t quoted=${it.quoted} signature=${it.signature}")
                 println(it.content)
             }
-            //now it does not support enclosed quotes
-            //assertThat(fragments, Matchers.hasSize(src.quotes))
-            assertThat(fragments, Matchers.hasSize(Matchers.greaterThan(1)))
+            assertThat(fragments, Matchers.hasSize(src.quotes))
             num++
         }
     }

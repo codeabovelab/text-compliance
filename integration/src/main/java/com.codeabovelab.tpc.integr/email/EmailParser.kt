@@ -49,7 +49,7 @@ class EmailParser {
             if(builder == null) {
                 return
             }
-            val frag = builder!!.build()
+            val frag = builder.build()
             if (!frag.content.isNullOrEmpty()) {
                 fragments.add(frag)
             }
@@ -68,7 +68,7 @@ class EmailParser {
 
         fun read() {
             val m = QUOTE_MARKER_RX.matcher(text)
-            var last = 0
+            var last: Int
             while(m.find()) {
                 last = m.start()
                 var group = m.group()
@@ -140,7 +140,7 @@ class EmailParser {
         }
 
         private fun partComplete() {
-            val current = currHeader.getBegin()
+            val current = if(currHeader.isFound()) currHeader.getBegin() else text.length
             // note that it part correspond to prevHeader
             addPart(prevHeader, text.substring(prev, current))
             prevHeader.copy(currHeader)
