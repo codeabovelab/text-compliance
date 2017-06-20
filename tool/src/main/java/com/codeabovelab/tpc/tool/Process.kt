@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.kw.KeywordSetMatcher
 import com.codeabovelab.tpc.core.kw.WordPredicate
+import com.codeabovelab.tpc.core.kw.WordSearchResult
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
@@ -146,7 +147,10 @@ class Process(
 
         val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
         val labels = collectLabels(report)
-        log.info("{} labels: {}", relPath, labels.max.entries.joinToString { "${it.key}=${it.value} (min=${labels.min[it.key]})" })
+        val numFormat = NumberFormat.getInstance(Locale.ROOT)
+        log.info("{} labels: {}", relPath, labels.max.entries.joinToString {
+            "${it.key}=${numFormat.format(it.value)} (min=${numFormat.format(labels.min[it.key])})"
+        })
         val baseName = PathUtils.withoutExtension(relPath)
         val reportPath = outPath.resolve(baseName + "-report.yaml")
         val textPath = outPath.resolve(baseName + "-analyzed.txt")
@@ -160,7 +164,7 @@ class Process(
     }
 
     private fun printReport(labels: LabelsData, text: StringBuilder, writer: BufferedWriter) {
-        val numFormat = NumberFormat.getInstance()
+        val numFormat = NumberFormat.getInstance(Locale.ROOT)
         for (entry in labels.entries) {
             val coords = entry.coordinates
             writer.append(text, coords.offset, coords.offset + coords.length)
@@ -169,8 +173,8 @@ class Process(
                 writer.append(label.label.label)
                 writer.append('=')
                 writer.append(numFormat.format(label.label.similarity))
-                writer.append(" by rule=")
-                writer.append(label.rule)
+                writer.append(" notice: ")
+                writer.append(label.notice)
             }
             writer.appendln()
         }
@@ -194,7 +198,14 @@ class Process(
                     }
                     entries.compute(entry.coordinates) { _, old ->
                         val set = old ?: HashSet<LabelEntry>()
-                        set.add(LabelEntry(rr.ruleId, label))
+                        val notice = when(entry) {
+                            is WordSearchResult.Entry -> "keyword=${entry.keywords.joinToString { it }}"
+                            else -> "rule=${rr.ruleId}"
+                        }
+                        set.add(LabelEntry(
+                                label,
+                                notice
+                        ))
                         set
                     }
                 }
@@ -229,7 +240,7 @@ class Process(
     )
 
     data class LabelEntry(
-            val rule: String,
-            val label: Label
+            val label: Label,
+            val notice: String
     )
 }
