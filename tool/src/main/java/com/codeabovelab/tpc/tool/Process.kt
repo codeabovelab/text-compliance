@@ -6,14 +6,13 @@ import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.TextClassifierResult
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
-import com.codeabovelab.tpc.core.processor.ProcessModifier
-import com.codeabovelab.tpc.core.processor.Processor
-import com.codeabovelab.tpc.core.processor.Rule
+import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.core.thesaurus.JWNLWordSynonyms
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentField
 import com.codeabovelab.tpc.doc.TextDocumentReader
 import com.codeabovelab.tpc.integr.email.EmailDocumentReader
+import com.codeabovelab.tpc.text.TextCoordinates
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.util.PathUtils
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -21,8 +20,8 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import net.didion.jwnl.JWNL
 import org.slf4j.LoggerFactory
+import java.io.BufferedWriter
 import java.io.ByteArrayInputStream
-import java.io.StringReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -147,46 +146,66 @@ class Process(
         val report = proc.process(doc, modifier)
 
         val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
-        val tcr = report.findRule<TextClassifierResult>()
-        log.info("{} labels: {}", relPath, printLabels(tcr))
+        val labels = collectLabels(report)
+        log.info("{} labels: {}", relPath, labels.max.entries.joinToString { "${it.key}=${it.value} (min=${labels.min[it.key]})" })
         val baseName = PathUtils.withoutExtension(relPath)
         val reportPath = outPath.resolve(baseName + "-report.yaml")
         val textPath = outPath.resolve(baseName + "-analyzed.txt")
         Files.createDirectories(reportPath.parent)
-        if(tcr != null) {
-            val numFormat = NumberFormat.getInstance()
-            Files.newBufferedWriter(textPath, StandardCharsets.UTF_8).use {
-                for(entry in tcr.entries) {
-                    val coords = entry.coordinates
-                    it.append(text, coords.offset, coords.offset + coords.length)
-                    for(label in entry.labels) {
-                        it.append("\n \u26A0 ")
-                        it.append(label.label)
-                        it.append('=')
-                        it.append(numFormat.format(label.similarity))
-                    }
-                    it.appendln()
-                }
-            }
+        Files.newBufferedWriter(textPath, StandardCharsets.UTF_8).use {
+            printReport(labels, text, it)
         }
         Files.newOutputStream(reportPath).use {
             om.writeValue(it, report)
         }
     }
 
-    private fun printLabels(tcr: TextClassifierResult?): String {
-        if(tcr == null) {
-            return ""
+    private fun printReport(labels: LabelsData, text: StringBuilder, writer: BufferedWriter) {
+        val numFormat = NumberFormat.getInstance()
+        for (entry in labels.entries) {
+            val coords = entry.coordinates
+            writer.append(text, coords.offset, coords.offset + coords.length)
+            for (label in entry.labels) {
+                writer.append("\n \u26A0 ")
+                writer.append(label.label.label)
+                writer.append('=')
+                writer.append(numFormat.format(label.label.similarity))
+                writer.append(" by rule=")
+                writer.append(label.rule)
+            }
+            writer.appendln()
         }
-        val map = HashMap<String, Double>()
-        for(entry in tcr.entries) {
-            for(label in entry.labels) {
-                map.compute(label.label) { _, old ->
-                    if(old == null) label.similarity else Math.min(old, label.similarity)
+    }
+
+    private fun collectLabels(report: ProcessorReport): LabelsData {
+        val min = HashMap<String, Double>()
+        val max = HashMap<String, Double>()
+        val entries = HashMap<TextCoordinates, MutableSet<LabelEntry>>()
+        for (rr in report.rules) {
+            for (entry in rr.result.entries) {
+                if (entry !is Labeled) {
+                    continue
+                }
+                for (label in entry.labels) {
+                    min.compute(label.label) { _, old ->
+                        if (old == null) label.similarity else Math.min(old, label.similarity)
+                    }
+                    max.compute(label.label) { _, old ->
+                        if (old == null) label.similarity else Math.max(old, label.similarity)
+                    }
+                    entries.compute(entry.coordinates) { key, old ->
+                        val set = old ?: HashSet<LabelEntry>()
+                        set.add(LabelEntry(rr.ruleId, label))
+                        set
+                    }
                 }
             }
         }
-        return tcr.labels.joinToString { "${it.label}=${it.similarity} (min=${map[it.label]})" }
+        return LabelsData(
+                min = min,
+                max = max,
+                entries = entries.map { LabelsEntry(it.key, it.value) }
+        )
     }
 
     private fun readDoc(path: Path): Document {
@@ -198,4 +217,20 @@ class Process(
             return db.build()
         }
     }
+
+    data class LabelsData(
+            val min: Map<String, Double>,
+            val max: Map<String, Double>,
+            val entries: List<LabelsEntry>
+    )
+
+    data class LabelsEntry(
+            val coordinates: TextCoordinates,
+            val labels: Collection<LabelEntry>
+    )
+
+    data class LabelEntry(
+            val rule: String,
+            val label: Label
+    )
 }

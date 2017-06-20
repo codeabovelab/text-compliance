@@ -37,9 +37,9 @@ class WordPredicateTest {
             res.entries.forEach {
                 val offset = it.coordinates.offset
                 val sentence = text.substring(offset, offset + it.coordinates.length)
-                log.info(sentence + ": " + it.word)
-                Assert.assertNotNull(it.word)
-                Assert.assertThat(it.word, CoreMatchers.hasItem(WordSearchResult.Label(keyWord, setOf(keyWord))))
+                log.info(sentence + ": " + it.words)
+                Assert.assertNotNull(it.words)
+                Assert.assertThat(it.words, CoreMatchers.hasItem(WordSearchResult.Label(keyWord, setOf(keyWord))))
             }
         }
     }

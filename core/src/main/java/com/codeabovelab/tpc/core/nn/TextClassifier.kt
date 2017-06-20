@@ -1,9 +1,7 @@
 package com.codeabovelab.tpc.core.nn
 
 import com.codeabovelab.tpc.core.nn.nlp.*
-import com.codeabovelab.tpc.core.processor.PredicateContext
-import com.codeabovelab.tpc.core.processor.PredicateResult
-import com.codeabovelab.tpc.core.processor.RulePredicate
+import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.TextCoordinates
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
@@ -11,7 +9,6 @@ import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.deeplearning4j.text.uima.UimaResource
 import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.cpu.nativecpu.NDArray
 import org.nd4j.linalg.ops.transforms.Transforms
 import java.nio.file.Path
 
@@ -63,12 +60,12 @@ class TextClassifier(
         return TextClassifierResult(entries = entries, labels = textLabels)
     }
 
-    private fun extractLabels(indArray: INDArray): List<TextClassifierResult.Label> {
+    private fun extractLabels(indArray: INDArray): List<Label> {
         val labels = pv.nearestLabels(indArray, maxLabels)
         val labelsWithSim = labels.stream().map {
             val lm = pv.getWordVectorMatrix(it)
             val similarity = Transforms.cosineSim(indArray, lm)
-            TextClassifierResult.Label(it, similarity)
+            Label(it, similarity)
         }.collect(Collectors.toList())
         return labelsWithSim
     }
@@ -98,12 +95,11 @@ class TextClassifierResult(
         /**
          * Labels for all text
          */
-        val labels: List<Label>
-    ): PredicateResult<TextClassifierResult.Entry>(entries) {
+        override val labels: Collection<Label>
+    ): PredicateResult<TextClassifierResult.Entry>(entries), Labeled {
 
-    class Entry(coordinates: TextCoordinates,
-                val labels: List<Label>):
-            PredicateResult.Entry(coordinates)
-
-    data class Label(val label: String, val similarity: Double)
+    class Entry(
+            coordinates: TextCoordinates,
+            override val labels: List<Label>
+    ) : PredicateResult.Entry(coordinates), Labeled
 }
