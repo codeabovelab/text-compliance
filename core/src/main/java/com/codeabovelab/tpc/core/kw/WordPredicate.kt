@@ -19,7 +19,7 @@ class WordPredicate(
         val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(text))
         val entries = ArrayList<WordSearchResult.Entry>()
         val labelsSet = HashSet<Label>()
-        val keywords = ArrayList<String>()
+        val keywords = HashSet<String>()
         while(si.hasNext()) {
             val sentence = si.next()
             if(sentence.isNullOrEmpty()) {
@@ -41,7 +41,7 @@ class WordPredicate(
         return WordSearchResult(entries = entries)
     }
 
-    private fun extractLabels(seq: SentenceData, keywords: MutableList<String>, labelsSet: MutableSet<Label>) {
+    private fun extractLabels(seq: SentenceData, keywords: MutableSet<String>, labelsSet: MutableSet<Label>) {
         val wordContext = WordContext.create()
         wordContext.sentence = seq
         for (word in seq.words) {

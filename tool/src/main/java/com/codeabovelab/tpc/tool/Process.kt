@@ -83,25 +83,16 @@ class Process(
     }
 
     private fun configureKeyWord(proc: Processor) {
-        val keywordsDir = learnedDir.keywords
         val thesaurusConfig = learnedConfig.thesaurus
-        val wordsSet = thesaurusConfig.words.orEmpty()
+        val keywordsDir = learnedConfig.path(thesaurusConfig.words)
         val hasKeywordsDir = Files.exists(keywordsDir)
-        if (wordsSet.isEmpty() && !hasKeywordsDir) {
+        if (!hasKeywordsDir) {
             return
         }
         if(!initThesaurus(thesaurusConfig)) {
             return
         }
-        val thesaurus = JWNLWordSynonyms()
         val ksmBuilder = KeywordSetMatcher.Builder()
-        val defaultLabel = Collections.singleton("key-word")
-        wordsSet.forEach {
-            ksmBuilder.add(it, defaultLabel)
-            thesaurus.lookup(it).words.forEach {
-                ksmBuilder.add(it, defaultLabel)
-            }
-        }
         if(hasKeywordsDir) {
             loadFromFiles(keywordsDir, ksmBuilder)
         }
@@ -112,12 +103,16 @@ class Process(
     }
 
     private fun loadFromFiles(keywordsDir: Path, ksmBuilder: KeywordSetMatcher.Builder) {
+        val thesaurus = JWNLWordSynonyms()
         Files.walk(keywordsDir).filter {
             "txt" == PathUtils.extension(it)
         }.forEach {
             val labels = FileTextIterator.extractLabels(it)
             Files.lines(it).forEach {
                 ksmBuilder.add(it, labels)
+                thesaurus.lookup(it).words.forEach {
+                    ksmBuilder.add(it, labels)
+                }
             }
         }
     }

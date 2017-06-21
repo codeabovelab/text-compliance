@@ -16,6 +16,7 @@ import java.nio.file.Paths
  */
 class LearnConfig {
     private val log = LoggerFactory.getLogger(this.javaClass)
+    private var root: Path? = null
     var doc2vec = VectorsConfiguration()
     var wordsConversion: WordConversion = WordConversion.RAW
     var thesaurus = ThesaurusConfiguration()
@@ -56,6 +57,7 @@ class LearnConfig {
         return SentenceIteratorImpl.uimaResource(pos = p, morphological = m)
     }
 
+
     fun configure(config: Path?) {
         if (config == null) {
             return
@@ -72,6 +74,14 @@ class LearnConfig {
                 Config.write(this, it)
             }
         }
+        this.root = config
+    }
+
+    fun path(relativePath: String): Path {
+        if(root == null) {
+            throw IllegalStateException("Config is not bind with path, invoke 'configure()' first")
+        }
+        return root!!.resolve(relativePath)
     }
 
 
@@ -126,8 +136,7 @@ class LearnConfig {
             return Files(
                     root = root,
                     config = root.resolve(Config.FILE),
-                    doc2vec = root.resolve("doc2vec.zip"),
-                    keywords = root.resolve("keywords")
+                    doc2vec = root.resolve("doc2vec.zip")
             )
         }
     }
@@ -135,12 +144,13 @@ class LearnConfig {
     data class Files(
             var root: Path,
             val config: Path,
-            val doc2vec: Path,
-            val keywords: Path
+            val doc2vec: Path
     )
 
     data class ThesaurusConfiguration(
             var jwnlurl: String? = null,
-            var words: Set<String>? = null)
+            var words: String = "words",
+            var wordNet: String = "wordnet"
+    )
 }
 
