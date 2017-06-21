@@ -2,17 +2,23 @@ package com.codeabovelab.tpc.tool.learn
 
 import com.codeabovelab.tpc.core.nn.TokenizerFactoryImpl
 import com.codeabovelab.tpc.core.nn.nlp.*
+import com.codeabovelab.tpc.tool.util.Config
+import com.codeabovelab.tpc.tool.util.Copy
+import com.codeabovelab.tpc.util.Reflections
+import org.apache.commons.io.FileUtils
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache
 import org.slf4j.LoggerFactory
+import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.stream.Stream
+import kotlin.reflect.full.findAnnotation
 
 /**
  */
@@ -34,10 +40,12 @@ class Learning(
         }
         pvf.parentFile.mkdirs()
         val lc = LearnConfig()
-        val configPath = Paths.get(config)
-        lc.configure(configPath) // this method wil create config if absent
-
-        Files.copy(configPath, ld.config, StandardCopyOption.REPLACE_EXISTING)
+        if(config != null) {
+            val srcConfigPath = Paths.get(config)
+            lc.configure(srcConfigPath) // this method wil create config if absent
+            copyResources(srcConfigPath.parent, ld.root, lc)
+            lc.save(ld.config)
+        }
 
         val pv = learn(lc)
 
@@ -102,5 +110,21 @@ class Learning(
         )
     }
 
+    private fun copyResources(fromPath: Path, toPath: Path, lc: LearnConfig) {
+        Reflections.forEach(lc) {
+            val copyAnn = this.property.findAnnotation<Copy>()
+            if(copyAnn != null) {
+                val strPath = this.propertyValue as String
+                val from = fromPath.resolve(strPath)
+                val to = toPath.resolve(copyAnn.dir)
+                //Files.createDirectories(to.parent)
+                FileUtils.copyDirectory(from.toFile(), to.toFile())
+                this.propertyValue = copyAnn.dir
+                false
+            } else {
+                true
+            }
+        }
+    }
 }
 

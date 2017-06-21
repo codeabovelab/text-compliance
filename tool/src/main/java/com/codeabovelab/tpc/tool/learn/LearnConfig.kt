@@ -4,6 +4,7 @@ import com.codeabovelab.tpc.core.nn.nlp.Pos
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.nn.nlp.WordContext
 import com.codeabovelab.tpc.tool.util.Config
+import com.codeabovelab.tpc.tool.util.Copy
 import org.deeplearning4j.models.embeddings.loader.VectorsConfiguration
 import org.deeplearning4j.text.uima.UimaResource
 import org.slf4j.LoggerFactory
@@ -69,12 +70,16 @@ class LearnConfig {
                 Config.read(this, it)
             }
         } else {
-            log.info("Save config to $config")
-            FileOutputStream(cf).use {
-                Config.write(this, it)
-            }
+            save(config)
         }
-        this.root = config
+        this.root = config.parent
+    }
+
+    fun save(config: Path) {
+        log.info("Save config to $config")
+        FileOutputStream(config.toFile()).use {
+            Config.write(this, it)
+        }
     }
 
     fun path(relativePath: String): Path {
@@ -149,8 +154,8 @@ class LearnConfig {
 
     data class ThesaurusConfiguration(
             var jwnlurl: String? = null,
-            var words: String = "words",
-            var wordNet: String = "wordnet"
+            @Copy("words") var words: String? = null,
+            @Copy("wordnet") var wordNet: String? = null
     )
 }
 

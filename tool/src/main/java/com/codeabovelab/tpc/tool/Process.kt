@@ -84,7 +84,10 @@ class Process(
 
     private fun configureKeyWord(proc: Processor) {
         val thesaurusConfig = learnedConfig.thesaurus
-        val keywordsDir = learnedConfig.path(thesaurusConfig.words)
+        if(thesaurusConfig.words == null) {
+            return
+        }
+        val keywordsDir = learnedConfig.path(thesaurusConfig.words!!)
         val hasKeywordsDir = Files.exists(keywordsDir)
         if (!hasKeywordsDir) {
             return
