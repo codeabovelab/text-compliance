@@ -41,7 +41,7 @@ class Learning(
         pvf.parentFile.mkdirs()
         val lc = LearnConfig()
         if(config != null) {
-            val srcConfigPath = Paths.get(config)
+            val srcConfigPath = Paths.get(config).toAbsolutePath()
             lc.configure(srcConfigPath) // this method wil create config if absent
             copyResources(srcConfigPath.parent, ld.root, lc)
             lc.save(ld.config)
