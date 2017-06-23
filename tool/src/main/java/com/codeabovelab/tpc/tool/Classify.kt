@@ -12,12 +12,12 @@ import java.nio.file.Paths
 /**
  */
 class Classify(
-        private val in_data: String,
-        private val in_learned: String
+        private val inData: String,
+        private val inLearned: String
 ) {
     fun run() {
-        val texts = Files.readAllLines(Paths.get(in_data), StandardCharsets.UTF_8)
-        val ld = LearnConfig.learnedDir(in_learned)
+        val texts = Files.readAllLines(Paths.get(inData), StandardCharsets.UTF_8)
+        val ld = LearnConfig.learnedDir(inLearned)
         val lc = LearnConfig()
         lc.configure(ld.config)
         val tc = TextClassifier(
