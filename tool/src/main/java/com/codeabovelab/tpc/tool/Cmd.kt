@@ -72,6 +72,14 @@ class Cmd {
                 )::run
             }
 
+        },
+        evaluate {
+            override fun create(cmd: Cmd): () -> Unit {
+                require(cmd::learned)
+                return Evaluate(
+                      inLearned = cmd.learned!!
+                )::run
+            }
         }
         ;
 
