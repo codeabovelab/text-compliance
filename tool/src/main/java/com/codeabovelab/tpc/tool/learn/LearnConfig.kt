@@ -92,7 +92,7 @@ class LearnConfig {
 
     fun wordSupplier(): (wc: WordContext) -> String? = when (wordsConversion) {
         LearnConfig.WordConversion.RAW -> {
-            { it.word.str }
+            { it.word.str.toLowerCase() }
         }
         LearnConfig.WordConversion.POS -> {
             {

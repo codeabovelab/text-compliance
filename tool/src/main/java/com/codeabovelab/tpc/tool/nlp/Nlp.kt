@@ -22,6 +22,7 @@ class Nlp(private val inDir: String,
     private val ur = SentenceIteratorImpl.uimaResource(true, true)
     private val escaper = CharEscaperBuilder()
             .addEscapes("|=".toCharArray(), "_")
+            .addEscape('-', "")// lemma remain - at end of some words
             .toEscaper()
 
     fun run() {
@@ -54,13 +55,18 @@ class Nlp(private val inDir: String,
                 continue
             }
             for(w in sd!!.words) {
-                if(w.str.isBlank()) {
+                val str = escape(w.str)
+                if(str.isBlank()) {
                     // it produce token for space and some other unprinted symbols
                     continue
                 }
-                writer.append(escape(w.str))
-                val hasLemma = w.lemma != null && !w.str.equals(w.lemma, true)
+                if(w.pos == Pos.SYM) {
+                    continue
+                }
                 val hasPos = w.pos != Pos.UNKNOWN
+                writer.append(str)
+                // note that below we compare _unescaped_ string with lemma
+                val hasLemma = w.lemma != null && !w.str.equals(w.lemma, true)
                 if(hasPos) {
                     writer.append("|p=")
                     writer.append(w.pos.name)
