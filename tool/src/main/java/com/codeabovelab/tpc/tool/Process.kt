@@ -7,7 +7,8 @@ import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.*
-import com.codeabovelab.tpc.core.thesaurus.JWNLWordSynonyms
+import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
+import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentField
 import com.codeabovelab.tpc.doc.TextDocumentReader
@@ -18,7 +19,6 @@ import com.codeabovelab.tpc.util.PathUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import net.didion.jwnl.JWNL
 import org.slf4j.LoggerFactory
 import java.io.BufferedWriter
 import java.io.ByteArrayInputStream
@@ -60,8 +60,8 @@ class Process(
 
         val pathIter = Files.walk(inPath).filter {
             docReaders.containsKey(PathUtils.extension(it))
-        } .iterator()
-        while(pathIter.hasNext()) {
+        }.iterator()
+        while (pathIter.hasNext()) {
             val path = pathIter.next()
             try {
                 processDoc(proc, path)
@@ -84,7 +84,7 @@ class Process(
 
     private fun configureKeyWord(proc: Processor) {
         val thesaurusConfig = learnedConfig.thesaurus
-        if(thesaurusConfig.words == null) {
+        if (thesaurusConfig.words == null) {
             return
         }
         val keywordsDir = learnedConfig.path(thesaurusConfig.words!!)
@@ -92,12 +92,10 @@ class Process(
         if (!hasKeywordsDir) {
             return
         }
-        if(!initThesaurus(thesaurusConfig)) {
-            return
-        }
+        val wordSynonyms = initThesaurus(thesaurusConfig)
         val ksmBuilder = KeywordSetMatcher.Builder()
-        if(hasKeywordsDir) {
-            loadFromFiles(keywordsDir, ksmBuilder)
+        if (hasKeywordsDir) {
+            loadFromFiles(keywordsDir, wordSynonyms, ksmBuilder)
         }
         val sw = WordPredicate(
                 keywordMatcher = ksmBuilder.build(),
@@ -105,30 +103,29 @@ class Process(
         proc.addRule(Rule("searchWords", 0.0f, sw))
     }
 
-    private fun loadFromFiles(keywordsDir: Path, ksmBuilder: KeywordSetMatcher.Builder) {
-        val thesaurus = JWNLWordSynonyms()
+    private fun loadFromFiles(keywordsDir: Path, wordSynonyms: WordSynonyms, ksmBuilder: KeywordSetMatcher.Builder) {
         Files.walk(keywordsDir).filter {
             "txt" == PathUtils.extension(it)
         }.forEach {
             val labels = FileTextIterator.extractLabels(it)
             Files.lines(it).forEach {
                 ksmBuilder.add(it, labels)
-                thesaurus.lookup(it).words.forEach {
+                wordSynonyms.lookup(it).words.forEach {
                     ksmBuilder.add(it, labels)
                 }
             }
         }
     }
 
-    private fun initThesaurus(thesaurus: LearnConfig.ThesaurusConfiguration): Boolean {
-        if(thesaurus.jwnlurl == null) {
-            return false
+    private fun initThesaurus(thesaurus: LearnConfig.ThesaurusConfiguration): WordSynonyms {
+        if (thesaurus.jwnlurl == null) {
+            return WordSynonyms(JwnlThesaurusDictionary.resolve())
+        } else {
+            val resource = learnedDir.root.resolve(thesaurus.jwnlurl!!)
+            //below we use hack to define relative dir into JWNL xml config, wee need rewrite it
+            val xml = resource.toFile().readText(StandardCharsets.UTF_8).replace("\${DIR}", learnedDir.root.toString())
+            return WordSynonyms(JwnlThesaurusDictionary.source(ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8))).resolve())
         }
-        val resource = learnedDir.root.resolve(thesaurus.jwnlurl!!)
-        //below we use hack to define relative dir into JWNL xml config, wee need rewrite it
-        val xml = resource.toFile().readText(StandardCharsets.UTF_8).replace("\${DIR}", learnedDir.root.toString())
-        JWNL.initialize(ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8)))
-        return true
     }
 
     private fun processDoc(proc: Processor, path: Path) {
@@ -196,7 +193,7 @@ class Process(
                     }
                     entries.compute(entry.coordinates) { _, old ->
                         val set = old ?: HashSet<LabelEntry>()
-                        val notice = when(entry) {
+                        val notice = when (entry) {
                             is WordSearchResult.Entry -> "keyword=${entry.keywords.joinToString { it }}"
                             else -> "rule=${rr.ruleId}"
                         }

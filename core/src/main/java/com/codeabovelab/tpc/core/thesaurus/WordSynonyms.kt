@@ -1,6 +1,10 @@
 package com.codeabovelab.tpc.core.thesaurus
 
-interface WordSynonyms {
+class WordSynonyms(val dict: ThesaurusDictionary) {
 
-    fun lookup(word: String, useCanonical: Boolean = false): SearchResult
+    fun lookup(word: String): SearchResult {
+        return SearchResult(dict.lookup(word))
+    }
+
+    data class SearchResult(val words: Set<String>)
 }
