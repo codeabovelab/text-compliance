@@ -9,7 +9,7 @@ class JWNLTest {
 
     @Test
     fun testSynonyms() {
-        val syn = WordSynonyms(JwnlThesaurusDictionary.resolve())
+        val syn = WordSynonyms(JwnlThesaurusDictionary.DictionaryResolver)
         val lookup = syn.lookup("hell")
         Assert.assertNotNull(lookup)
         assertThat(lookup.words, containsInAnyOrder(

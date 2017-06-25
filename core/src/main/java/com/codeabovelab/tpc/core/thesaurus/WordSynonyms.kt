@@ -1,9 +1,9 @@
 package com.codeabovelab.tpc.core.thesaurus
 
-class WordSynonyms(val dict: ThesaurusDictionary) {
+class WordSynonyms(val resolver: ThesaurusDictionary.Resolver) {
 
     fun lookup(word: String): SearchResult {
-        return SearchResult(dict.lookup(word))
+        return SearchResult(resolver.resolve().lookup(word))
     }
 
     data class SearchResult(val words: Set<String>)

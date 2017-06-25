@@ -119,12 +119,12 @@ class Process(
 
     private fun initThesaurus(thesaurus: LearnConfig.ThesaurusConfiguration): WordSynonyms {
         if (thesaurus.jwnlurl == null) {
-            return WordSynonyms(JwnlThesaurusDictionary.resolve())
+            return WordSynonyms(JwnlThesaurusDictionary.DictionaryResolver)
         } else {
             val resource = learnedDir.root.resolve(thesaurus.jwnlurl!!)
             //below we use hack to define relative dir into JWNL xml config, wee need rewrite it
             val xml = resource.toFile().readText(StandardCharsets.UTF_8).replace("\${DIR}", learnedDir.root.toString())
-            return WordSynonyms(JwnlThesaurusDictionary.source(ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8))).resolve())
+            return WordSynonyms(JwnlThesaurusDictionary.source(ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8))))
         }
     }
 
