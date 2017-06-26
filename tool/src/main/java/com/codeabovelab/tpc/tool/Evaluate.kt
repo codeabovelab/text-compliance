@@ -1,9 +1,15 @@
 package com.codeabovelab.tpc.tool
 
+import com.codeabovelab.tpc.core.nn.nlp.*
+import com.codeabovelab.tpc.text.TextImpl
 import com.codeabovelab.tpc.tool.learn.LearnConfig
+import com.google.common.base.Splitter
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.nd4j.linalg.ops.transforms.Transforms
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.text.NumberFormat
 import java.util.*
 import java.util.stream.Collectors
@@ -12,8 +18,10 @@ import java.util.stream.Collectors
  * Print list of labels and nearest words
  */
 class Evaluate(
-        private val inLearned: String
+        private val inLearned: String,
+        private val inData: String?
 ) {
+
     fun run() {
         val ld = LearnConfig.learnedDir(inLearned)
         val lc = LearnConfig()
@@ -33,6 +41,43 @@ class Evaluate(
                         "$it=${nf.format(sim)}"
                     }.collect(Collectors.joining("\n\t"))
             println("${label.word}\n\t$words")
+        }
+        if (inData != null) {
+            val uima = lc.createUimaResource()
+            val wordSupplier = lc.wordSupplier()
+            val path = Paths.get(inData)
+            println("For file: $path")
+            val wch = WordContext.create()
+            val sims = StringBuilder()
+            Files.lines(path, StandardCharsets.UTF_8).forEach { line ->
+                val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(TextImpl("", line)))
+                while (si.hasNext()) {
+                    val sd = si.next()
+                    if (sd == null) {
+                        continue
+                    }
+                    println(sd.str)
+                    wch.sentence = sd
+                    labels.forEach { label ->
+                        val labelVec = pv.getWordVectorMatrix(label.word)
+                        sd.words.forEach { wd ->
+                            wch.word = wd
+                            val str = wordSupplier(wch.context)
+                            val wordVec = pv.getWordVectorMatrix(str)
+                            val sim = if (wordVec == null) {
+                                UnkDetector.UNK
+                            } else {
+                                val tmp = Transforms.cosineSim(labelVec, wordVec)
+                                nf.format(tmp)
+                            }
+                            sims.append("$str=$sim ")
+                        }
+                        println("${label.word}\n$sims")
+                        sims.setLength(0)
+                    }
+                    println()
+                }
+            }
         }
     }
 

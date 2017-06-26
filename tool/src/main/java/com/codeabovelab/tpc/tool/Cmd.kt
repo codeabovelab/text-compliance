@@ -77,7 +77,8 @@ class Cmd {
             override fun create(cmd: Cmd): () -> Unit {
                 require(cmd::learned)
                 return Evaluate(
-                      inLearned = cmd.learned!!
+                        inLearned = cmd.learned!!,
+                        inData = cmd.inPath
                 )::run
             }
         }
