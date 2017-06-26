@@ -20,7 +20,9 @@ dependencies {
     compile "org.cleartk:cleartk-clearnlp:2.0.0"
     compile "org.datavec:datavec-data-codec:${datavec}"
 
-    compile "net.sf.extjwnl:extjwnl:1.8.0"
+    compile("net.sf.extjwnl:extjwnl:1.8.0") {
+        exclude group: "org.slf4j"
+    }
     compile "net.sf.extjwnl:extjwnl-data-wn31:1.2"
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
