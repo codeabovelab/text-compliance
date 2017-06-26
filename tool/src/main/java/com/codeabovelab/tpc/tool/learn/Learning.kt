@@ -67,6 +67,7 @@ class Learning(
                 .vocabCache(cache)
                 .tokenizerFactory(t)
                 .build()
+        pv.unk = UnkDetector.UNK
         pv.setSequenceIterator(iter)
         pv.fit()
         return pv

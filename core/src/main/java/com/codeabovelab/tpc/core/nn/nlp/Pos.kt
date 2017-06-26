@@ -171,4 +171,8 @@ enum class Pos {
     val isVerb: Boolean get() {
         return name.first() == 'V'
     }
+
+    val isProperNoun: Boolean get() {
+        return this == NNP || this == NNPS
+    }
 }

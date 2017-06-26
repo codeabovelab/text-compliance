@@ -27,6 +27,7 @@ class TextClassifier(
 
     init {
         pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile.toFile())
+        pv.unk = UnkDetector.UNK
         pv.tokenizerFactory = TokenizerFactoryImpl()
     }
 
@@ -76,9 +77,14 @@ class TextClassifier(
         val vws = ArrayList<VocabWord>()
         for (word in seq.words) {
             wch.word = word
-            val str = wordSupplier(wch.context)
-            if (str.isNullOrEmpty()) {
-                continue
+            val str: String?
+            if(UnkDetector.isUnknown(word)) {
+                str = UnkDetector.UNK
+            } else {
+                str = wordSupplier(wch.context)
+                if (str.isNullOrEmpty()) {
+                    continue
+                }
             }
             val vw = pv.vocab.wordFor(str)
             // when null - the word is unknown

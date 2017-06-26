@@ -55,7 +55,7 @@ class Nlp(private val inDir: String,
                 continue
             }
             for(w in sd!!.words) {
-                val str = escape(w.str)
+                var str = escape(w.str)
                 if(str.isBlank()) {
                     // it produce token for space and some other unprinted symbols
                     continue
@@ -63,10 +63,14 @@ class Nlp(private val inDir: String,
                 if(w.pos == Pos.SYM) {
                     continue
                 }
-                val hasPos = w.pos != Pos.UNKNOWN
+                val unknown = UnkDetector.isUnknown(w)
+                if(unknown) {
+                    str = UnkDetector.UNK
+                }
+                val hasPos = !unknown && w.pos != Pos.UNKNOWN
                 writer.append(str)
                 // note that below we compare _unescaped_ string with lemma
-                val hasLemma = w.lemma != null && !w.str.equals(w.lemma, true)
+                val hasLemma = !unknown && w.lemma != null && !w.str.equals(w.lemma, true)
                 if(hasPos) {
                     writer.append("|p=")
                     writer.append(w.pos.name)
