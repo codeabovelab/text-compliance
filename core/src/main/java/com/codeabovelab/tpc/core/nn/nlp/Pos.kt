@@ -175,4 +175,15 @@ enum class Pos {
     val isProperNoun: Boolean get() {
         return this == NNP || this == NNPS
     }
+
+    /**
+     * A string which identity king of POS like N for Noun, V for Verb and etc
+     */
+    val kind: String get() {
+        return if(this == UNKNOWN) {
+            this.name
+        } else {
+            name.substring(0, 1)
+        }
+    }
 }

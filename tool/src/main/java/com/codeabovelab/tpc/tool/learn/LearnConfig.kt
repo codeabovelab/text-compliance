@@ -99,7 +99,7 @@ class LearnConfig {
                 if(it.word.pos == Pos.UNKNOWN)
                     it.word.str
                 else
-                    it.word.str + "_" + it.word.pos
+                    it.word.str + "_" + it.word.pos.kind
             }
         }
         LearnConfig.WordConversion.LEMMA -> {
@@ -111,7 +111,7 @@ class LearnConfig {
                 if(it.word.pos == Pos.UNKNOWN)
                     str
                 else
-                    str + "_" + it.word.pos
+                    str + "_" + it.word.pos.kind
             }
         }
     }
