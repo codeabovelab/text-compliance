@@ -16,8 +16,21 @@ object Reflections {
      * It visit same object only one time.
      * @param handler return true when we must go deeper
      */
-    fun forEach(obj: Any, handler: ObjectVisitor.() -> Boolean) {
-        ObjectVisitor(handler).visit(obj)
+    fun forEachRecursive(obj: Any, handler: ObjectVisitor.() -> Boolean) {
+        val visited = Collections.newSetFromMap(IdentityHashMap<Any, Boolean>())
+        PlainVisitor({
+            if(this.propVal != null && !visited.add(this.propVal)) {
+                return@PlainVisitor
+            }
+            val deeper = handler()
+            if (this.propVal != null && deeper) {
+                this.visit(this.propVal!!)
+            }
+        }).visit(obj)
+    }
+
+    fun forEach(obj: Any, handler: ObjectVisitor.() -> Unit) {
+        PlainVisitor(handler).visit(obj)
     }
 
     /**
@@ -33,19 +46,18 @@ object Reflections {
                 packageName == "sun"
     }
 
-    class ObjectVisitor internal constructor(
-            private val handler: ObjectVisitor.() -> Boolean
-    ) {
+    private class PlainVisitor internal constructor(
+            private val handler: PlainVisitor.() -> Unit
+    ): ObjectVisitor {
 
         private val STUB : (value: Any?) -> Unit = {}
-        private val visited = Collections.newSetFromMap(IdentityHashMap<Any, Boolean>())
         private var prop: KProperty<*>? = null
-        private var propVal: Any? = null
+        internal var propVal: Any? = null
         private var propSetter: ((value: Any?) -> Unit)? = null
-        val property: KProperty<*>
+        override val property: KProperty<*>
             get() = prop!!
-        var propertyValue: Any
-            get() = propVal!!
+        override var propertyValue: Any?
+            get() = propVal
             set(value) = propSetter!!(value)
 
         internal fun visit(obj: Any) {
@@ -56,7 +68,6 @@ object Reflections {
             }
         }
 
-
         private fun visitProps(type: KClass<out Any>, obj: Any) {
             if(isBuiltIn(type)) {
                 return
@@ -66,18 +77,19 @@ object Reflections {
                     continue
                 }
                 this.propVal = prop.getter.call(obj)
-                if (propVal == null || !visited.add(propVal)) {
-                    continue
-                }
                 this.propSetter = if(prop is KMutableProperty1) {{
                     prop.setter.call(obj, it)
                 }} else STUB
                 this.prop = prop
-                val deeper = this.handler()
-                if (deeper) {
-                    visit(propVal!!)
-                }
+                this.handler()
             }
         }
+    }
+
+
+
+    interface ObjectVisitor {
+        val property: KProperty<*>
+        var propertyValue: Any?
     }
 }

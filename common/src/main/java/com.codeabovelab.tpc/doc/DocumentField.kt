@@ -7,7 +7,7 @@ import com.codeabovelab.tpc.text.Textual
 interface DocumentField : Textual {
 
     interface Builder {
-        fun build(document: Document.Builder): DocumentFieldImpl
+        fun build(documentId: String): DocumentFieldImpl
     }
 
     /**

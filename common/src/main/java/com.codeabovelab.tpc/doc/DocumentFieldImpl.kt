@@ -5,7 +5,7 @@ import com.codeabovelab.tpc.text.TextImpl
 
 /**
  */
-class DocumentFieldImpl(parentId: String, b: DocumentFieldImpl.Builder) : DocumentField {
+class DocumentFieldImpl private constructor(parentId: String, b: DocumentFieldImpl.Builder) : DocumentField {
 
     class Builder : DocumentField.Builder {
         var name: String? = null
@@ -21,8 +21,8 @@ class DocumentFieldImpl(parentId: String, b: DocumentFieldImpl.Builder) : Docume
             return this
         }
 
-        override fun build(document: Document.Builder): DocumentFieldImpl {
-            return DocumentFieldImpl(document.id!!, this)
+        override fun build(documentId: String): DocumentFieldImpl {
+            return DocumentFieldImpl(documentId, this)
         }
     }
 

@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.tool.learn
 
 import com.codeabovelab.tpc.core.nn.TokenizerFactoryImpl
 import com.codeabovelab.tpc.core.nn.nlp.*
-import com.codeabovelab.tpc.tool.util.Config
 import com.codeabovelab.tpc.tool.util.Copy
 import com.codeabovelab.tpc.util.Reflections
 import org.apache.commons.io.FileUtils
@@ -11,12 +10,9 @@ import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache
 import org.slf4j.LoggerFactory
-import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import java.util.stream.Stream
 import kotlin.reflect.full.findAnnotation
 
@@ -112,7 +108,7 @@ class Learning(
     }
 
     private fun copyResources(fromPath: Path, toPath: Path, lc: LearnConfig) {
-        Reflections.forEach(lc) {
+        Reflections.forEachRecursive(lc) {
             val copyAnn = this.property.findAnnotation<Copy>()
             if(copyAnn != null) {
                 val strPath = this.propertyValue as String

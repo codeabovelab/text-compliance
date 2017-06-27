@@ -23,9 +23,9 @@ class ReflectionsTest {
 
     @Test
     fun testForEach() {
-        val expect = ArrayDeque(listOf("enum", "other", "str", "same", "str"))
+        val expect = ArrayDeque(listOf("enum", "other", "other", "str", "same", "str"))
         val to = TestObject("one", TestObject("child"))
-        Reflections.forEach(to) {
+        Reflections.forEachRecursive(to) {
             println("${this.property.name} = ${this.propertyValue}")
             assertEquals(expect.removeFirst(), this.property.name)
             true

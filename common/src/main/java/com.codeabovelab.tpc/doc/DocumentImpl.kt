@@ -41,13 +41,13 @@ class DocumentImpl(b: DocumentImpl.Builder) : Document {
         this.id = b.id!!
         this.body = TextImpl(this.id, b.body!!)
         val fb = ImmutableList.builder<DocumentField>()
-        b.fields.forEach { fb.add(it.build(b)) }
+        b.fields.forEach { fb.add(it.build(id)) }
         this.fields = fb.build()
     }
 
     override fun read(consumer: TextConsumer) {
-        consumer(this, body)
         fields.forEach { df -> df.read(consumer) }
+        consumer(this, body)
     }
 
     companion object {
