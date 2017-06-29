@@ -28,7 +28,7 @@ class WordPredicateTest {
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.Companion.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
+        val pc = PredicateContext(document = DocumentImpl.Companion.builder().body("test_doc", "<none>").build(), attributes = emptyMap())
         for (text in texts) {
             println(i++)
             val res = tc.test(pc, TextImpl("sample_" + i, text))
