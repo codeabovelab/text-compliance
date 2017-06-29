@@ -28,7 +28,7 @@ class Classify(
         )
 
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.Companion.builder().id("test_doc").body("<none>").build(), attributes = emptyMap())
+        val pc = PredicateContext(document = DocumentImpl.Builder().body("test_doc","<none>").build(), attributes = emptyMap())
         for(text in texts) {
             i++
             println("Text #$i")

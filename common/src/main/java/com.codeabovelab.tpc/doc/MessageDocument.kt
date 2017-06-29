@@ -9,7 +9,6 @@ import java.time.ZonedDateTime
 interface MessageDocument: Document {
 
     interface Builder: Document.Builder {
-        override var id: String?
         /**
          * String which is identified sender (user) of message
          */

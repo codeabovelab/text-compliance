@@ -8,5 +8,5 @@ interface DocumentReader<out T : Document.Builder> {
     /**
      * read document from specified stream
      */
-    fun read(istr: InputStream): T
+    fun read(id: String?, istr: InputStream): T
 }

@@ -1,34 +1,35 @@
-package com.codeabovelab.tpc.integr.email;
+package com.codeabovelab.tpc.integr.email
 
-import com.codeabovelab.tpc.doc.DocumentField;
-import com.codeabovelab.tpc.doc.DocumentImpl;
-import com.codeabovelab.tpc.text.TextualUtil;
-import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import com.codeabovelab.tpc.doc.DocumentField
+import com.codeabovelab.tpc.doc.DocumentImpl
+import com.codeabovelab.tpc.doc.MessageDocumentImpl
+import com.codeabovelab.tpc.text.TextualUtil
+import com.google.common.collect.ImmutableList
+import org.junit.Test
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+import java.util.List
+import java.util.Map
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertNotNull;
+import kotlin.test.assertNotNull
 
 /**
  */
-public class EmailDocumentReaderTest {
+class EmailDocumentReaderTest {
 
-    private static final List<String> FIELDS = ImmutableList.of(
+    val FIELDS = ImmutableList.of(
       EmailDocumentReader.F_FROM,
       EmailDocumentReader.F_RECIPIENTS,
       EmailDocumentReader.F_SENDER,
       EmailDocumentReader.F_SUBJECT,
       EmailDocumentReader.F_SENT_DATE
-    );
+    )
 
     @Test
-    public void test() throws Exception {
-        String msg = "Received: from mxfront9m.mail.yandex.net ([127.0.0.1])\n" +
+    fun test() {
+        val msg = "Received: from mxfront9m.mail.yandex.net ([127.0.0.1])\n" +
           "\tby mxfront9m.mail.yandex.net with LMTP id jNGsscI3\n" +
           "\tfor <test@ya.ru>; Thu, 18 May 2017 16:32:26 +0300\n" +
           "Received: from github-smtp2-ext2.iad.github.net (github-smtp2-ext2.iad.github.net [192.30.252.193])\n" +
@@ -69,17 +70,17 @@ public class EmailDocumentReaderTest {
           "You were automatically subscribed because you=E2=80=99ve been given acces=\n" +
           "s to the repository.\n" +
           "\n" +
-          "Thanks!\n";
-        EmailDocumentReader etd = new EmailDocumentReader();
-        DocumentImpl doc = (DocumentImpl) etd.read(new ByteArrayInputStream(msg.getBytes())).build();
-        System.out.println(doc);
-        assertNotNull(doc.getBody().getData());
-        Map<String, DocumentField> fields = doc.getFields().stream().collect(Collectors.toMap(DocumentField::getName, Function.identity()));
-        for(String name: FIELDS) {
-            System.out.println("Test field: " + name);
-            DocumentField df = fields.get(name);
-            assertNotNull(df);
-            System.out.println("\t" + TextualUtil.read(df));
+          "Thanks!\n"
+        val etd = EmailDocumentReader()
+        val doc = etd.read(null, ByteArrayInputStream(msg.toByteArray(StandardCharsets.UTF_8))).build() as MessageDocumentImpl
+        System.out.println(doc)
+        assertNotNull(doc.body.data)
+        val fields = doc.fields.associateByTo(HashMap<String, DocumentField>(), DocumentField::name, {it})
+        for(name in FIELDS) {
+            System.out.println("Test field: " + name)
+            val df = fields[name]
+            assertNotNull(df)
+            System.out.println("\t" + TextualUtil.read(df))
         }
     }
 

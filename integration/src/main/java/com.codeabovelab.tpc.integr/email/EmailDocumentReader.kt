@@ -1,24 +1,24 @@
-package com.codeabovelab.tpc.integr.email;
+package com.codeabovelab.tpc.integr.email
 
-import com.codeabovelab.tpc.doc.Document;
-import com.codeabovelab.tpc.doc.DocumentFieldImpl;
-import com.codeabovelab.tpc.doc.DocumentImpl;
-import com.codeabovelab.tpc.doc.DocumentReader
-import com.codeabovelab.tpc.util.DateTimeUtil;
+import com.codeabovelab.tpc.doc.*
+import com.codeabovelab.tpc.text.TextImpl
+import com.codeabovelab.tpc.util.DateTimeUtil
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.stream.Collectors;
+import javax.mail.Session
+import javax.mail.internet.MimeMessage
+import java.io.InputStream
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.Arrays
+import java.util.Date
+import java.util.stream.Collectors
 
 /**
  *
  */
 class EmailDocumentReader:
 //we use raw document as return type, because in future it may be changed to more specific type
-        DocumentReader<Document.Builder> {
+        DocumentReader<MessageDocument.Builder> {
 
     companion object {
         const val F_SUBJECT = "subject"
@@ -30,23 +30,38 @@ class EmailDocumentReader:
 
     private val emailParser = EmailParser()
 
-    override fun read(istr: InputStream): Document.Builder {
+    override fun read(id: String?, istr: InputStream): MessageDocument.Builder {
         var session: Session? = null
         val msg = MimeMessage(session, istr)
-        val db = DocumentImpl.builder()
-          .id(msg.messageID)
-          .body(getContent(msg))
+        val db = MessageDocumentImpl.Builder()
+        db.body = TextImpl(id ?: msg.messageID, getContent(msg))
+
         addField(db, F_SUBJECT, msg.subject)
+        db.from = extractSender(msg)
         addField(db, F_SENDER, msg.sender)
-        addField(db, F_FROM, msg.from)
         // parser produce errors like ' javax.mail.internet.AddressException: Domain contains illegal character in string'
         // on any address with _ and may other symbols
-        addField(db, F_RECIPIENTS, msg.allRecipients)
-        addField(db, F_SENT_DATE, msg.sentDate)
+        msg.allRecipients?.forEach { db.to.add(toString(it)!!) }
+        db.date = ZonedDateTime.ofInstant(msg.sentDate.toInstant(), ZoneOffset.UTC)
         return db
     }
 
-    private fun addField(db: DocumentImpl.Builder, name: String, value: Any?) {
+    private fun extractSender(msg: MimeMessage): String? {
+        val from = msg.from
+        val sender = msg.sender
+        if((from == null || from.isEmpty()) && sender == null) {
+            return null
+        }
+        //note that MimeMessage may return non null 'from' even if it header is null,
+        // because it use sender header too
+        return if(sender == null) {
+            toString(from[0])
+        } else {
+            toString(sender)
+        }
+    }
+
+    private fun addField(db: MessageDocumentImpl.Builder, name: String, value: Any?) {
         val str = toString(value)
         db.addField(DocumentFieldImpl.builder().name(name).data(str))
     }

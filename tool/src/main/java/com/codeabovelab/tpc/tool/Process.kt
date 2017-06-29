@@ -217,8 +217,7 @@ class Process(
         val ext = PathUtils.extension(path)
         val reader = docReaders[ext]!!
         Files.newInputStream(path).use {
-            val db = reader.read(it)
-            db.id = path.toString()
+            val db = reader.read(path.toString(), it)
             return db.build()
         }
     }
