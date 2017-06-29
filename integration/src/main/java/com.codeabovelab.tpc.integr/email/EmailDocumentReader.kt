@@ -12,6 +12,8 @@ import java.time.ZonedDateTime
 import java.util.Arrays
 import java.util.Date
 import java.util.stream.Collectors
+import javax.mail.Address
+import javax.mail.internet.InternetAddress
 
 /**
  *
@@ -24,8 +26,6 @@ class EmailDocumentReader:
         const val F_SUBJECT = "subject"
         const val F_SENDER = "sender"
         const val F_FROM = "from"
-        const val F_RECIPIENTS = "recipients"
-        const val F_SENT_DATE = "sentDate"
     }
 
     private val emailParser = EmailParser()
@@ -84,6 +84,8 @@ class EmailDocumentReader:
             }
         } else if(value is Date) {
             str = DateTimeUtil.toUTCString(value)
+        } else if(value is InternetAddress) {
+            str = value.address
         } else {
             str = value.toString()
         }

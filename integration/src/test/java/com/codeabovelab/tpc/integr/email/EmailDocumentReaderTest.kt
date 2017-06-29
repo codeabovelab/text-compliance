@@ -1,7 +1,6 @@
 package com.codeabovelab.tpc.integr.email
 
 import com.codeabovelab.tpc.doc.DocumentField
-import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.doc.MessageDocumentImpl
 import com.codeabovelab.tpc.text.TextualUtil
 import com.google.common.collect.ImmutableList
@@ -9,11 +8,8 @@ import org.junit.Test
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
-import java.util.List
-import java.util.Map
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  */
@@ -21,10 +17,10 @@ class EmailDocumentReaderTest {
 
     val FIELDS = ImmutableList.of(
       EmailDocumentReader.F_FROM,
-      EmailDocumentReader.F_RECIPIENTS,
+            "to",
       EmailDocumentReader.F_SENDER,
       EmailDocumentReader.F_SUBJECT,
-      EmailDocumentReader.F_SENT_DATE
+      "date"
     )
 
     @Test
@@ -75,13 +71,21 @@ class EmailDocumentReaderTest {
         val doc = etd.read(null, ByteArrayInputStream(msg.toByteArray(StandardCharsets.UTF_8))).build() as MessageDocumentImpl
         System.out.println(doc)
         assertNotNull(doc.body.data)
-        val fields = doc.fields.associateByTo(HashMap<String, DocumentField>(), DocumentField::name, {it})
-        for(name in FIELDS) {
-            System.out.println("Test field: " + name)
-            val df = fields[name]
-            assertNotNull(df)
-            System.out.println("\t" + TextualUtil.read(df))
+        val map = HashMap<String, DocumentField>()
+        doc.read { textual, _ ->
+            if(textual is DocumentField) {
+                map.put(textual.name, textual)
+            }
         }
+        val fieldNames = HashSet(FIELDS)
+        map.forEach { k, df ->
+            System.out.println("Test field: " + k)
+            fieldNames.remove(k)
+            assertNotNull(df)
+            val text = TextualUtil.read(df)
+            System.out.println("\t" + text)
+        }
+        assertTrue(fieldNames.isEmpty(), "It must be an empty: $fieldNames")
     }
 
 }

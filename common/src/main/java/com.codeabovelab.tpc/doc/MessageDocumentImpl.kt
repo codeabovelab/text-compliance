@@ -20,8 +20,11 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
         }
     }
 
+    @FieldDesc
     override val from: String = builder.from!!
+    @FieldDesc
     override val to: List<String> = ImmutableList.copyOf(builder.to)
+    @FieldDesc
     override val date: ZonedDateTime = builder.date!!
     private val virtualFields = DocumentUtils.createFields(this)
 
