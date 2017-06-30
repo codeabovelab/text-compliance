@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.core.nn
 
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.processor.PredicateContext
-import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
 import org.junit.Test
@@ -34,7 +33,7 @@ class TextClassifierTest {
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.builder().body("test_doc", "<none>").build(), attributes = emptyMap())
+        val pc = PredicateContext.STUB
         for(text in texts) {
             System.out.println(i++)
             val res = tc.test(pc, TextImpl("sample_" + i, text))

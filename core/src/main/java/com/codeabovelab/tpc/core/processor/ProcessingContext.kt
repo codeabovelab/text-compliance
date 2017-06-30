@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.processor
 
+import com.codeabovelab.tpc.core.thread.MessagesThread
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.Textual
@@ -9,10 +10,13 @@ import com.google.common.collect.ImmutableMap
  * Processing context, it can be used in concurrent environment.
  * Must be thread save.
  */
-class ProcessingContext(val document: Document,
-                        val modifier: ProcessModifier,
-                        val reportBuilder: ProcessorReport.Builder,
-                        val rules: List<Rule<*>>) {
+class ProcessingContext(
+        val document: Document,
+        val modifier: ProcessModifier,
+        val reportBuilder: ProcessorReport.Builder,
+        val rules: List<Rule<*>>,
+        val thread: MessagesThread
+) {
 
     fun onText(textual: Textual, text: Text) {
         if(!modifier.filter(textual)) {
@@ -37,7 +41,11 @@ class ProcessingContext(val document: Document,
     private fun getPredicateContext(): PredicateContext {
         // now predicate context has snapshot of attributes
         // therefore we can not share it instance
-        return PredicateContext(document, ImmutableMap.copyOf(getAttributes()))
+        return PredicateContext(
+                document = document,
+                attributes = ImmutableMap.copyOf(getAttributes()),
+                thread = thread
+        )
     }
 
     /**

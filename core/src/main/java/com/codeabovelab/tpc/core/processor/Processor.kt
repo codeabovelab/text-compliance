@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.processor
 
+import com.codeabovelab.tpc.core.thread.MessagesThread
 import com.codeabovelab.tpc.doc.Document
 
 import java.util.ArrayList
@@ -23,9 +24,18 @@ class Processor {
     fun process(doc: Document, modifier: ProcessModifier = ProcessModifier.DEFAULT): ProcessorReport {
         val prb = ProcessorReport.Builder()
         prb.documentId = doc.id
-        val pc = ProcessingContext(doc, modifier, prb, selectRules())
+        val thread = detectThread(doc)
+        val pc = ProcessingContext(document = doc,
+                modifier = modifier,
+                reportBuilder = prb,
+                rules = selectRules(),
+                thread = thread)
         doc.read(pc::onText)
         return prb.build()
+    }
+
+    private fun detectThread(doc: Document): MessagesThread {
+        return MessagesThread.NONE
     }
 
     private fun selectRules(): List<Rule<*>> {

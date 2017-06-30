@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.processor.PredicateContext
-import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.text.TextImpl
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import java.nio.charset.StandardCharsets
@@ -28,7 +27,7 @@ class Classify(
         )
 
         var i = 0
-        val pc = PredicateContext(document = DocumentImpl.Builder().body("test_doc","<none>").build(), attributes = emptyMap())
+        val pc = PredicateContext.STUB
         for(text in texts) {
             i++
             println("Text #$i")
