@@ -21,9 +21,17 @@ interface MessageDocument: Document {
          * date of message creation
          */
         var date: ZonedDateTime?
+        /**
+         * List of references to other documents.
+         */
+        val references: List<Ref>
         override fun build(): MessageDocument
     }
 
+    /**
+     * List of references to other documents.
+     */
+    val references: List<Ref>
     /**
      * String which is identified sender (user) of message
      */

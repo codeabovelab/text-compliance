@@ -13,6 +13,7 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
         override var from: String? = null
         override val to: MutableList<String> = ArrayList()
         override var date: ZonedDateTime? = null
+        override var references: MutableList<Ref> = ArrayList()
 
         override fun build(): MessageDocument {
             Asserts.nonNullAll(this::body, this.body!!::id, this::from, this::date)
@@ -26,6 +27,8 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
     override val to: List<String> = ImmutableList.copyOf(builder.to)
     @FieldDesc
     override val date: ZonedDateTime = builder.date!!
+    @FieldDesc
+    override val references: List<Ref> = ImmutableList.copyOf(builder.references)
     private val virtualFields = DocumentUtils.createFields(this)
 
     override fun read(consumer: TextConsumer) {

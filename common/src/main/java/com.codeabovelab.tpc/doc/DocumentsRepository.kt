@@ -3,5 +3,9 @@ package com.codeabovelab.tpc.doc
 /**
  */
 interface DocumentsRepository {
-    operator fun get(id: String): Document
+    /**
+     * Retrieve document by id.
+     * @return doc or null
+     */
+    operator fun get(id: String): Document?
 }

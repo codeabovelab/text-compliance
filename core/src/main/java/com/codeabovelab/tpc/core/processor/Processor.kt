@@ -1,7 +1,9 @@
 package com.codeabovelab.tpc.core.processor
 
 import com.codeabovelab.tpc.core.thread.MessagesThread
+import com.codeabovelab.tpc.core.thread.ThreadResolver
 import com.codeabovelab.tpc.doc.Document
+import com.codeabovelab.tpc.doc.MessageDocument
 
 import java.util.ArrayList
 import java.util.Collections
@@ -10,7 +12,9 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Must be a thread safe.
  */
-class Processor {
+class Processor(
+        private val threadResolver: ThreadResolver? = null
+) {
 
     private val rules = ConcurrentHashMap<String, Rule<*>>()
 
@@ -35,7 +39,11 @@ class Processor {
     }
 
     private fun detectThread(doc: Document): MessagesThread {
-        return MessagesThread.NONE
+        return if(threadResolver != null && doc is MessageDocument) {
+            threadResolver.getThread(doc)
+        } else {
+            MessagesThread.NONE
+        }
     }
 
     private fun selectRules(): List<Rule<*>> {
