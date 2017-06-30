@@ -13,7 +13,7 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
         override var from: String? = null
         override val to: MutableList<String> = ArrayList()
         override var date: ZonedDateTime? = null
-        override var references: MutableList<Ref> = ArrayList()
+        override val references: MutableList<Ref> = ArrayList()
 
         override fun build(): MessageDocument {
             Asserts.nonNullAll(this::body, this.body!!::id, this::from, this::date)

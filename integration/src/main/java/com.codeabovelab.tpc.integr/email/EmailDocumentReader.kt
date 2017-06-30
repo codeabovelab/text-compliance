@@ -9,10 +9,8 @@ import javax.mail.internet.MimeMessage
 import java.io.InputStream
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.Arrays
-import java.util.Date
+import java.util.*
 import java.util.stream.Collectors
-import javax.mail.Address
 import javax.mail.internet.InternetAddress
 
 /**
@@ -43,7 +41,35 @@ class EmailDocumentReader:
         // on any address with _ and may other symbols
         msg.allRecipients?.forEach { db.to.add(toString(it)!!) }
         db.date = ZonedDateTime.ofInstant(msg.sentDate.toInstant(), ZoneOffset.UTC)
+        extractReferences(msg, db.references)
         return db
+    }
+
+    private fun  extractReferences(msg: MimeMessage, refs: MutableList<Ref>) {
+        val refsHeader = msg.getHeader("References", null)
+        var ref: ParentRef? = null
+        fun updateRef(addr: InternetAddress) {
+            ref = ParentRef(addr.address, if(ref != null) listOf(ref!!) else null)
+        }
+        if(refsHeader != null) {
+            val refsAddr = InternetAddress.parseHeader(refsHeader, false)
+            for(addr in refsAddr) {
+                updateRef(addr)
+            }
+        }
+        val inReplyToHeader = msg.getHeader("In-Reply-To", null)
+        if(inReplyToHeader != null) {
+            val inReplyAddr = InternetAddress.parseHeader(inReplyToHeader, false)
+            if(inReplyAddr.isNotEmpty()) {
+                val addr = inReplyAddr[0]
+                if(ref == null || ref!!.id != addr.address) {
+                    updateRef(addr)
+                }
+            }
+        }
+        if(ref != null) {
+            refs.add(ref!!)
+        }
     }
 
     private fun extractSender(msg: MimeMessage): String? {

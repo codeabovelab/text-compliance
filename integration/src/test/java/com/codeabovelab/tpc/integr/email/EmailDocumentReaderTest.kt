@@ -2,12 +2,14 @@ package com.codeabovelab.tpc.integr.email
 
 import com.codeabovelab.tpc.doc.DocumentField
 import com.codeabovelab.tpc.doc.MessageDocumentImpl
+import com.codeabovelab.tpc.doc.ParentRef
 import com.codeabovelab.tpc.text.TextualUtil
 import com.google.common.collect.ImmutableList
 import org.junit.Test
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -53,6 +55,8 @@ class EmailDocumentReaderTest {
           "Content-Type: text/plain;\n" +
           " charset=UTF-8\n" +
           "Content-Transfer-Encoding: quoted-printable\n" +
+          "In-Reply-To: <23@web6j.yandex.ru>\n" +
+          "References: <asomeotherid@host> <Sj@OfsysSMTP.hq2.rep> <23@web6j.yandex.ru>"
           "X-Auto-Response-Suppress: All\n" +
           "Return-Path: noreply@github.com\n" +
           "X-Yandex-Forward: f7fef8356ed7d07132f32edacecf2b50\n" +
@@ -85,6 +89,9 @@ class EmailDocumentReaderTest {
             val text = TextualUtil.read(df)
             System.out.println("\t" + text)
         }
+        assertEquals(
+                listOf(ParentRef("23@web6j.yandex.ru", listOf(ParentRef("Sj@OfsysSMTP.hq2.rep", listOf(ParentRef("asomeotherid@host")))))),
+                doc.references)
         assertTrue(fieldNames.isEmpty(), "It must be an empty: $fieldNames")
     }
 
