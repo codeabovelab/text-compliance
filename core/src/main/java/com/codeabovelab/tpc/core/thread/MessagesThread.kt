@@ -12,22 +12,30 @@ interface MessagesThread {
         override val documents: List<String>
             get() = Collections.emptyList()
 
-        override fun forEach(consumer: ThreadConsumer) {
-            //none
-        }
+        override fun getDocument(id: String) = null
     }
 
     /**
-     * List of messages in thread
+     * List of messages in thread. In order from first to newest message (include current).
      */
     val documents: List<String>
 
     /**
-     * Iterate over thread messages. Note that it may be time consumption, because need
+     * Gte document from current thread. Can return null even id present in [documents]
+     */
+    fun getDocument(id: String): Document?
+
+    /**
+     * Iterate over thread messages. In same order with [documents]. Note that it may be time consumption, because need
      * to load messages. Also sometime it may can not load message for specified id, and will
      * pass null document into consumer.
      */
-    fun forEach(consumer: ThreadConsumer)
+    fun forEach(consumer: ThreadConsumer) {
+        for(id in documents) {
+            val doc = getDocument(id)
+            consumer(id, doc)
+        }
+    }
 }
 
 typealias ThreadConsumer = (id: String, doc: Document?) -> Unit

@@ -1,5 +1,5 @@
-package com.codeabovelab.tpc.core.processor;
+package com.codeabovelab.tpc.core.processor
 
 /**
  */
-data class RuleReport(val ruleId: String, val result: PredicateResult<*>)
+data class RuleReport<out T : PredicateResult<*>>(val ruleId: String, val result: T)

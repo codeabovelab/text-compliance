@@ -9,6 +9,10 @@ open class PredicateResult<out E: PredicateResult.Entry>(val entries: List<E>) {
 
     open class Entry(val coordinates: TextCoordinates)
 
+    /**
+     * This method provide result of [RulePredicate] triggering.
+     * Default implementation delegate call to [entries].isEmpty()
+     */
     @JsonIgnore
-    fun isEmpty() = entries.isEmpty()
+    open fun isEmpty() = entries.isEmpty()
 }

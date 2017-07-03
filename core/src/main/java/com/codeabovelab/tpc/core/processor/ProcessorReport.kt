@@ -18,14 +18,14 @@ class ProcessorReport(builder: Builder) {
                 field = value
             }
 
-        val rules = CopyOnWriteArrayList<RuleReport>()
+        val rules = CopyOnWriteArrayList<RuleReport<*>>()
         val attributes = ConcurrentHashMap<String, Any>()
 
         fun build() = ProcessorReport(this)
     }
 
     val documentId: String
-    val rules: List<RuleReport>
+    val rules: List<RuleReport<*>>
     val attributes: Map<String, Any>
 
     init {
@@ -38,7 +38,7 @@ class ProcessorReport(builder: Builder) {
         return "ProcessorReport(documentId='$documentId', rules=$rules, attributes=$attributes)"
     }
 
-    inline fun <reified T : PredicateResult<*>> findRule(): T? {
+    inline fun <reified T : PredicateResult<*>> findPredicateResult(): T? {
         val type = T::class
         val res = rules.find {
             type.isInstance(it.result)

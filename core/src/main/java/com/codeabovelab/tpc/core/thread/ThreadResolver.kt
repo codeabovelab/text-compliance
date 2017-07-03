@@ -13,6 +13,7 @@ class ThreadResolver(
     fun getThread(doc: MessageDocument): MessagesThread {
         val ids = ArrayList<String>()
         val loaded = HashMap<String, Document?>()
+        ids.add(doc.id)
         //put self for cases with cyclic references
         loaded.put(doc.id, doc)
         val parents = LinkedList<List<Ref>>()
@@ -20,6 +21,7 @@ class ThreadResolver(
         while(parents.isNotEmpty()) {
             loadParents(loaded, ids, parents)
         }
+        ids.reverse()
         return LazyMessagesThread(ImmutableList.copyOf(ids), loaded)
     }
 
@@ -54,14 +56,13 @@ class ThreadResolver(
             private val loaded: Map<String, Document?>
     ): MessagesThread {
 
-        override fun forEach(consumer: ThreadConsumer) {
-            for(id in documents) {
-                var doc = loaded[id]
-                if(doc == null) {
-                    doc = repo[id]
-                }
-                consumer(id, doc)
+        override fun getDocument(id: String): Document? {
+            // do not collapse it into one line!
+            var doc = loaded[id]
+            if(doc == null) {
+                doc = repo[id]
             }
+            return doc
         }
 
     }
