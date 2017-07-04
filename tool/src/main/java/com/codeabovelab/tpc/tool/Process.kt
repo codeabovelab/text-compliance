@@ -141,25 +141,33 @@ class Process(
         val report = proc.process(doc, modifier)
 
         val relPath = if (path == inPath) path.fileName else inPath.relativize(path)
-        val labels = collectLabels(report)
         val numFormat = NumberFormat.getInstance(Locale.ROOT)
-        log.info("{} labels: {}", relPath, labels.max.entries.joinToString {
-            "${it.key}=${numFormat.format(it.value)} (min=${numFormat.format(labels.min[it.key])})"
+        log.info("{} labels: {}", relPath, report.labels.joinToString {
+            "${it.label}=${numFormat.format(it.similarity)}"
         })
         val baseName = PathUtils.withoutExtension(relPath)
         val reportPath = outPath.resolve(baseName + "-report.yaml")
         val textPath = outPath.resolve(baseName + "-analyzed.txt")
         Files.createDirectories(reportPath.parent)
         Files.newBufferedWriter(textPath, StandardCharsets.UTF_8).use {
-            printReport(labels, text, it)
+            printReport(report, text, it)
         }
         Files.newOutputStream(reportPath).use {
             om.writeValue(it, report)
         }
     }
 
-    private fun printReport(labels: LabelsData, text: StringBuilder, writer: BufferedWriter) {
+    private fun printReport(report: ProcessorReport, text: StringBuilder, writer: BufferedWriter) {
+        val labels = collectLabels(report)
         val numFormat = NumberFormat.getInstance(Locale.ROOT)
+        writer.appendln("LABELS:")
+        for (label in report.labels) {
+            writer.append(label.label)
+            writer.append('=')
+            writer.append(numFormat.format(label.similarity))
+            writer.newLine()
+        }
+        writer.appendln("ENTRIES:")
         for (entry in labels.entries) {
             val coords = entry.coordinates
             writer.append(text, coords.offset, coords.offset + coords.length)
@@ -171,7 +179,7 @@ class Process(
                 writer.append(" notice: ")
                 writer.append(label.notice)
             }
-            writer.appendln()
+            writer.newLine()
         }
     }
 

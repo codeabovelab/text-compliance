@@ -7,7 +7,7 @@ import kotlin.reflect.full.cast
 
 /**
  */
-class ProcessorReport(builder: Builder) {
+class ProcessorReport(builder: Builder): Labeled {
     /**
      * Must be thread safe
      */
@@ -27,11 +27,36 @@ class ProcessorReport(builder: Builder) {
     val documentId: String
     val rules: List<RuleReport<*>>
     val attributes: Map<String, Any>
+    override val labels: Collection<Label>
 
     init {
         this.documentId = builder.documentId ?: throw IllegalArgumentException("No documentId")
         this.rules = builder.rules
         this.attributes = builder.attributes
+        this.labels = calcLabels()
+    }
+
+    private fun calcLabels(): Collection<Label> {
+        val map = HashMap<String, MutableSimilarity>()
+        fun aggregate(label: Label) {
+            val sim = map.computeIfAbsent(label.label) { _ -> MutableSimilarity() }
+            sim += label.similarity
+        }
+        for(rule in this.rules) {
+            val res = rule.result
+            if(res is Labeled) {
+                res.labels.forEach(::aggregate)
+            } else {
+              for(entry in res.entries) {
+                  if(entry is Labeled) {
+                      entry.labels.forEach(::aggregate)
+                  }
+              }
+            }
+        }
+        return map.mapTo(ArrayList<Label>()) {
+            e -> Label(e.key, e.value.value)
+        }
     }
 
     override fun toString(): String {
