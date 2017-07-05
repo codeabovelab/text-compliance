@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.tool.learn.Learning
 import com.codeabovelab.tpc.tool.nlp.Nlp
+import com.codeabovelab.tpc.tool.process.Process
 import org.kohsuke.args4j.Argument
 import org.kohsuke.args4j.Option
 import java.util.*
