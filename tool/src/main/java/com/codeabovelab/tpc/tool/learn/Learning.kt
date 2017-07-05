@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 import java.util.stream.Stream
 import kotlin.reflect.full.findAnnotation
 
@@ -83,27 +84,25 @@ class Learning(
                     NlpTextSentenceIter.create(path)
                 })
         )
-        val fi = { stream: Stream<Path> ->
-            val files = stream.reduce(HashMap<String, Path>(), { map, path ->
+        fun filesIterator(stream: Stream<Path>): Iterator<Path> {
+            // we use tree map for provide order
+            val paths = TreeMap<String, Path>()
+            stream.forEach({ path ->
                 val pathStr = path.toString()
                 val ext = pathStr.substringAfterLast('.')
                 val str = pathStr.substringBeforeLast('.')
                 if (ext == NlpParser.EXT) {
                     // we must prefer NlpParser.EXT to other
-                    map.put(str, path)
+                    paths.put(str, path)
                 } else {
-                    map.putIfAbsent(str, path)
+                    paths.putIfAbsent(str, path)
                 }
-                map
-            }, { left, _ ->
-                //we suppose that 'left' same as '_'
-                left
-            }).values
-            files.stream().sorted().iterator()
+            })
+            return paths.values.iterator()
         }
         return DirSeqIterator.FileSupport(
                 map = map,
-                filesIterator = fi
+                filesIterator = ::filesIterator
         )
     }
 
@@ -111,11 +110,13 @@ class Learning(
         Reflections.forEachRecursive(lc) {
             val copyAnn = this.property.findAnnotation<Copy>()
             if(copyAnn != null) {
-                val strPath = this.propertyValue as String
-                val from = fromPath.resolve(strPath)
-                val to = toPath.resolve(copyAnn.dir)
-                //Files.createDirectories(to.parent)
-                FileUtils.copyDirectory(from.toFile(), to.toFile())
+                val value = this.propertyValue
+                if(value is String) {
+                    val strPath = value
+                    val from = fromPath.resolve(strPath)
+                    val to = toPath.resolve(copyAnn.dir)
+                    FileUtils.copyDirectory(from.toFile(), to.toFile())
+                }
                 this.propertyValue = copyAnn.dir
                 false
             } else {
