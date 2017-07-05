@@ -28,10 +28,11 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
     private var id: String = filePath.toAbsolutePath().toString()
     private var _index: Int = 0
     private val _labels: List<String>
+    private val stream = Files.lines(filePath)
 
     init {
         _labels = extractLabels(filePath)
-        this.reader = Files.lines(filePath).iterator()
+        this.reader = stream.iterator()
     }
 
     override val count: Int
@@ -60,5 +61,9 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
             }
         }
         return TextImpl("$id#$_index", sb.toString())
+    }
+
+    override fun close() {
+        stream.close()
     }
 }

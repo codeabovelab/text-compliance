@@ -24,6 +24,10 @@ class DirSeqIterator(
     private val log = LoggerFactory.getLogger(this.javaClass)
     private var fileIter: Iterator<Path> = Collections.emptyIterator<Path>()
     private var sentenceIter: SentenceIterator? = null
+        set(value) {
+            field?.close()
+            field = value
+        }
     private val seqCounter = AtomicInteger(0)
 
     init {

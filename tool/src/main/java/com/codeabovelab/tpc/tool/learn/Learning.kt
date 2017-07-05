@@ -74,11 +74,12 @@ class Learning(
         val ur = lc.createUimaResource()
         val map = mapOf<String, (Path) -> SentenceIterator?>(
                 Pair("txt", { path ->
-                    try {
-                        SentenceIteratorImpl.create(ur, FileTextIterator(path))
+                    val fti = try {
+                        FileTextIterator(path)
                     } catch (e: IOException) {
                         throw RuntimeException("On read " + path,  e)
                     }
+                    SentenceIteratorImpl.create(ur, fti)
                 }),
                 Pair(NlpParser.EXT, { path ->
                     NlpTextSentenceIter.create(path)

@@ -112,4 +112,10 @@ class SentenceIteratorImpl(
     override fun currentLabels(): List<String>? {
         return iter.labels
     }
+
+    override fun close() {
+        if(iter is AutoCloseable) {
+            iter.close()
+        }
+    }
 }

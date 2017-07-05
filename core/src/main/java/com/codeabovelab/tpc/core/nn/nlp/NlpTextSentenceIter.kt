@@ -2,14 +2,16 @@ package com.codeabovelab.tpc.core.nn.nlp
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Stream
 
 /**
  */
-class NlpTextSentenceIter(
-        private val iter: Iterator<String>,
+class NlpTextSentenceIter private constructor(
+        private val stream: Stream<String>,
         private val labels: List<String>?
-) : SentenceIterator {
+) : SentenceIterator, AutoCloseable {
 
+    private val iter = stream.iterator();
     private var offset = 0
 
     override fun hasNext(): Boolean {
@@ -23,16 +25,19 @@ class NlpTextSentenceIter(
         return sd
     }
 
-
     override fun currentLabels(): List<String>? {
         return labels
     }
 
+    override fun close() {
+        stream.close()
+    }
+
     companion object {
         fun create(path: Path): SentenceIterator {
-            val iter = Files.lines(path).iterator()
+            val stream = Files.lines(path)
             return NlpTextSentenceIter(
-                    iter = iter,
+                    stream = stream,
                     labels = FileTextIterator.extractLabels(path)
             )
         }

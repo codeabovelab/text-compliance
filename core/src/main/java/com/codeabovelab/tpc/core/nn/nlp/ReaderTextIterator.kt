@@ -10,9 +10,10 @@ import java.util.*
  */
 class ReaderTextIterator(
         private val id: String,
-        r: Reader
+        reader: Reader
 ) : TextIterator {
-    private var reader: Iterator<String> = BufferedReader(r).lines().iterator()
+    private val buff = BufferedReader(reader)
+    private var iterator: Iterator<String> = buff.lines().iterator()
     private var _index: Int = -1
 
     override val count: Int
@@ -22,14 +23,14 @@ class ReaderTextIterator(
         get() = _index
 
     override fun hasNext(): Boolean {
-        return reader.hasNext()
+        return iterator.hasNext()
     }
 
     override fun next(): Text {
         _index++
         val sb = StringBuilder()
         while (hasNext()) {
-            val line = reader.next()
+            val line = iterator.next()
             if (line.isEmpty() || line.isBlank()) {
                 break
             }
@@ -37,5 +38,9 @@ class ReaderTextIterator(
         }
         val data = sb.toString()
         return TextImpl("$id#$_index", data)
+    }
+
+    override fun close() {
+        buff.close()
     }
 }

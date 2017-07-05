@@ -4,7 +4,7 @@ import com.codeabovelab.tpc.text.Text
 
 /**
  */
-interface TextIterator : Iterator<Text> {
+interface TextIterator : Iterator<Text>, AutoCloseable {
     val count: Int
 
     val labels: List<String>?
@@ -33,6 +33,9 @@ interface TextIterator : Iterator<Text> {
                     return src
                 }
 
+                override fun close() {
+                    //nothing
+                }
             }
         }
     }
