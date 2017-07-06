@@ -1,6 +1,8 @@
 package com.codeabovelab.tpc.tool.process
 
 import com.codeabovelab.tpc.core.kw.KeywordSetMatcher
+import com.codeabovelab.tpc.core.kw.KeywordsFileHeader
+import com.codeabovelab.tpc.core.kw.KeywordsFileReader
 import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
@@ -11,7 +13,9 @@ import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
 import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.util.PathUtils
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.ByteArrayInputStream
+import java.io.FileReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -23,6 +27,8 @@ class ProcessorConfigurer(
         private val learnedDir: LearnConfig.Files,
         private val learnedConfig: LearnConfig
 ) {
+
+    val om = ObjectMapper()
 
     fun configure() {
         configureTextClassifier()
@@ -62,14 +68,17 @@ class ProcessorConfigurer(
 
 
     private fun loadFromFiles(keywordsDir: Path, wordSynonyms: WordSynonyms, ksmBuilder: KeywordSetMatcher.Builder) {
+        val kfr = KeywordsFileReader(deserializer = { om.readValue(it, KeywordsFileHeader::class.java) })
         Files.walk(keywordsDir).filter {
-            "txt" == PathUtils.extension(it)
+            KeywordsFileReader.EXT == PathUtils.extension(it)
         }.forEach {
             val labels = FileTextIterator.extractLabels(it)
-            Files.lines(it).forEach {
-                ksmBuilder.add(it, labels)
-                wordSynonyms.lookup(it).words.forEach {
-                    ksmBuilder.add(it, labels)
+            kfr.read(FileReader(it.toFile())) { kfh, keyword ->
+                ksmBuilder.add(keyword, labels)
+                if(kfh.synonyms) {
+                    wordSynonyms.lookup(keyword).words.forEach {
+                        ksmBuilder.add(it, labels)
+                    }
                 }
             }
         }
