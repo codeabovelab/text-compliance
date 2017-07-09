@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.learn
+package com.codeabovelab.tpc.tool.learn.sentiment
 
 interface SentimentDocumentArray {
 

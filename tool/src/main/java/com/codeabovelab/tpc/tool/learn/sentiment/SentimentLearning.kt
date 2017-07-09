@@ -1,5 +1,6 @@
-package com.codeabovelab.tpc.tool.learn
+package com.codeabovelab.tpc.tool.learn.sentiment
 
+import com.codeabovelab.tpc.tool.learn.LearnConfig
 import org.deeplearning4j.eval.Evaluation
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.nn.conf.GradientNormalization
@@ -86,18 +87,18 @@ class SentimentLearning(
         for (i in 0..lc.sentiment.nEpochs - 1) {
             net.fit(train)
             train.reset()
-            println("Epoch $i complete. Starting evaluation:")
+            log.info("Epoch {} completed. Starting evaluation:", i)
 
             val evaluation = Evaluation()
             while (test.hasNext()) {
                 val t = test.next()
                 val features = t.features
-                val lables = t.labels
+                val labels = t.labels
                 val inMask = t.featuresMaskArray
                 val outMask = t.labelsMaskArray
                 val predicted = net.output(features, false, inMask, outMask)
 
-                evaluation.evalTimeSeries(lables, predicted, outMask)
+                evaluation.evalTimeSeries(labels, predicted, outMask)
             }
             test.reset()
 

@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.learn
+package com.codeabovelab.tpc.tool.learn.sentiment
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor
@@ -9,7 +9,6 @@ import org.nd4j.linalg.dataset.api.DataSetPreProcessor
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.util.*
 

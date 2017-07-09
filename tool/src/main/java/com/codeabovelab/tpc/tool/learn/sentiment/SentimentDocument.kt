@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.learn
+package com.codeabovelab.tpc.tool.learn.sentiment
 
 class SentimentDocument(
         val text: String,
