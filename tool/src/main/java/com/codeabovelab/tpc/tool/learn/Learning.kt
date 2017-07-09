@@ -32,14 +32,14 @@ class Learning(
         val ld = LearnConfig.learnedDir(destDir)
         val pvf = ld.doc2vec.toFile()
         if (pvf.exists()) {
-            log.warn("Destination $destDir is exists, do nothing.")
+            log.warn("Destination $destDir exists, do nothing.")
             return
         }
         pvf.parentFile.mkdirs()
         val lc = LearnConfig()
         if(config != null) {
             val srcConfigPath = Paths.get(config).toAbsolutePath()
-            lc.configure(srcConfigPath) // this method wil create config if absent
+            lc.configure(srcConfigPath) // this method will create config if absent
             copyResources(srcConfigPath.parent, ld.root, lc)
             lc.save(ld.config)
         }
