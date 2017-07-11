@@ -1,12 +1,11 @@
 package com.codeabovelab.tpc.tool
 
-import com.codeabovelab.tpc.tool.ui.UiConfiguration
+import com.codeabovelab.tpc.tool.config.JacksonConfig
+import com.codeabovelab.tpc.tool.jpa.JpaConfiguration
+import com.codeabovelab.tpc.tool.ui.WebConfiguration
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.HttpHandlerAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.ReactiveWebServerAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 
@@ -15,10 +14,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 @Import(
         PropertySourcesPlaceholderConfigurer::class,
         ConfigurationPropertiesAutoConfiguration::class,
-        HttpHandlerAutoConfiguration::class,
-        ReactiveWebServerAutoConfiguration::class,
-        WebFluxAutoConfiguration::class,
-        UiConfiguration::class
+        JacksonConfig::class,
+        WebConfiguration::class,
+        JpaConfiguration::class
 )
 @SpringBootConfiguration
 open class Application {

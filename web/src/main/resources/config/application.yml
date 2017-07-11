@@ -8,3 +8,6 @@ spring:
 server:
   display-name: "Texaco web app"
 
+logging:
+  level:
+#    "org.springframework.boot.autoconfigure.logging": DEBUG

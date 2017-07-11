@@ -53,9 +53,14 @@ allprojects {
             dependency "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
             dependency "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_version"
             dependency "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+            dependency "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
 
             dependency "org.springframework.boot:spring-boot-starter-webflux:$spring_boot_version"
             dependency "org.springframework:spring-context:$spring_version"
+            dependency "org.springframework.data:spring-data-jpa:2.0.0.M4"
+
+            dependency "org.hibernate:hibernate-entitymanager:5.2.10.Final"
+            dependency "org.hsqldb:hsqldb:2.4.0"
         }
     }
 }
