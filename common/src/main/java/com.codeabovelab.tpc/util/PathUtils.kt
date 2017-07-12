@@ -6,6 +6,9 @@ import java.nio.file.Path
  */
 object PathUtils {
 
+    /**
+     * Return extension without '.'
+     */
     fun extension(path: Path): String {
         val str = path.toString()
         val dotPos = findExt(str, path)

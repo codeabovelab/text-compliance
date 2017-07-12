@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.rules
+package com.codeabovelab.tpc.tool.jpa
 
 import javax.persistence.Entity
 import javax.persistence.Id

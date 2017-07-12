@@ -28,6 +28,8 @@ class EmailDocumentReader:
 
     private val emailParser = EmailParser()
 
+    override val binary = false
+
     override fun read(id: String?, istr: InputStream): MessageDocument.Builder {
         var session: Session? = null
         val msg = MimeMessage(session, istr)

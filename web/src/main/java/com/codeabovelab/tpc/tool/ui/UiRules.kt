@@ -1,7 +1,7 @@
 package com.codeabovelab.tpc.tool.ui
 
-import com.codeabovelab.tpc.tool.rules.RuleEntity
-import com.codeabovelab.tpc.tool.rules.RulesRepository
+import com.codeabovelab.tpc.tool.jpa.RuleEntity
+import com.codeabovelab.tpc.tool.jpa.RulesRepository
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -20,8 +20,8 @@ class UiRules(
         return repository.findAll()
     }
 
-    @RequestMapping("/add", method = arrayOf(RequestMethod.POST))
-    fun add(@RequestBody entity: RuleEntity) {
+    @RequestMapping("/set", method = arrayOf(RequestMethod.POST))
+    fun set(@RequestBody entity: RuleEntity) {
         repository.save(entity)
     }
 }

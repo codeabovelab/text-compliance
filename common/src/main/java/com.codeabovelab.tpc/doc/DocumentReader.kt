@@ -9,4 +9,6 @@ interface DocumentReader<out T : Document.Builder> {
      * read document from specified stream
      */
     fun read(id: String?, istr: InputStream): T
+
+    val binary: Boolean get() = true
 }
