@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.config
+package com.codeabovelab.tpc.web.config
 
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer

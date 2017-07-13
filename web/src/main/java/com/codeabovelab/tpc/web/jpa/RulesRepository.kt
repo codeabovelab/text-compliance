@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.jpa
+package com.codeabovelab.tpc.web.jpa
 
 import org.springframework.data.jpa.repository.JpaRepository
 

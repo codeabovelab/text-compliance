@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.docs
+package com.codeabovelab.tpc.web.docs
 
 import com.codeabovelab.tpc.doc.DocumentReaders
 import com.codeabovelab.tpc.doc.TextDocumentReader

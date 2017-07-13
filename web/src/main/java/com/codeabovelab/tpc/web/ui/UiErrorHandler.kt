@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.tool.ui
+package com.codeabovelab.tpc.web.ui
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.ControllerAdvice

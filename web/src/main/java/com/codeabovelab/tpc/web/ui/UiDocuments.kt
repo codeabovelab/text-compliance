@@ -1,8 +1,8 @@
-package com.codeabovelab.tpc.tool.ui
+package com.codeabovelab.tpc.web.ui
 
 import com.codeabovelab.tpc.doc.DocumentReaders
-import com.codeabovelab.tpc.tool.jpa.DocEntity
-import com.codeabovelab.tpc.tool.jpa.DocsRepository
+import com.codeabovelab.tpc.web.jpa.DocEntity
+import com.codeabovelab.tpc.web.jpa.DocsRepository
 import com.codeabovelab.tpc.util.JsonBlobs
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

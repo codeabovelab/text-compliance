@@ -1,9 +1,9 @@
-package com.codeabovelab.tpc.tool.docs
+package com.codeabovelab.tpc.web.docs
 
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentReaders
 import com.codeabovelab.tpc.doc.DocumentsRepository
-import com.codeabovelab.tpc.tool.jpa.DocsRepository
+import com.codeabovelab.tpc.web.jpa.DocsRepository
 import java.io.ByteArrayInputStream
 
 /**

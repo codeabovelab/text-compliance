@@ -1,9 +1,9 @@
-package com.codeabovelab.tpc.tool
+package com.codeabovelab.tpc.web
 
-import com.codeabovelab.tpc.tool.config.JacksonConfig
-import com.codeabovelab.tpc.tool.docs.DocumentConfiguration
-import com.codeabovelab.tpc.tool.jpa.JpaConfiguration
-import com.codeabovelab.tpc.tool.ui.WebConfiguration
+import com.codeabovelab.tpc.web.config.JacksonConfig
+import com.codeabovelab.tpc.web.docs.DocumentConfiguration
+import com.codeabovelab.tpc.web.jpa.JpaConfiguration
+import com.codeabovelab.tpc.web.ui.WebConfiguration
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration
