@@ -25,41 +25,42 @@ class UiDocuments(
 
     @RequestMapping("/get", method = arrayOf(RequestMethod.GET))
     fun get(id: String): UiDoc? {
-        return toUi(repository.findByDocumentId(id))
+        val docEntity = repository.findByDocumentId(id)
+        return if(docEntity != null) {
+            UiDoc().toUi(docEntity)
+        } else {
+            null
+        }
     }
 
     @RequestMapping("/set", method = arrayOf(RequestMethod.POST))
     fun set(@RequestBody ui: UiDoc) {
-        val entity = toEntity(ui)
+        val docEntity = repository.findByDocumentId(ui.documentId!!) ?: DocEntity()
+        val entity = ui.toEntity(docEntity, readers)
         repository.save(entity)
     }
 
-
-    fun toUi(entity: DocEntity?): UiDoc? {
-        if(entity == null) {
-            return null
-        }
-        val ud = UiDoc()
-        ud.type = entity.type
-        ud.documentId = entity.documentId
-        ud.data = JsonBlobs.toString(entity.data, entity.binary)
-        return ud
-    }
-
-    fun toEntity(ui: UiDoc?): DocEntity? {
-        if(ui == null) {
-            return null
-        }
-        val entity = DocEntity()
-        entity.type = ui.type!!
-        entity.documentId = ui.documentId!!
-        entity.data = JsonBlobs.fromString(ui.data!!, readers.isBinary(entity.type))
-        return entity
-    }
 }
 
 class UiDoc {
     var type: String? = null
     var documentId: String? = null
     var data: String? = null
+
+    fun toUi(entity: DocEntity?) = apply {
+        if(entity == null) {
+            return@apply
+        }
+        this.type = entity.type
+        this.documentId = entity.documentId
+        this.data = JsonBlobs.toString(entity.data, entity.binary)
+    }
+
+    fun toEntity(entity: DocEntity, readers: DocumentReaders): DocEntity {
+        entity.type = this.type!!
+        entity.documentId = this.documentId!!
+        entity.binary = readers.isBinary(entity.type)
+        entity.data = JsonBlobs.fromString(this.data!!, entity.binary)
+        return entity
+    }
 }
