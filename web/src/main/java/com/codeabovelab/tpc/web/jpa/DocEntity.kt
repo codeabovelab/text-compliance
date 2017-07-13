@@ -1,14 +1,13 @@
 package com.codeabovelab.tpc.web.jpa
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
+import javax.persistence.*
 
 /**
  */
 @Entity
 open class DocEntity {
     @Id
+    @GeneratedValue
     var id: Long = 0
     var type: String = ""
     @Column(unique = true)
