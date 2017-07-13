@@ -6,6 +6,7 @@ spring:
     throw-exception-if-no-handler-found: true
   datasource:
     url: jdbc:hsqldb:mem:tmp
+    #url: jdbc:hsqldb:file:/tmp/db/db;shutdown=true
     username: user
     password: pass
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
