@@ -10,5 +10,10 @@ interface DocumentReader<out T : Document.Builder> {
      */
     fun read(id: String?, istr: InputStream): T
 
-    val binary: Boolean get() = true
+    val info: Info
+
+    data class Info(
+            val binary: Boolean,
+            val type: String
+    )
 }

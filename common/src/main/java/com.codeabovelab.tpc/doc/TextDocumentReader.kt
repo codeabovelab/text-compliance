@@ -13,7 +13,10 @@ class TextDocumentReader(
         val charset: Charset = StandardCharsets.UTF_8
 ): DocumentReader<DocumentImpl.Builder> {
 
-    override val binary = false
+    override val info = DocumentReader.Info(
+            binary = false,
+            type = "text"
+    )
 
     override fun read(id: String?, istr: InputStream): DocumentImpl.Builder {
         val db = DocumentImpl.builder()

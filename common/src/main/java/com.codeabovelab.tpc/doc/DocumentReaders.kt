@@ -8,9 +8,15 @@ class DocumentReaders private constructor(
         private val map: Map<String, DocumentReader<*>>
 ) {
 
-    operator fun get(type: String): DocumentReader<*> {
-        val reader = map[type]
-        return reader ?: throw NoSuchElementException("Can not find reader for '$type'")
+    operator fun get(type: String): DocumentReader<*>? {
+        return map[type]
+    }
+
+    /**
+     * return true if type is binary or unknown
+     */
+    fun isBinary(type: String): Boolean {
+        return this.get(type)?.info?.binary ?: true
     }
 
     class Builder {

@@ -3,12 +3,11 @@ package com.codeabovelab.tpc.tool.ui
 import com.codeabovelab.tpc.doc.DocumentReaders
 import com.codeabovelab.tpc.tool.jpa.DocEntity
 import com.codeabovelab.tpc.tool.jpa.DocsRepository
+import com.codeabovelab.tpc.util.JsonBlobs
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
-import java.nio.charset.StandardCharsets
-import java.util.*
 
 /**
  */
@@ -43,12 +42,7 @@ class UiDocuments(
         val ud = UiDoc()
         ud.type = entity.type
         ud.documentId = entity.documentId
-        val reader = readers[entity.type]
-        ud.data = if(reader.binary) {
-            Base64.getEncoder().encodeToString(entity.data)
-        } else {
-            String(entity.data, StandardCharsets.UTF_8)
-        }
+        ud.data = JsonBlobs.toString(entity.data, entity.binary)
         return ud
     }
 
@@ -59,12 +53,7 @@ class UiDocuments(
         val entity = DocEntity()
         entity.type = ui.type!!
         entity.documentId = ui.documentId!!
-        val reader = readers[entity.type]
-        entity.data = if(reader.binary) {
-            Base64.getDecoder().decode(ui.data!!)
-        } else {
-            ui.data!!.toByteArray(StandardCharsets.UTF_8)
-        }
+        entity.data = JsonBlobs.fromString(ui.data!!, readers.isBinary(entity.type))
         return entity
     }
 }

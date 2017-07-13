@@ -17,4 +17,5 @@ open class DocEntity {
      * Raw data of document
      */
     var data: ByteArray = byteArrayOf()
+    var binary: Boolean = true
 }

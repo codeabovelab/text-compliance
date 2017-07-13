@@ -28,7 +28,10 @@ class EmailDocumentReader:
 
     private val emailParser = EmailParser()
 
-    override val binary = false
+    override val info = DocumentReader.Info(
+            binary = false,
+            type = "email"
+    )
 
     override fun read(id: String?, istr: InputStream): MessageDocument.Builder {
         var session: Session? = null

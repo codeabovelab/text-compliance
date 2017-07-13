@@ -19,7 +19,7 @@ class DocumentsRepositoryImpl(
         if(docEntity == null) {
             return null
         }
-        val reader = readers[docEntity.type]
+        val reader = readers[docEntity.type]!!
         val istr = ByteArrayInputStream(docEntity.data)
         val builder = istr.use {
             reader.read(docEntity.documentId, it)
