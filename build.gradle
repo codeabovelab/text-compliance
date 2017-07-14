@@ -46,6 +46,7 @@ allprojects {
 
             dependency "com.google.guava:guava:22.0"
             dependency "org.projectlombok:lombok:1.16.16"
+            dependency "org.slf4j:slf4j-api:1.7.25"
             dependency "ch.qos.logback:logback-classic:1.1.11"
             dependency "junit:junit:4.12"
             dependency "org.hamcrest:hamcrest-junit:2.0.0.0"

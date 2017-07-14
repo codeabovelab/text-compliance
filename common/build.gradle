@@ -6,6 +6,7 @@ dependencies {
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
+    compile "org.slf4j:slf4j-api"
 
     testCompile 'org.jetbrains.kotlin:kotlin-test'
     testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
