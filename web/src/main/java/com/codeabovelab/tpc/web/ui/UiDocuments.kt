@@ -1,13 +1,16 @@
 package com.codeabovelab.tpc.web.ui
 
+import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.doc.DocumentReaders
 import com.codeabovelab.tpc.web.jpa.DocEntity
 import com.codeabovelab.tpc.web.jpa.DocsRepository
 import com.codeabovelab.tpc.util.JsonBlobs
+import com.codeabovelab.tpc.web.docproc.DocProcessor
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Mono
 
 /**
  */
@@ -15,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class UiDocuments(
         private var repository: DocsRepository,
-        private var readers: DocumentReaders
+        private var readers: DocumentReaders,
+        private var process: DocProcessor
 ) {
 
     @RequestMapping("/list", method = arrayOf(RequestMethod.GET))
@@ -40,6 +44,10 @@ class UiDocuments(
         repository.save(entity)
     }
 
+    @RequestMapping("/analyze", method = arrayOf(RequestMethod.POST))
+    fun analyze(id: String): Mono<ProcessorReport> {
+        return process.process(id)
+    }
 }
 
 class UiDoc {

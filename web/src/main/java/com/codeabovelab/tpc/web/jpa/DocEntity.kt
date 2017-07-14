@@ -15,6 +15,9 @@ open class DocEntity {
     /**
      * Raw data of document
      */
+    @Column(length = 10240)
     var data: ByteArray = byteArrayOf()
     var binary: Boolean = true
+    @Column(length = 10240 * 4)
+    var report: String? = null
 }

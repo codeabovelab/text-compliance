@@ -12,14 +12,14 @@ object Asserts {
         return prop.name
     }
 
-    fun <T> nonNull(prop: KProperty<T>): T {
+    fun <T> notNull(prop: KProperty<T>): T {
         val value = prop.getter.call()
         val name = propName(prop)
         Objects.requireNonNull(value, "'$name' is required")
         return value
     }
 
-    fun nonNullAll(vararg props: KProperty<*>) {
+    fun notNullAll(vararg props: KProperty<*>) {
         var sb: StringBuilder? = null
         for(prop in props) {
             val value = prop.getter.call()
@@ -36,6 +36,12 @@ object Asserts {
         if(sb != null) {
             sb.append(" is required")
             throw IllegalArgumentException(sb.toString())
+        }
+    }
+
+    fun notNull(any: Any?, message: String) {
+        if(any == null) {
+            throw NullPointerException(message)
         }
     }
 }

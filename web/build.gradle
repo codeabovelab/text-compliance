@@ -1,6 +1,7 @@
 dependencies {
 
     compile project(':core')
+    compile project(':tool')
 
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin'
@@ -11,7 +12,7 @@ dependencies {
 
     compile "org.hibernate:hibernate-entitymanager"
     compile "org.apache.tomcat:tomcat-jdbc"
-    compile "org.hsqldb:hsqldb"
+    compile group: "org.hsqldb", name: "hsqldb", version: "2.4.0", classifier:"jdk8debug"
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
     compile 'org.jetbrains.kotlin:kotlin-reflect'

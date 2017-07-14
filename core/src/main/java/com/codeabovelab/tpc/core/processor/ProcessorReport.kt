@@ -6,6 +6,8 @@ import kotlin.reflect.full.cast
 
 
 /**
+ * Report of document processing.
+ * Must support conversion from JSON.
  */
 class ProcessorReport(builder: Builder): Labeled {
     /**

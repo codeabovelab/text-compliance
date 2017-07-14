@@ -5,9 +5,11 @@ import com.codeabovelab.tpc.doc.TextDocumentReader
 import com.codeabovelab.tpc.integr.email.EmailDocumentReader
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 
 /**
  */
+@Import(DocsStorage::class)
 @Configuration
 open class DocumentConfiguration {
 

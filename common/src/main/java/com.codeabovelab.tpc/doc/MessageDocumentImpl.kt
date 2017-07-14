@@ -16,7 +16,7 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
         override val references: MutableList<Ref> = ArrayList()
 
         override fun build(): MessageDocument {
-            Asserts.nonNullAll(this::body, this.body!!::id, this::from, this::date)
+            Asserts.notNullAll(this::body, this.body!!::id, this::from, this::date)
             return MessageDocumentImpl(this)
         }
     }

@@ -61,7 +61,7 @@ allprojects {
             dependency "org.springframework.data:spring-data-jpa:2.0.0.M4"
 
             dependency "org.hibernate:hibernate-entitymanager:5.2.10.Final"
-            dependency "org.hsqldb:hsqldb:2.4.0"
+            //dependency "org.hsqldb:hsqldb:2.4.0"
             dependency 'org.apache.tomcat:tomcat-jdbc:8.5.16'
         }
     }
