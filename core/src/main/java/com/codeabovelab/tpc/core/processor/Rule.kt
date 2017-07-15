@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.processor;
+package com.codeabovelab.tpc.core.processor
 
 /**
  */

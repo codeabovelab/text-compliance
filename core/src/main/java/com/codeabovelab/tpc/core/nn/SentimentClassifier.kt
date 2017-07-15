@@ -54,10 +54,7 @@ class SentimentClassifier(
 
     fun loadFeaturesFromString(reviewContents: String, maxLength: Int): INDArray {
         val tokens = tokenizerFactory.create(reviewContents).tokens
-        val tokensFiltered = ArrayList<String>()
-        for (t in tokens) {
-            if (wordVectors.hasWord(t)) tokensFiltered.add(t)
-        }
+        val tokensFiltered = tokens.filter { wordVectors.hasWord(it) }
         val outputLength = Math.max(maxLength, tokensFiltered.size)
 
         val features = Nd4j.create(1, vectorSize, outputLength)

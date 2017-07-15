@@ -17,8 +17,7 @@ import reactor.core.publisher.Mono
 @Component
 class DocProcessor(
         private val repo: DocsStorage,
-        @Value("\${texaco.processor.classifier.dir}")
-        private val classifierDir: String
+        @Value("\${texaco.processor.classifier.dir}") private val classifierDir: String
 ) {
     private val processor = Processor(threadResolver = ThreadResolver(repo))
 

@@ -69,6 +69,5 @@ class WordSearchResult(
     class Entry(coordinates: TextCoordinates,
                 val keywords: List<String>,
                 override val labels: Collection<Label>
-    ) : PredicateResult.Entry(coordinates), Labeled {
-    }
+    ) : PredicateResult.Entry(coordinates), Labeled
 }

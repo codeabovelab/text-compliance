@@ -11,7 +11,7 @@ class NlpTextSentenceIter private constructor(
         private val labels: List<String>?
 ) : SentenceIterator, AutoCloseable {
 
-    private val iter = stream.iterator();
+    private val iter = stream.iterator()
     private var offset = 0
 
     override fun hasNext(): Boolean {
