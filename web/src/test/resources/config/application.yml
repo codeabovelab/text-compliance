@@ -1,0 +1,18 @@
+
+spring:
+  application:
+    name: "Texaco web app"
+  datasource:
+    url: jdbc:hsqldb:mem:tmp
+    #url: jdbc:hsqldb:file:/tmp/db/db;shutdown=true
+    username: user
+    password: pass
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+
+texaco:
+  processor.classifier.dir: /tmp/learned-data/
+
+logging:
+  level:
+    "org.springframework.boot.autoconfigure.logging": DEBUG
+
