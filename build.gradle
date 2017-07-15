@@ -59,6 +59,7 @@ allprojects {
             dependency "org.springframework.boot:spring-boot-starter-webflux:$spring_boot_version"
             dependency "org.springframework:spring-context:$spring_version"
             dependency "org.springframework.data:spring-data-jpa:2.0.0.M4"
+            dependency "org.springframework.boot:spring-boot-starter-test:$spring_boot_version"
 
             dependency "org.hibernate:hibernate-entitymanager:5.2.10.Final"
             //dependency "org.hsqldb:hsqldb:2.4.0"
