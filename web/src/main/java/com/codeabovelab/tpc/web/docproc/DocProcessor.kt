@@ -8,6 +8,7 @@ import com.codeabovelab.tpc.tool.process.ProcessorConfigurer
 import com.codeabovelab.tpc.web.docs.DocsStorage
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -19,6 +20,7 @@ class DocProcessor(
         private val repo: DocsStorage,
         @Value("\${texaco.processor.classifier.dir}") private val classifierDir: String
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java)
     private val processor = Processor(threadResolver = ThreadResolver(repo))
 
     init {
@@ -35,7 +37,12 @@ class DocProcessor(
 
     private val cache = CacheBuilder.newBuilder().build(object : CacheLoader<String, ProcessorReport>() {
         override fun load(id: String): ProcessorReport {
-            var report = repo.getReport(id)
+            var report = try {
+                repo.getReport(id)
+            } catch (e : Exception) {
+                log.error("Error while load report: ", e)
+                null
+            }
             if (report == null) {
                 val doc = repo[id]!!
                 report = processor.process(doc = doc)
