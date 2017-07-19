@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.objuri
 
 import com.codeabovelab.tpc.util.Asserts
 import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
@@ -17,7 +16,6 @@ class ClassScheme<out T : Any>(
 
     companion object {
         private val C_STRING = java.lang.String::class.java
-
     }
 
     private val map = factories.associateBy { it.returnType.javaType.typeName }
@@ -33,9 +31,9 @@ class ClassScheme<out T : Any>(
 
     private fun parseQuery(reqParams: List<KParameter>, uri: Uri): Map<KParameter, Any?> {
         val map = HashMap<KParameter, Any?>()
-        for(reqParam in reqParams) {
+        for (reqParam in reqParams) {
             val str = uri.parameters[reqParam.name!!]
-            if(str != null) {
+            if (str != null) {
                 val obj = fromString(reqParam, str)
                 map.put(reqParam, obj)
             }
@@ -47,11 +45,23 @@ class ClassScheme<out T : Any>(
     private fun fromString(reqParam: KParameter, str: String): Any {
         val classifier = reqParam.type.classifier
         val javaClass = (classifier as KClass<*>).javaObjectType
-        if(javaClass == C_STRING) {
+        if (javaClass == C_STRING) {
             return URLDecoder.decode(str, "UTF-8")
         }
         //cache for primitives?
         val fromString = javaClass.getDeclaredMethod("valueOf", C_STRING)
         return fromString.invoke(null, str)
+    }
+
+    class Builder<T : Any> {
+        val name: String = "class"
+        val factories: MutableList<KCallable<T>> = ArrayList()
+
+        fun build(): ClassScheme<T> {
+            return ClassScheme(
+                    name = name,
+                    factories = *factories.toTypedArray()
+            )
+        }
     }
 }

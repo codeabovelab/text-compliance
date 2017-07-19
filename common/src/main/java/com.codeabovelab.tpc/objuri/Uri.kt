@@ -3,6 +3,7 @@ package com.codeabovelab.tpc.objuri
 /**
  */
 class Uri private constructor(
+        val source: String,
         val scheme: String,
         val path: String,
         val parameters: Parameters
@@ -19,9 +20,10 @@ class Uri private constructor(
                 path = str.substring(schemeEnd + 1, pathEnd)
                 parseParameters(pathEnd + 1, str, params)
             } else {
-                path = ""
+                path = str.substring(schemeEnd + 1, str.length)
             }
             return Uri(
+                source = str,
                 scheme = scheme,
                 path = path,
                 parameters = Parameters(params)
@@ -48,6 +50,10 @@ class Uri private constructor(
                 i = valEnd + 1
             }
         }
+    }
+
+    override fun toString(): String {
+        return source
     }
 
     data class Parameters constructor(val list: List<Parameter>) {

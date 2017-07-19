@@ -10,8 +10,12 @@ class ObjUriTest {
     @Test
     fun test() {
         val ou = ObjUri(ClassScheme(factories = SomeObject::class.primaryConstructor!!))
-        val obj : SomeObject = ou.create("class:${SomeObject::class.qualifiedName}?intArg=234&longArg=${Long.MAX_VALUE}&strArg=%3Fa%3Db")
+
+        var obj : SomeObject = ou.create("class:${SomeObject::class.qualifiedName}?intArg=234&longArg=${Long.MAX_VALUE}&strArg=%3Fa%3Db")
         assertEquals(SomeObject(234, Long.MAX_VALUE, "?a=b"), obj)
+
+        obj = ou.create("class:${SomeObject::class.qualifiedName}")
+        assertEquals(SomeObject(), obj)
     }
 }
 
