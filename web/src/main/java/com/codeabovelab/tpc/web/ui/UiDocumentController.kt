@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
  */
 @RequestMapping("/doc")
 @RestController
-class UiDocuments(
+class UiDocumentController(
         private var repository: DocsRepository,
         private var readers: DocumentReaders,
         private var process: DocProcessor
@@ -30,11 +30,7 @@ class UiDocuments(
     @RequestMapping("/get", method = arrayOf(RequestMethod.GET))
     fun get(id: String): UiDoc? {
         val docEntity = repository.findByDocumentId(id)
-        return if(docEntity != null) {
-            UiDoc().toUi(docEntity)
-        } else {
-            null
-        }
+        return docEntity.toUi()
     }
 
     @RequestMapping("/set", method = arrayOf(RequestMethod.POST))
@@ -50,19 +46,21 @@ class UiDocuments(
     }
 }
 
+fun DocEntity?.toUi(): UiDoc? {
+    if(this == null) {
+        return null
+    }
+    val ui = UiDoc()
+    ui.type = type
+    ui.documentId = documentId
+    ui.data = JsonBlobs.toString(data, binary)
+    return ui
+}
+
 class UiDoc {
     var type: String? = null
     var documentId: String? = null
     var data: String? = null
-
-    fun toUi(entity: DocEntity?) = apply {
-        if(entity == null) {
-            return@apply
-        }
-        this.type = entity.type
-        this.documentId = entity.documentId
-        this.data = JsonBlobs.toString(entity.data, entity.binary)
-    }
 
     fun toEntity(entity: DocEntity, readers: DocumentReaders): DocEntity {
         entity.type = this.type!!

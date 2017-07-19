@@ -3,6 +3,7 @@
 
 target/
 build/
+out/
 .gradle/
 /gradle/
 *.log
