@@ -1,14 +1,10 @@
 package com.codeabovelab.tpc.tool.process
 
-import com.codeabovelab.tpc.core.kw.KeywordSetMatcher
-import com.codeabovelab.tpc.core.kw.KeywordsFileHeader
-import com.codeabovelab.tpc.core.kw.KeywordsFileReader
-import com.codeabovelab.tpc.core.kw.WordPredicate
+import com.codeabovelab.tpc.core.kw.*
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
-import com.codeabovelab.tpc.core.processor.Processor
-import com.codeabovelab.tpc.core.processor.Rule
+import com.codeabovelab.tpc.core.processor.RulePredicate
 import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
 import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
 import com.codeabovelab.tpc.tool.learn.LearnConfig
@@ -19,41 +15,55 @@ import java.io.FileReader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.reflect.KCallable
 
 /**
+ * Provide some predefined predicates: keywords, classifier & etc
  */
-class ProcessorConfigurer(
-        private val proc: Processor,
+class PredicateProvider(
         private val learnedDir: LearnConfig.Files,
         private val learnedConfig: LearnConfig
 ) {
 
-    val om = ObjectMapper()
+    private val om = ObjectMapper()
+    val textClassifierPredicate = configureTextClassifier()
+    val wordPredicate = configureKeyWord()
 
-    fun configure() {
-        configureTextClassifier()
-        configureKeyWord()
+    /**
+     * Do not use this function. It need only for [publish], we make it public because consumer must has access
+     * to it.
+     */
+    fun wordPredicateFactory() : WordPredicate {
+        return wordPredicate!!
     }
 
-    private fun configureTextClassifier() {
+    fun publish(consumer: PredicateConsumer) {
+        consumer(this::textClassifierPredicate)
+        val wp = this.wordPredicate
+        if(wp != null) {
+            consumer(this::wordPredicateFactory)
+        }
+    }
+
+    private fun configureTextClassifier(): TextClassifier {
         val tc = TextClassifier(
                 vectorsFile = learnedDir.doc2vec,
                 maxLabels = 3,
                 uima = learnedConfig.createUimaResource(),
                 wordSupplier = learnedConfig.wordSupplier()
         )
-        proc.addRule(Rule("classify", 0.0f, tc))
+        return tc
     }
 
-    private fun configureKeyWord() {
+    private fun configureKeyWord() : WordPredicate? {
         val thesaurusConfig = learnedConfig.thesaurus
         if (thesaurusConfig.words == null) {
-            return
+            return null
         }
         val keywordsDir = learnedConfig.path(thesaurusConfig.words!!)
         val hasKeywordsDir = Files.exists(keywordsDir)
         if (!hasKeywordsDir) {
-            return
+            return null
         }
         val wordSynonyms = initThesaurus(thesaurusConfig)
         val ksmBuilder = KeywordSetMatcher.Builder()
@@ -62,8 +72,9 @@ class ProcessorConfigurer(
         }
         val sw = WordPredicate(
                 keywordMatcher = ksmBuilder.build(),
-                uima = SentenceIteratorImpl.uimaResource(morphological = true))
-        proc.addRule(Rule("searchWords", 0.0f, sw))
+                uima = SentenceIteratorImpl.uimaResource(morphological = true)
+        )
+        return sw
     }
 
 
@@ -95,3 +106,5 @@ class ProcessorConfigurer(
         }
     }
 }
+
+typealias PredicateConsumer = (KCallable<RulePredicate<*>>) -> Unit

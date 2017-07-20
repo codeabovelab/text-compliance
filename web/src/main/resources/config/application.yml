@@ -4,6 +4,7 @@ spring:
     name: "Texaco web app"
   mvc:
     throw-exception-if-no-handler-found: true
+    log-resolved-exception: true
   datasource:
     url: jdbc:hsqldb:mem:tmp
     #url: jdbc:hsqldb:file:/tmp/db/db;shutdown=true
@@ -11,7 +12,6 @@ spring:
     password: pass
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
   jpa.hibernate.ddl-auto: none
-
 server:
   display-name: "Texaco web app"
 

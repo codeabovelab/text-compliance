@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.processor
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.full.cast
@@ -29,6 +30,7 @@ class ProcessorReport(builder: Builder): Labeled {
     val documentId: String
     val rules: List<RuleReport<*>>
     val attributes: Map<String, Any>
+    @JsonIgnore
     override val labels: Collection<Label>
 
     init {

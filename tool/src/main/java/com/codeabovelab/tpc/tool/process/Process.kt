@@ -47,11 +47,13 @@ class Process(
     fun run() {
 
         val proc = Processor()
-        ProcessorConfigurer(
-                proc = proc,
+        PredicateProvider(
                 learnedConfig = learnedConfig,
                 learnedDir = learnedDir
-        ).configure()
+        ).publish {
+            val predicate = it.call()
+            proc.addRule(Rule(id = it.name, weight = 1f, predicate = predicate))
+        }
 
         val pathIter = Files.walk(inPath).filter {
             docReaders.containsKey(PathUtils.extension(it))

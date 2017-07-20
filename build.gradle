@@ -12,6 +12,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.spring.gradle:dependency-management-plugin:1.0.2.RELEASE"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
     }
 }
 apply plugin: 'java'

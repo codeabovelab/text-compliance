@@ -6,6 +6,8 @@ import com.codeabovelab.tpc.web.jpa.DocEntity
 import com.codeabovelab.tpc.web.jpa.DocsRepository
 import com.codeabovelab.tpc.util.JsonBlobs
 import com.codeabovelab.tpc.web.docproc.DocProcessor
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -15,8 +17,9 @@ import reactor.core.publisher.Mono
 /**
  */
 @RequestMapping("/doc")
+@Transactional(propagation = Propagation.REQUIRED)
 @RestController
-class UiDocuments(
+open class UiDocumentController(
         private var repository: DocsRepository,
         private var readers: DocumentReaders,
         private var process: DocProcessor
@@ -30,11 +33,7 @@ class UiDocuments(
     @RequestMapping("/get", method = arrayOf(RequestMethod.GET))
     fun get(id: String): UiDoc? {
         val docEntity = repository.findByDocumentId(id)
-        return if(docEntity != null) {
-            UiDoc().toUi(docEntity)
-        } else {
-            null
-        }
+        return docEntity.toUi()
     }
 
     @RequestMapping("/set", method = arrayOf(RequestMethod.POST))
@@ -44,25 +43,32 @@ class UiDocuments(
         repository.save(entity)
     }
 
+    @RequestMapping("/delete", method = arrayOf(RequestMethod.POST))
+    fun delete(id : String) {
+        repository.deleteByDocumentId(id)
+    }
+
     @RequestMapping("/analyze", method = arrayOf(RequestMethod.POST))
     fun analyze(id: String): Mono<ProcessorReport> {
         return process.process(id)
     }
 }
 
+fun DocEntity?.toUi(): UiDoc? {
+    if(this == null) {
+        return null
+    }
+    val ui = UiDoc()
+    ui.type = type
+    ui.documentId = documentId
+    ui.data = JsonBlobs.toString(data, binary)
+    return ui
+}
+
 class UiDoc {
     var type: String? = null
     var documentId: String? = null
     var data: String? = null
-
-    fun toUi(entity: DocEntity?) = apply {
-        if(entity == null) {
-            return@apply
-        }
-        this.type = entity.type
-        this.documentId = entity.documentId
-        this.data = JsonBlobs.toString(entity.data, entity.binary)
-    }
 
     fun toEntity(entity: DocEntity, readers: DocumentReaders): DocEntity {
         entity.type = this.type!!

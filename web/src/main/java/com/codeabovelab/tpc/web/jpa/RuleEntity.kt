@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.web.jpa
 
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -7,11 +8,20 @@ import javax.persistence.Id
 /**
  */
 @Entity
-class RuleEntity {
+open class RuleEntity {
     @Id
     @GeneratedValue
     var id: Long = 0
-    var weight: Float = 0f
-    var predicate: String = ""
+
+    @Column(unique = true, nullable = false)
+    lateinit var ruleId: String
+
+    @Column(nullable = false)
+    var weight: Float = 1f
+
+    @Column(length = 10240, nullable = false)
+    lateinit var predicate: String
+
+    @Column(length = 10240)
     var action: String? = null
 }

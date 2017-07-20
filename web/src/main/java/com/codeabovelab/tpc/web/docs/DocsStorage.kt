@@ -5,7 +5,9 @@ import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentReaders
 import com.codeabovelab.tpc.doc.DocumentsRepository
 import com.codeabovelab.tpc.web.jpa.DocsRepository
+import com.codeabovelab.tpc.web.jpa.JpaConfiguration
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.ByteArrayInputStream
 
@@ -15,6 +17,7 @@ import java.io.ByteArrayInputStream
 class DocsStorage(
         private val repository: DocsRepository,
         private val readers: DocumentReaders,
+        @Qualifier(JpaConfiguration.BEAN_OBJECT_MAPPER)
         private val mapper: ObjectMapper
 ): DocumentsRepository {
 
