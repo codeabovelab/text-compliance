@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository
 interface DocsRepository : JpaRepository<DocEntity, Long> {
 
     fun findByDocumentId(docId: String): DocEntity?
+    fun deleteByDocumentId(docId: String)
 }

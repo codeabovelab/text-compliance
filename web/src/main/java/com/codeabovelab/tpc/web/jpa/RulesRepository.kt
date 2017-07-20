@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface RulesRepository: JpaRepository<RuleEntity, Long> {
     fun findByRuleId(ruleId: String): RuleEntity?
+    fun deleteByRuleId(ruleId: String)
 }

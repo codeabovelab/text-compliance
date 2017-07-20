@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.web.docproc
 
+import com.codeabovelab.tpc.core.processor.ProcessModifier
 import com.codeabovelab.tpc.core.processor.Processor
 import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.core.thread.ThreadResolver
@@ -48,7 +49,8 @@ class DocProcessor(
         rules.forEach {
             processor.addRule(it)
         }
-        val report = processor.process(doc = doc)
+        val modifier = ProcessModifier()
+        val report = processor.process(doc = doc, modifier = modifier)
         return report
     }
 

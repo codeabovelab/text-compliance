@@ -6,6 +6,8 @@ import com.codeabovelab.tpc.web.jpa.DocEntity
 import com.codeabovelab.tpc.web.jpa.DocsRepository
 import com.codeabovelab.tpc.util.JsonBlobs
 import com.codeabovelab.tpc.web.docproc.DocProcessor
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -15,8 +17,9 @@ import reactor.core.publisher.Mono
 /**
  */
 @RequestMapping("/doc")
+@Transactional(propagation = Propagation.REQUIRED)
 @RestController
-class UiDocumentController(
+open class UiDocumentController(
         private var repository: DocsRepository,
         private var readers: DocumentReaders,
         private var process: DocProcessor
@@ -38,6 +41,11 @@ class UiDocumentController(
         val docEntity = repository.findByDocumentId(ui.documentId!!) ?: DocEntity()
         val entity = ui.toEntity(docEntity, readers)
         repository.save(entity)
+    }
+
+    @RequestMapping("/delete", method = arrayOf(RequestMethod.POST))
+    fun delete(id : String) {
+        repository.deleteByDocumentId(id)
     }
 
     @RequestMapping("/analyze", method = arrayOf(RequestMethod.POST))

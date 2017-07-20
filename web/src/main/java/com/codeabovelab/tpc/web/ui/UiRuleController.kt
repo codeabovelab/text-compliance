@@ -2,6 +2,9 @@ package com.codeabovelab.tpc.web.ui
 
 import com.codeabovelab.tpc.web.jpa.RuleEntity
 import com.codeabovelab.tpc.web.jpa.RulesRepository
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController
 /**
  */
 @RequestMapping("/rule")
+@Transactional(propagation = Propagation.REQUIRED)
+@Component
 @RestController
 class UiRuleController(
         private var repository: RulesRepository
@@ -33,6 +38,10 @@ class UiRuleController(
         repository.save(entity)
     }
 
+    @RequestMapping("/delete", method = arrayOf(RequestMethod.POST))
+    fun delete(id : String) {
+        repository.deleteByRuleId(id)
+    }
 }
 
 fun RuleEntity?.toUi() : UiRule? {

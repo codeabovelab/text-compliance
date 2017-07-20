@@ -22,3 +22,4 @@ dependencies {
     testCompile 'junit:junit'
 }
 
+apply plugin: 'org.jetbrains.kotlin.plugin.spring'
