@@ -8,7 +8,7 @@ import javax.persistence.Id
 /**
  */
 @Entity
-open class RuleEntity {
+class RuleEntity {
     @Id
     @GeneratedValue
     var id: Long = 0
@@ -24,4 +24,7 @@ open class RuleEntity {
 
     @Column(length = 10240)
     var action: String? = null
+
+    @Column(length = 1024)
+    var description: String? = null
 }

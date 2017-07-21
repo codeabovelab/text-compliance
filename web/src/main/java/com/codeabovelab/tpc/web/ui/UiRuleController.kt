@@ -52,7 +52,8 @@ fun RuleEntity?.toUi() : UiRule? {
             ruleId = ruleId,
             action = action,
             predicate = predicate,
-            weight = weight
+            weight = weight,
+            description = description
     )
 }
 
@@ -60,7 +61,8 @@ class UiRule(
     var ruleId: String,
     var weight: Float,
     var predicate: String,
-    var action: String?
+    var action: String?,
+    var description: String?
 ) {
 
     fun toEntity(entity: RuleEntity) : RuleEntity {
@@ -68,6 +70,7 @@ class UiRule(
         entity.weight = weight
         entity.predicate = predicate
         entity.ruleId = ruleId
+        entity.description = description
         return entity
     }
 }
