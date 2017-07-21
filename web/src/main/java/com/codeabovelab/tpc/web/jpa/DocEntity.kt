@@ -20,6 +20,6 @@ open class DocEntity {
     @Column(length = 10240, nullable = false)
     lateinit var data: ByteArray
     var binary: Boolean = true
-    @Column(length = 10240 * 4)
-    var report: String? = null
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+    lateinit var reports: List<ProcessorReportEntity>
 }

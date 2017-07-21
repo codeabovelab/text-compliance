@@ -10,7 +10,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-webflux'
     compile 'com.google.guava:guava'
 
-    compile "org.hibernate:hibernate-entitymanager"
+    compile "org.hibernate:hibernate-core"
     compile "org.apache.tomcat:tomcat-jdbc"
     compile group: "org.hsqldb", name: "hsqldb", version: "2.4.0", classifier:"jdk8debug"
 

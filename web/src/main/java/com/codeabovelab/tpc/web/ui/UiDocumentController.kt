@@ -21,8 +21,7 @@ import reactor.core.publisher.Mono
 @RestController
 open class UiDocumentController(
         private var repository: DocsRepository,
-        private var readers: DocumentReaders,
-        private var process: DocProcessor
+        private var readers: DocumentReaders
 ) {
 
     @RequestMapping("/list", method = arrayOf(RequestMethod.GET))
@@ -46,11 +45,6 @@ open class UiDocumentController(
     @RequestMapping("/delete", method = arrayOf(RequestMethod.POST))
     fun delete(id : String) {
         repository.deleteByDocumentId(id)
-    }
-
-    @RequestMapping("/analyze", method = arrayOf(RequestMethod.POST))
-    fun analyze(id: String): Mono<ProcessorReport> {
-        return process.process(id)
     }
 }
 
