@@ -6,42 +6,21 @@ import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.core.thread.ThreadResolver
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.web.docs.DocsStorage
+import com.codeabovelab.tpc.web.jpa.ProcessorReportEntity
 import com.codeabovelab.tpc.web.rules.RulesLoader
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
 
 /**
  */
 @Component
 class DocProcessor(
-        private val repo: DocsStorage,
-        private val rulesLoader: RulesLoader
+        private val docsStorage: DocsStorage,
+        private val rulesLoader: RulesLoader,
+        private val reportsStorage: ProcessorReportsStorage
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val threadResolver = ThreadResolver(repo)
-
-    init {
-    }
-
-    private val cache = CacheBuilder.newBuilder().build(object : CacheLoader<String, ProcessorReport>() {
-        override fun load(id: String): ProcessorReport {
-            var report = try {
-                repo.getReport(id)
-            } catch (e : Exception) {
-                log.error("Error while load report: ", e)
-                null
-            }
-            if (report == null) {
-                val doc = repo[id]!!
-                report = processorReport(doc)
-                repo.saveReport(report)
-            }
-            return report
-        }
-    })
+    private val threadResolver = ThreadResolver(docsStorage)
 
     private fun processorReport(doc: Document): ProcessorReport {
         val processor = Processor(threadResolver = threadResolver)
@@ -57,9 +36,24 @@ class DocProcessor(
     /**
      * Start document processing
      */
-    fun process(id: String): Mono<ProcessorReport> {
-        return Mono.fromCallable {
-            cache.get(id)
+    fun process(id: String, renew: Boolean): ProcessorReportEntity {
+        var reportEntity = if(renew) {
+            null
+        } else {
+            try {
+                reportsStorage.getLastReportEntity(id)
+            } catch (e: Exception) {
+                log.error("Error while load report: ", e)
+                null
+            }
         }
+        if (reportEntity == null) {
+            val doc = docsStorage[id]!!
+            val report = processorReport(doc)
+            reportEntity = reportsStorage.saveReport(report)
+        }
+        return reportEntity
     }
+
+
 }
