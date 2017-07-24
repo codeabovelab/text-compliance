@@ -28,7 +28,7 @@ class WordPredicate(
             val seq = sentence!!
             extractLabels(seq, keywords, labelsSet)
             if(labelsSet.isEmpty() || keywords.isEmpty()) {
-                return WordSearchResult(entries = emptyList())
+                continue
             }
             val resEntry = WordSearchResult.Entry(
                     coordinates = text.getCoordinates(seq.offset, seq.str.length),
