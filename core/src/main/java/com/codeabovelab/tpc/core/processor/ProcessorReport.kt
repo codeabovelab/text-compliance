@@ -58,9 +58,12 @@ class ProcessorReport(builder: Builder): Labeled {
               }
             }
         }
-        return map.mapTo(ArrayList<Label>()) {
-            e -> Label(e.key, e.value.value)
+        val list = map.mapTo(ArrayList<Label>()) {
+            e ->
+            Label(e.key, e.value.value)
         }
+        list.sortDescending()
+        return list
     }
 
     override fun toString(): String {
