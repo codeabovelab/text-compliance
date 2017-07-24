@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.web.jpa
 
+import com.codeabovelab.tpc.web.config.JacksonConfig
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -57,7 +58,7 @@ open class JpaConfiguration {
         fun createJpaObjectMapper() : ObjectMapper {
             val mapper = ObjectMapper()
             mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL)
-            mapper.registerModule(KotlinModule())
+            mapper.registerModules(JacksonConfig.commonModules())
             return mapper
         }
     }

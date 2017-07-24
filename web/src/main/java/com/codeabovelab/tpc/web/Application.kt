@@ -16,7 +16,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 @Import(
         PropertySourcesPlaceholderConfigurer::class,
         ConfigurationPropertiesAutoConfiguration::class,
-        JacksonConfig::class,
+        //JacksonConfig::class,
         BeansConfig::class,
         WebConfiguration::class,
         JpaConfiguration::class,
