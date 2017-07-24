@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.web.ui
 
+import com.codeabovelab.tpc.core.processor.Label
 import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.web.docproc.DocProcessor
 import com.codeabovelab.tpc.web.docproc.ProcessorReportsStorage
@@ -63,4 +64,7 @@ data class UiProcessorReport(
         val id: Long,
         val date: LocalDateTime,
         val report: ProcessorReport
-)
+) {
+    val labels: Collection<Label>
+        get() = report.labels
+}

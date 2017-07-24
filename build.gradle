@@ -56,6 +56,7 @@ allprojects {
             dependency "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_version"
             dependency "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
             dependency "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
+            dependency "com.fasterxml.jackson.datatype:jackson-datatype-guava:$jackson_version"
 
             dependency "org.springframework.boot:spring-boot-starter-webflux:$spring_boot_version"
             dependency "org.springframework:spring-context:$spring_version"

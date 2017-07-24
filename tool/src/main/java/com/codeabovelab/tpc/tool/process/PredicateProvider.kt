@@ -9,7 +9,9 @@ import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
 import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.util.PathUtils
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.FileReader
 import java.nio.charset.StandardCharsets
@@ -24,7 +26,7 @@ class PredicateProvider(
         private val learnedDir: LearnConfig.Files,
         private val learnedConfig: LearnConfig
 ) {
-
+    private val log = LoggerFactory.getLogger(this::class.java)
     private val om = ObjectMapper()
     val textClassifierPredicate = configureTextClassifier()
     val wordPredicate = configureKeyWord()
@@ -79,18 +81,23 @@ class PredicateProvider(
 
 
     private fun loadFromFiles(keywordsDir: Path, wordSynonyms: WordSynonyms, ksmBuilder: KeywordSetMatcher.Builder) {
+        log.info("Begin scan directory {} for keyword files.", keywordsDir)
         val kfr = KeywordsFileReader(deserializer = { om.readValue(it, KeywordsFileHeader::class.java) })
         Files.walk(keywordsDir).filter {
             KeywordsFileReader.EXT == PathUtils.extension(it)
         }.forEach {
-            val labels = FileTextIterator.extractLabels(it)
-            kfr.read(FileReader(it.toFile())) { kfh, keyword ->
-                ksmBuilder.add(keyword, labels)
-                if(kfh.synonyms) {
-                    wordSynonyms.lookup(keyword).words.forEach {
-                        ksmBuilder.add(it, labels)
+            try {
+                val labels = FileTextIterator.extractLabels(it)
+                kfr.read(FileReader(it.toFile())) { kfh, keyword ->
+                    ksmBuilder.add(keyword, labels)
+                    if(kfh.synonyms) {
+                        wordSynonyms.lookup(keyword).words.forEach {
+                            ksmBuilder.add(it, labels)
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                log.error("Can not parse keyword file:", e)
             }
         }
     }
