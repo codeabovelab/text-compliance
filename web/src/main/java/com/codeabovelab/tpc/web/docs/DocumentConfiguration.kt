@@ -9,12 +9,15 @@ import org.springframework.context.annotation.Import
 
 /**
  */
-@Import(DocsStorage::class)
+@Import(
+        DocsStorage::class,
+        ThreadResolverService::class
+)
 @Configuration
-open class DocumentConfiguration {
+class DocumentConfiguration {
 
     @Bean
-    open fun documentReaders() = DocumentReaders.Builder()
+    fun documentReaders() = DocumentReaders.Builder()
             .set(EmailDocumentReader(), "email")
             .set(TextDocumentReader(), "text")
             .build()

@@ -6,6 +6,7 @@ import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.core.thread.ThreadResolver
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.web.docs.DocsStorage
+import com.codeabovelab.tpc.web.docs.ThreadResolverService
 import com.codeabovelab.tpc.web.jpa.ProcessorReportEntity
 import com.codeabovelab.tpc.web.rules.RulesLoader
 import org.slf4j.LoggerFactory
@@ -17,13 +18,13 @@ import org.springframework.stereotype.Component
 class DocProcessor(
         private val docsStorage: DocsStorage,
         private val rulesLoader: RulesLoader,
+        private val threadResolver: ThreadResolverService,
         private val reportsStorage: ProcessorReportsStorage
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val threadResolver = ThreadResolver(docsStorage)
 
     private fun processorReport(doc: Document): ProcessorReport {
-        val processor = Processor(threadResolver = threadResolver)
+        val processor = Processor(threadResolver = threadResolver.backend)
         val rules = rulesLoader.getRules()
         rules.forEach {
             processor.addRule(it)

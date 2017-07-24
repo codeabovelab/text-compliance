@@ -15,7 +15,6 @@ class DocsStorage(
         private val readers: DocumentReaders
 ): DocumentsRepository {
 
-
     override fun get(id: String): Document? {
         val docEntity = repository.findByDocumentId(id)
         if(docEntity == null) {
