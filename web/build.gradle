@@ -5,6 +5,7 @@ dependencies {
 
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava'
     compile "org.springframework:spring-context"
     compile "org.springframework.data:spring-data-jpa"
     compile 'org.springframework.boot:spring-boot-starter-webflux'

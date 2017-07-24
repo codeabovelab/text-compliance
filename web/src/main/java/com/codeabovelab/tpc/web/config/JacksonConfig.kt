@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.web.config
 
 import com.fasterxml.jackson.databind.Module
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.guava.GuavaModule
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -19,7 +20,7 @@ open class JacksonConfig {
 
     companion object {
         fun commonModules(): List<Module> {
-            return arrayListOf(KotlinModule(), JavaTimeModule(), Jdk8Module())
+            return arrayListOf(KotlinModule(), JavaTimeModule(), Jdk8Module(), GuavaModule())
         }
     }
 
