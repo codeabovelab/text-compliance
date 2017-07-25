@@ -5,6 +5,7 @@ import com.codeabovelab.tpc.web.jpa.RulesRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.MimeTypeUtils
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 /**
  */
-@RequestMapping("/rule")
+@RequestMapping( path = arrayOf("/rule"), produces = arrayOf(MimeTypeUtils.APPLICATION_JSON_VALUE))
 @Transactional(propagation = Propagation.REQUIRED)
 @Component
 @RestController

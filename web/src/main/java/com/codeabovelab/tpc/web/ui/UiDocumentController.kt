@@ -7,6 +7,7 @@ import com.codeabovelab.tpc.util.JsonBlobs
 import com.codeabovelab.tpc.web.docs.ThreadResolverService
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.MimeTypeUtils
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 /**
  */
-@RequestMapping("/doc")
+@RequestMapping( path = arrayOf("/doc"), produces = arrayOf(MimeTypeUtils.APPLICATION_JSON_VALUE))
 @Transactional(propagation = Propagation.REQUIRED)
 @RestController
 open class UiDocumentController(
