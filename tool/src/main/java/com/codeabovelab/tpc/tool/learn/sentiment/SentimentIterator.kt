@@ -66,13 +66,15 @@ class SentimentIterator(
         val reviews = ArrayList<String>(num)
         val positive = BooleanArray(num)
 
-        var i = 0
-        while (i < num && cursor < totalExamples()) {
-            val sentence = textIterator[i]
-            reviews.add(sentence.text)
-            positive[i] = sentence.label == SentimentLabel.POSITIVE
-            cursor++
-            i++
+        run {
+            var i = 0
+            while (i < num && cursor < totalExamples()) {
+                val sentence = textIterator[i]
+                reviews.add(sentence.text)
+                positive[i] = sentence.label == SentimentLabel.POSITIVE
+                cursor++
+                i++
+            }
         }
 
         //Second: tokenize reviews and filter out unknown words

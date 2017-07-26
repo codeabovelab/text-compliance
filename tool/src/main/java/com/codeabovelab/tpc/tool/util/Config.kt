@@ -14,7 +14,7 @@ object Config {
 
     val om = ObjectMapper(YAMLFactory())
     val woNulls = ObjectMapper(YAMLFactory())
-            .setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))!!
+            .setDefaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))!!
 
 
     fun <T: Any> read(dest: T, istream: InputStream) {
