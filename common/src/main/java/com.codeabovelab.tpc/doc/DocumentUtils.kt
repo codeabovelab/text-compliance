@@ -11,7 +11,7 @@ object DocumentUtils {
     fun createField(owner: Document, prop: KProperty<*>): DocumentField.Builder {
         val value = prop.getter.call(owner)?.toString()
         return DocumentFieldImpl.builder()
-                .name(prop.name)
+                .id(prop.name)
                 .data(value)
     }
 
@@ -22,7 +22,9 @@ object DocumentUtils {
             if(fieldDesc == null) {
                 return@forEach
             }
-            list.add(createField(doc, property).build(doc.id))
+            val fb = createField(doc, property)
+            fb.parent = doc
+            list.add(fb.build())
         }
         return list
     }

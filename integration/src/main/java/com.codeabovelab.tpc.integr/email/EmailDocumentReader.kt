@@ -94,7 +94,7 @@ class EmailDocumentReader:
 
     private fun addField(db: MessageDocumentImpl.Builder, name: String, value: Any?) {
         val str = toString(value)
-        db.addField(DocumentFieldImpl.builder().name(name).data(str))
+        db.addField(DocumentFieldImpl.builder().id(name).data(str))
     }
 
     private fun toString(value: Any?): String? {

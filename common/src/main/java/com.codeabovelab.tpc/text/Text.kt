@@ -32,5 +32,9 @@ interface Text {
      * *
      * @return coordinates object
      */
-    fun getCoordinates(offset: Int, length: Int): TextCoordinates
+    fun getCoordinates(offset: Int, length: Int): TextCoordinates {
+        var l = length
+        if (length == -1) l = this.length
+        return TextCoordinatesImpl(id, offset, l)
+    }
 }

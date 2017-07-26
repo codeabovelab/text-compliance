@@ -78,7 +78,7 @@ class EmailDocumentReaderTest {
         val map = HashMap<String, DocumentField>()
         doc.read { textual, _ ->
             if(textual is DocumentField) {
-                map.put(textual.name, textual)
+                map.put(textual.id, textual)
             }
         }
         val fieldNames = HashSet(FIELDS)

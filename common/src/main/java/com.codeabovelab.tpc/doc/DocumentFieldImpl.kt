@@ -2,17 +2,19 @@ package com.codeabovelab.tpc.doc
 
 import com.codeabovelab.tpc.text.TextConsumer
 import com.codeabovelab.tpc.text.TextImpl
+import com.codeabovelab.tpc.text.Textual
 
 /**
  */
-class DocumentFieldImpl private constructor(parentId: String, b: DocumentFieldImpl.Builder) : DocumentField {
+class DocumentFieldImpl private constructor(b: DocumentFieldImpl.Builder) : DocumentField {
 
     class Builder : DocumentField.Builder {
-        var name: String? = null
+        override var id: String? = null
+        override var parent: Textual? = null
         var data: String? = null
 
-        fun name(name: String): Builder {
-            this.name = name
+        fun id(id: String): Builder {
+            this.id = id
             return this
         }
 
@@ -21,18 +23,16 @@ class DocumentFieldImpl private constructor(parentId: String, b: DocumentFieldIm
             return this
         }
 
-        override fun build(documentId: String): DocumentFieldImpl {
-            return DocumentFieldImpl(documentId, this)
+        override fun build(): DocumentFieldImpl {
+            return DocumentFieldImpl(this)
         }
     }
 
-    override val id: String
-    override val name: String
+    override val id: String = b.id!!
+    override val parent: Textual? = b.parent!!
     val data: TextImpl
 
     init {
-        this.name = b.name!!
-        this.id = parentId + this.name
         this.data = TextImpl(this.id, b.data.orEmpty())
     }
 

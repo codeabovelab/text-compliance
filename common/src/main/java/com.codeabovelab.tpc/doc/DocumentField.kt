@@ -7,12 +7,10 @@ import com.codeabovelab.tpc.text.Textual
 interface DocumentField : Textual {
 
     interface Builder {
-        fun build(documentId: String): DocumentFieldImpl
-    }
+        var id: String?
 
-    /**
-     * Filed name. Note that it not does not include document id.
-     * @return non null string
-     */
-    val name: String
+        var parent: Textual?
+
+        fun build(): DocumentField
+    }
 }
