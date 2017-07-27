@@ -26,16 +26,13 @@ class Processor(
     }
 
     fun process(doc: Document, modifier: ProcessModifier = ProcessModifier.DEFAULT): ProcessorReport {
-        val prb = ProcessorReport.Builder()
-        prb.documentId = doc.id
         val thread = detectThread(doc)
         val pc = ProcessingContext(document = doc,
                 modifier = modifier,
-                reportBuilder = prb,
                 rules = selectRules(),
                 thread = thread)
         doc.read(pc::onText)
-        return prb.build()
+        return pc.build()
     }
 
     private fun detectThread(doc: Document): MessagesThread {

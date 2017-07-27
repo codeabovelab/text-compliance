@@ -17,6 +17,12 @@ interface Textual {
     val parent: Textual?
 
     /**
+     * Child elements of textual. Do not iterate its manually. Instead use [read] method.
+     */
+    val childs: List<Textual>
+        get() = listOf()
+
+    /**
      * Sequentially invoke consumer on internal text.
      * @param consumer non null value
      */

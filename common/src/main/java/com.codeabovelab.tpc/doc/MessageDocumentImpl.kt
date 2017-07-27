@@ -32,9 +32,13 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
     private val virtualFields = DocumentUtils.createFields(this)
 
     override fun read(consumer: TextConsumer) {
+        // we must iterate over fields first
         fields.forEach { it.read(consumer) }
         virtualFields.forEach { it.read(consumer) }
+        // then visit document body
         consumer(this, body)
+        // and at end visit child documents (like attachments)
+        // it not implemented yet
     }
 
 }

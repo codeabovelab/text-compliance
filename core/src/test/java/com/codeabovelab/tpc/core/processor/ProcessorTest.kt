@@ -5,6 +5,7 @@ import com.codeabovelab.tpc.core.thread.ThreadTestUtil
 import com.codeabovelab.tpc.doc.DocumentImpl
 import com.codeabovelab.tpc.doc.DocumentsRepositoryImpl
 import org.junit.Test
+import kotlin.reflect.full.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -45,5 +46,14 @@ class ProcessorTest {
         println("removed: ${predicateRes.removed}")
         assertEquals(listOf(added), predicateRes.added)
         assertEquals(listOf(removed), predicateRes.removed)
+    }
+
+
+    inline fun <reified T : PredicateResult<*>> ProcessorReport.findPredicateResult(): T? {
+        val type = T::class
+        val res = report.rules.values.find {
+            type.isInstance(it.result)
+        }
+        return if(res != null) type.cast(res.result) else null
     }
 }

@@ -128,30 +128,28 @@ class Process(
         val min = HashMap<String, Double>()
         val max = HashMap<String, Double>()
         val entries = HashMap<TextCoordinates, MutableSet<LabelEntry>>()
-        for (rr in report.rules) {
-            for (entry in rr.result.entries) {
-                if (entry !is Labeled) {
-                    continue
+        report.visitEntries { entry ->
+            if(entry !is Labeled) {
+                return@visitEntries
+            }
+            for(label in entry.labels) {
+                min.compute(label.label) { _, old ->
+                    if (old == null) label.similarity else Math.min(old, label.similarity)
                 }
-                for (label in entry.labels) {
-                    min.compute(label.label) { _, old ->
-                        if (old == null) label.similarity else Math.min(old, label.similarity)
+                max.compute(label.label) { _, old ->
+                    if (old == null) label.similarity else Math.max(old, label.similarity)
+                }
+                entries.compute(entry.coordinates) { _, old ->
+                    val set = old ?: HashSet<LabelEntry>()
+                    val notice = when (entry) {
+                        is WordSearchResult.Entry -> "keyword=${entry.keywords.joinToString { it }}"
+                        else -> "entry=${entry}"
                     }
-                    max.compute(label.label) { _, old ->
-                        if (old == null) label.similarity else Math.max(old, label.similarity)
-                    }
-                    entries.compute(entry.coordinates) { _, old ->
-                        val set = old ?: HashSet<LabelEntry>()
-                        val notice = when (entry) {
-                            is WordSearchResult.Entry -> "keyword=${entry.keywords.joinToString { it }}"
-                            else -> "rule=${rr.ruleId}"
-                        }
-                        set.add(LabelEntry(
-                                label,
-                                notice
-                        ))
-                        set
-                    }
+                    set.add(LabelEntry(
+                            label,
+                            notice
+                    ))
+                    set
                 }
             }
         }

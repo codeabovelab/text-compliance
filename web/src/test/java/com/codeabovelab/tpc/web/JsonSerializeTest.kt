@@ -28,12 +28,15 @@ class JsonSerializeTest {
             attributes.put("two", "asdasd")
             attributes.put("three", CustomData())
             val labels = listOf(Label("testLabel", .3))
-            rules.add(RuleReport("oneRule", TextClassifierResult(
-                    entries = listOf(TextClassifierResult.Entry(
-                            coordinates = TextCoordinatesImpl("textCoordsId", 0, 100), labels = labels)
-                    ),
-                    labels = labels
-            )))
+            report = ProcessorReport.TextReport.Builder().apply {
+                textId = "mainText"
+                rules.put("oneRule", RuleReport("oneRule", TextClassifierResult(
+                        entries = listOf(TextClassifierResult.Entry(
+                                coordinates = TextCoordinatesImpl("textCoordsId", 0, 100), labels = labels)
+                        ),
+                        labels = labels
+                )))
+            }.build()
         }.build()
         test(pr)
     }
