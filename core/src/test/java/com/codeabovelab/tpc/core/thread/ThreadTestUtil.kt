@@ -15,7 +15,8 @@ object ThreadTestUtil {
         val mdb = MessageDocumentImpl.Builder()
         mdb.from = P_ONE
         mdb.date = ZonedDateTime.now()
-        mdb.body(id, "some text")
+        mdb.id = id
+        mdb.body("some text")
         for(parent in parents) {
             mdb.references.add(ParentRef(parent))
         }

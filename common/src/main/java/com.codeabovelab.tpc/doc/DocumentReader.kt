@@ -4,7 +4,7 @@ import java.io.InputStream
 
 /**
  */
-interface DocumentReader<out T : Document.Builder> {
+interface DocumentReader<T : Document.Builder<T>> {
     /**
      * read document from specified stream
      */

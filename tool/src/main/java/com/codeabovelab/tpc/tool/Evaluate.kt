@@ -50,7 +50,7 @@ class Evaluate(
             val wch = WordContext.create()
             val sims = StringBuilder()
             Files.lines(path, StandardCharsets.UTF_8).forEach { line ->
-                val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(TextImpl("", line)))
+                val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(TextImpl(line)))
                 while (si.hasNext()) {
                     val sd = si.next()
                     if (sd == null) {

@@ -5,6 +5,30 @@ package com.codeabovelab.tpc.text
  */
 interface Textual {
 
+    interface Builder<B : Builder<B>> {
+        @Suppress("UNCHECKED_CAST")
+        val thiz: B
+            get() = this as B
+
+        var id: String?
+
+        fun id(id: String): B {
+            this.id = id
+            return thiz
+        }
+
+        var parent: Textual?
+
+        val childs: MutableList<Textual.Builder<*>>
+
+        fun addChild(child: Textual.Builder<*>): B {
+            childs.add(child)
+            return thiz
+        }
+
+        fun build(): Textual
+    }
+
     /**
      * The id of textual. May be uuid or something else. Must be unique for siblings of its parent.
      * @return non null string

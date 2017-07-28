@@ -18,12 +18,10 @@ import javax.mail.internet.InternetAddress
  */
 class EmailDocumentReader:
 //we use raw document as return type, because in future it may be changed to more specific type
-        DocumentReader<MessageDocument.Builder> {
+        DocumentReader<MessageDocumentImpl.Builder> {
 
     companion object {
         const val F_SUBJECT = "subject"
-        const val F_SENDER = "sender"
-        const val F_FROM = "from"
     }
 
     private val emailParser = EmailParser()
@@ -33,15 +31,15 @@ class EmailDocumentReader:
             type = "email"
     )
 
-    override fun read(id: String?, istr: InputStream): MessageDocument.Builder {
+    override fun read(id: String?, istr: InputStream): MessageDocumentImpl.Builder {
         var session: Session? = null
         val msg = MimeMessage(session, istr)
         val db = MessageDocumentImpl.Builder()
-        db.body = TextImpl(id ?: msg.messageID, getContent(msg))
+        db.id = id ?: msg.messageID
+        db.body = TextImpl(getContent(msg))
 
         addField(db, F_SUBJECT, msg.subject)
         db.from = extractSender(msg)
-        addField(db, F_SENDER, msg.sender)
         // parser produce errors like ' javax.mail.internet.AddressException: Domain contains illegal character in string'
         // on any address with _ and may other symbols
         msg.allRecipients?.forEach { db.to.add(toString(it)!!) }
@@ -94,14 +92,14 @@ class EmailDocumentReader:
 
     private fun addField(db: MessageDocumentImpl.Builder, name: String, value: Any?) {
         val str = toString(value)
-        db.addField(DocumentFieldImpl.builder().id(name).data(str))
+        db.addChild(DocumentFieldImpl.Builder().id(name).data(str))
     }
 
     private fun toString(value: Any?): String? {
         if(value == null) {
             return null
         }
-        var str: String?
+        val str: String?
         if(value.javaClass.isArray) {
             // we not expect arrays of primitive here
             val arr = value as Array<*>

@@ -53,10 +53,11 @@ class UiDocProcessController(
         if(this == null) {
             return null
         }
+        val report = processorReportsStorage.reportFromString(data)
         return UiProcessorReport(
                 id = id,
                 date = date,
-                report = processorReportsStorage.reportFromString(data)
+                report = report
         )
     }
 }
@@ -64,8 +65,8 @@ class UiDocProcessController(
 data class UiProcessorReport(
         val id: Long,
         val date: LocalDateTime,
-        val report: ProcessorReport
+        val report: ProcessorReport?
 ) {
     val labels: Collection<Label>
-        get() = report.labels
+        get() = report?.labels ?: listOf()
 }

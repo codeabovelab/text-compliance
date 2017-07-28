@@ -32,7 +32,7 @@ class JsonSerializeTest {
                 textId = "mainText"
                 rules.put("oneRule", RuleReport("oneRule", TextClassifierResult(
                         entries = listOf(TextClassifierResult.Entry(
-                                coordinates = TextCoordinatesImpl("textCoordsId", 0, 100), labels = labels)
+                                coordinates = TextCoordinatesImpl(0, 100), labels = labels)
                         ),
                         labels = labels
                 )))

@@ -9,14 +9,14 @@ import java.time.ZonedDateTime
  */
 class MessageDocumentImpl private constructor(builder: Builder): AbstractDocument(b = builder), MessageDocument {
 
-    class Builder: AbstractDocument.Builder<Builder>(), MessageDocument.Builder {
+    class Builder: AbstractDocument.Builder<Builder>(), MessageDocument.Builder<Builder> {
         override var from: String? = null
         override val to: MutableList<String> = ArrayList()
         override var date: ZonedDateTime? = null
         override val references: MutableList<Ref> = ArrayList()
 
         override fun build(): MessageDocument {
-            Asserts.notNullAll(this::body, this.body!!::id, this::from, this::date)
+            Asserts.notNullAll(this::body, this::id, this::from, this::date)
             return MessageDocumentImpl(this)
         }
     }
@@ -29,16 +29,13 @@ class MessageDocumentImpl private constructor(builder: Builder): AbstractDocumen
     override val date: ZonedDateTime = builder.date!!
     @FieldDesc
     override val references: List<Ref> = ImmutableList.copyOf(builder.references)
-    private val virtualFields = DocumentUtils.createFields(this)
+    override val attributes: Map<String, Any?> = DocumentUtils.addAttributes(this, builder.attributes)
 
     override fun read(consumer: TextConsumer) {
-        // we must iterate over fields first
-        fields.forEach { it.read(consumer) }
-        virtualFields.forEach { it.read(consumer) }
-        // then visit document body
+        // visit document body
         consumer(this, body)
         // and at end visit child documents (like attachments)
-        // it not implemented yet
+        childs.forEach { it.read(consumer) }
     }
 
 }

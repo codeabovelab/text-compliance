@@ -6,11 +6,7 @@ import com.codeabovelab.tpc.text.Textual
  */
 interface DocumentField : Textual {
 
-    interface Builder {
-        var id: String?
-
-        var parent: Textual?
-
-        fun build(): DocumentField
+    interface Builder<B : Builder<B>>: Textual.Builder<B> {
+        override fun build(): DocumentField
     }
 }

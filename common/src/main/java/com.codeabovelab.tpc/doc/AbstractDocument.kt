@@ -10,21 +10,15 @@ import java.util.ArrayList
  */
 abstract class AbstractDocument(b: AbstractDocument.Builder<*>) : Document {
 
-    abstract class Builder<B: AbstractDocument.Builder<B>>: Document.Builder {
+    abstract class Builder<B: AbstractDocument.Builder<B>>: Document.Builder<B> {
         override var body: Text? = null
-        val parent: Textual? = null
-        val fields = ArrayList<DocumentField.Builder>()
+        override var id: String? = null
+        override var attributes: MutableMap<String, Any?> = HashMap()
+        override var parent: Textual? = null
+        override val childs: MutableList<Textual.Builder<*>> = ArrayList()
 
-        @Suppress("UNCHECKED_CAST")
-        protected val thiz: B get() = this as B
-
-        fun body(id: String, body: String): B {
-            this.body = TextImpl(id, body)
-            return thiz
-        }
-
-        fun addField(field: DocumentField.Builder): B {
-            this.fields.add(field)
+        fun body(body: String): B {
+            this.body = TextImpl(body)
             return thiz
         }
 
@@ -32,17 +26,17 @@ abstract class AbstractDocument(b: AbstractDocument.Builder<*>) : Document {
 
     }
 
-    override val id: String get() = body.id
+    override val id: String = b.id!!
     val body: Text = b.body!!
     override val parent: Textual? = b.parent
-    val fields: List<DocumentField>
+    override final val childs: List<Textual>
 
     init {
-        val fb = ImmutableList.builder<DocumentField>()
-        b.fields.forEach {
+        val fb = ImmutableList.builder<Textual>()
+        b.childs.forEach {
             it.parent = this
             fb.add(it.build())
         }
-        this.fields = fb.build()
+        this.childs = fb.build()
     }
 }

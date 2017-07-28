@@ -18,7 +18,8 @@ class ProcessorTest {
         val processor = Processor()
         processor.addRule(Rule("simple", 0F, RegexPredicate("MARK"), SetAttributeAction("found", "mark")))
         val firstReport = processor.process(DocumentImpl.Builder()
-          .body("first", "some text MARK \n ant some other MARK text \n MARK")
+          .id("first")
+          .body("some text MARK \n ant some other MARK text \n MARK")
           .build())
         System.out.println(firstReport)
     }

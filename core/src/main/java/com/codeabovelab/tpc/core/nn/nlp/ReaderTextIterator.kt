@@ -37,7 +37,7 @@ class ReaderTextIterator(
             sb.append(line).append('\n')
         }
         val data = sb.toString()
-        return TextImpl("$id#$_index", data)
+        return TextImpl(data)
     }
 
     override fun close() {

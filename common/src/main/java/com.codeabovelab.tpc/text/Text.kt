@@ -5,14 +5,6 @@ package com.codeabovelab.tpc.text
  */
 interface Text {
     /**
-     * Id of textual.
-     * @return non null string
-     * *
-     * @see Textual.id
-     */
-    val id: String
-
-    /**
      * Give current text.
      * @return text
      */
@@ -35,6 +27,6 @@ interface Text {
     fun getCoordinates(offset: Int, length: Int): TextCoordinates {
         var l = length
         if (length == -1) l = this.length
-        return TextCoordinatesImpl(id, offset, l)
+        return TextCoordinatesImpl(offset, l)
     }
 }

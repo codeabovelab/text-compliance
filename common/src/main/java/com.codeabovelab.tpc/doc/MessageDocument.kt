@@ -8,7 +8,7 @@ import java.time.ZonedDateTime
  */
 interface MessageDocument: Document {
 
-    interface Builder: Document.Builder {
+    interface Builder<B: Builder<B>>: Document.Builder<B> {
         /**
          * String which is identified sender (user) of message
          */

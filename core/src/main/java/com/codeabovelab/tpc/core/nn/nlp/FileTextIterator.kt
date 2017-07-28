@@ -60,7 +60,7 @@ class FileTextIterator(private val filePath: Path) : TextIterator {
                 break
             }
         }
-        return TextImpl("$id#$_index", sb.toString())
+        return TextImpl(sb.toString())
     }
 
     override fun close() {

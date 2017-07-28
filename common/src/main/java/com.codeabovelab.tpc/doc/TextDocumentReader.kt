@@ -19,9 +19,10 @@ class TextDocumentReader(
     )
 
     override fun read(id: String?, istr: InputStream): DocumentImpl.Builder {
-        val db = DocumentImpl.builder()
+        val db = DocumentImpl.Builder()
+        db.id = id
         InputStreamReader(istr, charset).use {
-            db.body = TextImpl(id ?: "", CharStreams.toString(it))
+            db.body = TextImpl(CharStreams.toString(it))
         }
         return db
     }
