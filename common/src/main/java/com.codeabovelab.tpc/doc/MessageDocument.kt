@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.doc
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.ZonedDateTime
 
 /**
@@ -8,7 +9,7 @@ import java.time.ZonedDateTime
  */
 interface MessageDocument: Document {
 
-    interface Builder: Document.Builder {
+    interface Builder<B: Builder<B>>: Document.Builder<B> {
         /**
          * String which is identified sender (user) of message
          */
@@ -31,17 +32,21 @@ interface MessageDocument: Document {
     /**
      * List of references to other documents.
      */
+    @get:JsonIgnore
     val references: List<Ref>
     /**
      * String which is identified sender (user) of message
      */
+    @get:JsonIgnore
     val from: String
     /**
      * String which is identified destination (user, topic & etc) of message
      */
+    @get:JsonIgnore
     val to: List<String>
     /**
      * date of message creation
      */
+    @get:JsonIgnore
     val date: ZonedDateTime
 }

@@ -1,11 +1,17 @@
 package com.codeabovelab.tpc.text
 
 /**
+ * Simple implementation of textual.
  */
-class TextualImpl(override val id: String, text: String) : Textual {
-    private val text: TextImpl = TextImpl(this.id, text)
+class TextualImpl(
+        override val id: String,
+        override val data: String,
+        override val parent: Textual?
+) : Textual, Text {
+
+    override val length: Int get() = data.length
 
     override fun read(consumer: TextConsumer) {
-        consumer(this, text)
+        consumer(this, this)
     }
 }

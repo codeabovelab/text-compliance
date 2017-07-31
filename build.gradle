@@ -3,6 +3,7 @@ buildscript {
     ext.jackson_version = '2.9.0.pr3' //need for spring
     ext.spring_version = '5.0.0.RC2'
     ext.spring_boot_version = '2.0.0.M2'
+    ext.springfox_version = '2.7.0'
 
     repositories {
         mavenCentral()
@@ -58,10 +59,13 @@ allprojects {
             dependency "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
             dependency "com.fasterxml.jackson.datatype:jackson-datatype-guava:$jackson_version"
 
-            dependency "org.springframework.boot:spring-boot-starter-webflux:$spring_boot_version"
+            dependency "org.springframework.boot:spring-boot-starter-web:$spring_boot_version"
             dependency "org.springframework:spring-context:$spring_version"
             dependency "org.springframework.data:spring-data-jpa:2.0.0.M4"
             dependency "org.springframework.boot:spring-boot-starter-test:$spring_boot_version"
+
+            dependency "io.springfox:springfox-swagger2:$springfox_version"
+            dependency "io.springfox:springfox-swagger-ui:$springfox_version"
 
             dependency "org.hibernate:hibernate-core:5.2.10.Final"
             //dependency "org.hsqldb:hsqldb:2.4.0"

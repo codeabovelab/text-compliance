@@ -36,7 +36,7 @@ class TextClassifierTest {
         val pc = PredicateContext.STUB
         for(text in texts) {
             System.out.println(i++)
-            val res = tc.test(pc, TextImpl("sample_" + i, text))
+            val res = tc.test(pc, TextImpl(text))
             res.entries.forEach {
                 val offset = it.coordinates.offset
                 val sentence = text.substring(offset, offset + it.coordinates.length)

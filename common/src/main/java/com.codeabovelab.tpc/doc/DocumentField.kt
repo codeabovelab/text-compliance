@@ -6,13 +6,7 @@ import com.codeabovelab.tpc.text.Textual
  */
 interface DocumentField : Textual {
 
-    interface Builder {
-        fun build(documentId: String): DocumentFieldImpl
+    interface Builder<B : Builder<B>>: Textual.Builder<B> {
+        override fun build(): DocumentField
     }
-
-    /**
-     * Filed name. Note that it not does not include document id.
-     * @return non null string
-     */
-    val name: String
 }

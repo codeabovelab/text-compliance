@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProcessorReportsRepository : JpaRepository<ProcessorReportEntity, Long> {
 
-    @Query("select r from #{#entityName} as r join r.document d where d.documentId = :documentId order by r.date")
+    @Query("select r from #{#entityName} as r join r.document d where d.documentId = :documentId order by r.date desc")
     fun getReportsByDocument(@Param("documentId") documentId: String): List<ProcessorReportEntity>
 }

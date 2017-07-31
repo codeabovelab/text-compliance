@@ -3,6 +3,7 @@ package com.codeabovelab.tpc.web.docproc
 import com.codeabovelab.tpc.core.processor.ProcessorReport
 import com.codeabovelab.tpc.web.jpa.*
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -16,6 +17,8 @@ class ProcessorReportsStorage(
         @Qualifier(JpaConfiguration.BEAN_OBJECT_MAPPER)
         private val mapper: ObjectMapper
 ) {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun getLastReportEntity(id: String): ProcessorReportEntity? {
         // due to limitations of JPQL we can not simply select only first row
@@ -32,8 +35,13 @@ class ProcessorReportsStorage(
         return repository.save(entity)
     }
 
-    fun reportFromString(entity: String): ProcessorReport {
-        return mapper.readValue(entity, ProcessorReport::class.java)!!
+    fun reportFromString(entity: String): ProcessorReport? {
+        return try {
+            mapper.readValue(entity, ProcessorReport::class.java)!!
+        } catch (e: Exception) {
+            log.error("Can not deserialize report: ", e)
+            null
+        }
     }
 
     private fun reportToString(report: ProcessorReport): String {

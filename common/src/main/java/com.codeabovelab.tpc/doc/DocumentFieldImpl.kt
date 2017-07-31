@@ -2,48 +2,39 @@ package com.codeabovelab.tpc.doc
 
 import com.codeabovelab.tpc.text.TextConsumer
 import com.codeabovelab.tpc.text.TextImpl
+import com.codeabovelab.tpc.text.Textual
+import com.codeabovelab.tpc.text.TextualUtil
 
 /**
  */
-class DocumentFieldImpl private constructor(parentId: String, b: DocumentFieldImpl.Builder) : DocumentField {
+class DocumentFieldImpl private constructor(b: DocumentFieldImpl.Builder) : DocumentField {
 
-    class Builder : DocumentField.Builder {
-        var name: String? = null
+    class Builder : DocumentField.Builder<Builder> {
+        override var id: String? = null
+        override var parent: Textual? = null
+        override var childs = ArrayList<Textual.Builder<*>>()
         var data: String? = null
-
-        fun name(name: String): Builder {
-            this.name = name
-            return this
-        }
 
         fun data(data: String?): Builder {
             this.data = data
             return this
         }
 
-        override fun build(documentId: String): DocumentFieldImpl {
-            return DocumentFieldImpl(documentId, this)
+        override fun build(): DocumentFieldImpl {
+            return DocumentFieldImpl(this)
         }
     }
 
-    override val id: String
-    override val name: String
+    override val id: String = b.id!!
+    override val parent: Textual? = b.parent!!
     val data: TextImpl
+    override final val childs: List<Textual> = TextualUtil.buildChilds(this, b)
 
     init {
-        this.name = b.name!!
-        this.id = parentId + this.name
-        this.data = TextImpl(this.id, b.data.orEmpty())
+        this.data = TextImpl(b.data.orEmpty())
     }
 
     override fun read(consumer: TextConsumer) {
         consumer(this, data)
-    }
-
-    companion object {
-
-        fun builder(): Builder {
-            return Builder()
-        }
     }
 }

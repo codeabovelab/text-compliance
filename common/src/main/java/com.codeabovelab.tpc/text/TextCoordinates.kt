@@ -6,12 +6,6 @@ package com.codeabovelab.tpc.text
  */
 interface TextCoordinates {
     /**
-     * If of textual object which contains this coordinates.
-     * @return non null string
-     */
-    val textualId: String
-
-    /**
      * Offset from document begin.
      * @return offset
      */

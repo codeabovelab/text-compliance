@@ -5,6 +5,7 @@ import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.Textual
 import com.google.common.collect.ImmutableMap
+import java.util.*
 
 /**
  * Processing context, it can be used in concurrent environment.
@@ -13,28 +14,52 @@ import com.google.common.collect.ImmutableMap
 class ProcessingContext(
         val document: Document,
         val modifier: ProcessModifier,
-        val reportBuilder: ProcessorReport.Builder,
         val rules: List<Rule<*>>,
         val thread: MessagesThread
 ) {
+
+    val reportBuilder = ProcessorReport.Builder()
+    private val textualBuilders = IdentityHashMap<Textual, ProcessorReport.TextReport.Builder>()
+
+    fun build(): ProcessorReport {
+        reportBuilder.documentId = document.id
+        fun buildTextReport(textual: Textual): ProcessorReport.TextReport? {
+            val builder = textualBuilders[textual]
+            if(builder == null) {
+                return null
+            }
+            for(child in textual.childs) {
+                val report = buildTextReport(child)
+                if(report != null) {
+                    builder.childs[child.id] = report
+                }
+            }
+            return builder.build()
+        }
+        reportBuilder.report = buildTextReport(document)!!
+        return reportBuilder.build()
+    }
 
     fun onText(textual: Textual, text: Text) {
         if(!modifier.filter(textual)) {
             return
         }
         val handledText = modifier.textHandler(text)
+        val trb = ProcessorReport.TextReport.Builder()
+        trb.textId = textual.id
         rules.forEach{
-            applyRule(handledText, it)
+            applyRule(handledText, it, trb)
         }
+        textualBuilders.put(textual, trb)
     }
 
-    private fun <T: PredicateResult<*>> applyRule(text: Text, rule: Rule<T>) {
+    private fun <T: PredicateResult<*>> applyRule(text: Text, rule: Rule<T>, builder: ProcessorReport.TextReport.Builder) {
         val predicate = rule.predicate
         val predRes = predicate.test(getPredicateContext(), text)
         if(predRes.isEmpty()) {
            return
         }
-        reportBuilder.rules.add(RuleReport(rule.id, predRes))
+        builder.rules.put(rule.id, RuleReport(rule.id, predRes))
         rule.action.apply(this, text, predRes)
     }
 

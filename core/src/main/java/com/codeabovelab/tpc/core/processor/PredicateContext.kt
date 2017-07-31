@@ -14,7 +14,7 @@ data class PredicateContext(
 ) {
     companion object {
         val STUB = PredicateContext(
-                document = DocumentImpl.builder().body("test_doc", "<none>").build(),
+                document = DocumentImpl.Builder().id("test_doc").body( "<none>").build(),
                 attributes = emptyMap(),
                 thread = MessagesThread.NONE
         )

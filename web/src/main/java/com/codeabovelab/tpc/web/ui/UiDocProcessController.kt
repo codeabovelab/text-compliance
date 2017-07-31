@@ -8,6 +8,7 @@ import com.codeabovelab.tpc.web.jpa.ProcessorReportEntity
 import com.codeabovelab.tpc.web.jpa.ProcessorReportsRepository
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.MimeTypeUtils
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -16,7 +17,7 @@ import java.time.LocalDateTime
 
 /**
  */
-@RequestMapping("/docproc")
+@RequestMapping( path = arrayOf("/docproc"), produces = arrayOf(MimeTypeUtils.APPLICATION_JSON_VALUE))
 @Transactional(propagation = Propagation.REQUIRED)
 @RestController
 class UiDocProcessController(
@@ -52,10 +53,11 @@ class UiDocProcessController(
         if(this == null) {
             return null
         }
+        val report = processorReportsStorage.reportFromString(data)
         return UiProcessorReport(
                 id = id,
                 date = date,
-                report = processorReportsStorage.reportFromString(data)
+                report = report
         )
     }
 }
@@ -63,8 +65,8 @@ class UiDocProcessController(
 data class UiProcessorReport(
         val id: Long,
         val date: LocalDateTime,
-        val report: ProcessorReport
+        val report: ProcessorReport?
 ) {
     val labels: Collection<Label>
-        get() = report.labels
+        get() = report?.labels ?: listOf()
 }

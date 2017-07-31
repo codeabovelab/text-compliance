@@ -1,17 +1,11 @@
 package com.codeabovelab.tpc.text
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 /**
  * Text, note that implementation may be mutable.
  */
 interface Text {
-    /**
-     * Id of textual.
-     * @return non null string
-     * *
-     * @see Textual.id
-     */
-    val id: String
-
     /**
      * Give current text.
      * @return text
@@ -22,6 +16,7 @@ interface Text {
      * length of current text
      * @return 0 or positive integer
      */
+    @get:JsonIgnore
     val length: Int
 
     /**
@@ -32,5 +27,9 @@ interface Text {
      * *
      * @return coordinates object
      */
-    fun getCoordinates(offset: Int, length: Int): TextCoordinates
+    fun getCoordinates(offset: Int, length: Int): TextCoordinates {
+        var l = length
+        if (length == -1) l = this.length
+        return TextCoordinatesImpl(offset, l)
+    }
 }
