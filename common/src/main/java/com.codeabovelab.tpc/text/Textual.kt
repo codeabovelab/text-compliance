@@ -1,8 +1,13 @@
 package com.codeabovelab.tpc.text
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.JsonIdentityReference
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
+
 /**
  * Something that has text.
  */
+@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator::class)
 interface Textual {
 
     interface Builder<B : Builder<B>> {
@@ -38,6 +43,7 @@ interface Textual {
     /**
      * Reference to parent, may be null
      */
+    @get:JsonIdentityReference
     val parent: Textual?
 
     /**

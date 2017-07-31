@@ -1,5 +1,7 @@
 package com.codeabovelab.tpc.text
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 /**
  * Text, note that implementation may be mutable.
  */
@@ -14,6 +16,7 @@ interface Text {
      * length of current text
      * @return 0 or positive integer
      */
+    @get:JsonIgnore
     val length: Int
 
     /**
