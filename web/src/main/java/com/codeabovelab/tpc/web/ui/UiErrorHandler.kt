@@ -1,16 +1,15 @@
 package com.codeabovelab.tpc.web.ui
 
+import com.google.common.base.Throwables
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.util.MimeType
 import org.springframework.util.MimeTypeUtils
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseBody
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.LocalDateTime
@@ -45,10 +44,15 @@ open class UiErrorHandler(
             headers.contentType = MediaType.TEXT_PLAIN
             sw.toString()
         } else {
+            val message = Throwables.getCausalChain(throwable).stream()
+                    .map(Throwable::message)
+                    //we need to use reduce without optional, for prevent NPE on null result from reducer
+                    .reduce(null) { first, last -> last ?: first }
             val sw = StringWriter()
             PrintWriter(sw).use { throwable.printStackTrace(it) }
             UiError(
                     date = LocalDateTime.now(),
+                    message = message,
                     stacktrace = sw.toString()
             )
         }
@@ -69,5 +73,6 @@ open class UiErrorHandler(
 
 data class UiError(
         val date: LocalDateTime,
+        val message: String?,
         val stacktrace: String
 )
