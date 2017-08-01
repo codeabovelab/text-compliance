@@ -3,6 +3,7 @@ package com.codeabovelab.tpc.integr.email
 import com.codeabovelab.tpc.doc.*
 import com.codeabovelab.tpc.text.TextImpl
 import com.codeabovelab.tpc.util.DateTimeUtil
+import com.codeabovelab.tpc.util.MimeTypes
 
 import javax.mail.Session
 import javax.mail.internet.MimeMessage
@@ -28,7 +29,7 @@ class EmailDocumentReader:
 
     override val info = DocumentReader.Info(
             binary = false,
-            type = "email"
+            type = MimeTypes.EMAIL
     )
 
     override fun read(id: String?, istr: InputStream): MessageDocumentImpl.Builder {
