@@ -16,12 +16,16 @@ class ProcessorTest {
     @Test
     fun simpleTest() {
         val processor = Processor()
-        processor.addRule(Rule("simple", 0F, RegexPredicate("MARK"), SetAttributeAction("found", "mark")))
+        val firstRule = Rule("first", 0F, RegexPredicate("MARK"), SetAttributeAction("first", "ok"))
+        val secondRule = Rule("second", 0F, RegexPredicate("FAIL"), SetAttributeAction("second", "ok"))
+        processor.addRule(Rule("group", 0F, RegexPredicate(".*"), ApplyRulesAction(listOf(firstRule, secondRule))))
         val firstReport = processor.process(DocumentImpl.Builder()
           .id("first")
           .body("some text MARK \n ant some other MARK text \n MARK")
           .build())
         System.out.println(firstReport)
+        assertEquals("ok", firstReport.attributes["first"])
+        assertEquals(null, firstReport.attributes["second"])
     }
 
     @Test
