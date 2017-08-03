@@ -15,4 +15,6 @@ interface Scheme<out T : Any> {
      * Create instance by specified uri
      */
     fun create(uri: Uri) : T
+
+    val definition: SchemeDefinition
 }

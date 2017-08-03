@@ -1,7 +1,9 @@
 package com.codeabovelab.tpc.web.ui
 
+import com.codeabovelab.tpc.objuri.SchemeDefinition
 import com.codeabovelab.tpc.web.jpa.RuleEntity
 import com.codeabovelab.tpc.web.jpa.RulesRepository
+import com.codeabovelab.tpc.web.rules.RulesLoader
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -18,12 +20,23 @@ import org.springframework.web.bind.annotation.RestController
 @Component
 @RestController
 class UiRuleController(
+        private var rulesLoader: RulesLoader,
         private var repository: RulesRepository
 ) {
 
     @RequestMapping("/list", method = arrayOf(RequestMethod.GET))
     fun list(): List<String> {
         return repository.findAll().map { it.ruleId }
+    }
+
+    @RequestMapping("/predicates/list", method = arrayOf(RequestMethod.GET))
+    fun predicatesList(): Map<String, SchemeDefinition> {
+        return rulesLoader.predicates.map.mapValues { it.value.definition }
+    }
+
+    @RequestMapping("/actions/list", method = arrayOf(RequestMethod.GET))
+    fun actionsList(): Map<String, SchemeDefinition> {
+        return rulesLoader.actions.map.mapValues { it.value.definition }
     }
 
     @RequestMapping("/get", method = arrayOf(RequestMethod.GET))
@@ -38,6 +51,7 @@ class UiRuleController(
         ui.toEntity(entity)
         repository.save(entity)
     }
+
 
     @RequestMapping("/delete", method = arrayOf(RequestMethod.POST))
     fun delete(id : String) {
@@ -75,4 +89,3 @@ class UiRule(
         return entity
     }
 }
-
