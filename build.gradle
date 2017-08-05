@@ -1,9 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.1.3'
-    ext.jackson_version = '2.9.0.pr3' //need for spring
-    ext.spring_version = '5.0.0.RC2'
-    ext.spring_boot_version = '2.0.0.M2'
-    ext.springfox_version = '2.7.0'
+    ext.kotlin_version = '1.1.3-2'
+    ext.jackson_version = '2.9.0.pr4' //need for spring
 
     repositories {
         mavenCentral()
@@ -12,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.2.RELEASE"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
     }
 }
@@ -34,9 +31,6 @@ allprojects {
         mavenLocal()
         mavenCentral()
         jcenter()
-        maven {
-            url 'https://repo.spring.io/libs-milestone'
-        }
     }
 
     dependencyManagement {
@@ -59,17 +53,6 @@ allprojects {
             dependency "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
             dependency "com.fasterxml.jackson.datatype:jackson-datatype-guava:$jackson_version"
 
-            dependency "org.springframework.boot:spring-boot-starter-web:$spring_boot_version"
-            dependency "org.springframework:spring-context:$spring_version"
-            dependency "org.springframework.data:spring-data-jpa:2.0.0.M4"
-            dependency "org.springframework.boot:spring-boot-starter-test:$spring_boot_version"
-
-            dependency "io.springfox:springfox-swagger2:$springfox_version"
-            dependency "io.springfox:springfox-swagger-ui:$springfox_version"
-
-            dependency "org.hibernate:hibernate-core:5.2.10.Final"
-            //dependency "org.hsqldb:hsqldb:2.4.0"
-            dependency 'org.apache.tomcat:tomcat-jdbc:8.5.16'
         }
     }
 }

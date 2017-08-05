@@ -1,3 +1,26 @@
+buildscript {
+    ext.springfox_version = '2.7.0'
+    ext.spring_milestone = 'https://repo.spring.io/libs-milestone'
+
+    repositories {
+        maven {
+            url "$spring_milestone"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.0.M3")
+    }
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'org.jetbrains.kotlin.plugin.spring'
+
+repositories {
+    maven {
+        url "$spring_milestone"
+    }
+}
+
 dependencies {
 
     compile project(':core')
@@ -9,13 +32,13 @@ dependencies {
     compile "org.springframework:spring-context"
     compile "org.springframework.data:spring-data-jpa"
     compile 'org.springframework.boot:spring-boot-starter-web'
-    compile "io.springfox:springfox-swagger2"
-    compile "io.springfox:springfox-swagger-ui"
+    compile "io.springfox:springfox-swagger2:$springfox_version"
+    compile "io.springfox:springfox-swagger-ui:$springfox_version"
     compile 'com.google.guava:guava'
 
     compile "org.hibernate:hibernate-core"
     compile "org.apache.tomcat:tomcat-jdbc"
-    compile group: "org.hsqldb", name: "hsqldb", version: "2.4.0", classifier:"jdk8debug"
+    compile "org.hsqldb:hsqldb:2.4.0:jdk8debug"
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
@@ -25,5 +48,3 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'junit:junit'
 }
-
-apply plugin: 'org.jetbrains.kotlin.plugin.spring'
