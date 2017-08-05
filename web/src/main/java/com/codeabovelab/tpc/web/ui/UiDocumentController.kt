@@ -11,10 +11,18 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.MimeTypeUtils
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
+import java.nio.charset.StandardCharsets
+import javax.mail.internet.MimeUtility
+import org.springframework.web.multipart.MultipartFile
+import java.io.InputStream
+import java.net.URLEncoder
+
 
 /**
  */
@@ -37,6 +45,59 @@ open class UiDocumentController(
     fun get(id: String): UiDoc? {
         val docEntity = repository.findByDocumentId(id)
         return docEntity.toUi()
+    }
+
+    @RequestMapping("/download", method = arrayOf(RequestMethod.GET))
+    fun download(id: String): ResponseEntity<StreamingResponseBody> {
+        val entity = repository.findByDocumentId(id)
+        if(entity == null) {
+            return ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.valueOf(entity.type)
+        val filename = getFileName(entity)
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''$filename")
+        return ResponseEntity(StreamingResponseBody { os ->
+            os.write(entity.data)
+        }, headers, HttpStatus.OK)
+    }
+
+    private fun getFileName(entity: DocEntity): String {
+        var name = entity.filename
+        if(name == null) {
+            name = "doc-${entity.id}.data"
+        }
+        return URLEncoder.encode(name, StandardCharsets.UTF_8.name())
+    }
+
+    @RequestMapping("/upload", method = arrayOf(RequestMethod.POST))
+    fun uploadSource(
+            @RequestPart("file") file: MultipartFile,
+            @RequestParam(name = "id", required = false) id: String?
+    ) {
+        // we must not upload to already existed document!
+        if(id != null && repository.findByDocumentId(id) != null) {
+            throw IllegalAccessException("Document with $id already exists.")
+        }
+        val entity = DocEntity()
+        entity.type = file.contentType
+        entity.filename = file.originalFilename
+        val reader = readers[entity.type]!!
+        entity.binary = reader.info.binary
+        if(file.size >= DocEntity.MAX_DOC_SIZE) {
+            throw IllegalArgumentException("Too big file: ${file.size}, max: ${DocEntity.MAX_DOC_SIZE}")
+        }
+        entity.data = file.inputStream.use { it.readBytes(file.size.toInt()) }
+
+        //test that document is readable and have correct id
+        val doc = entity.data.inputStream().use {
+            reader.read(id, it)
+        }.build()
+        entity.documentId = doc.id
+        if(id != null && doc.id != id) {
+            throw IllegalArgumentException("Doc id '${doc.id}' different from specified '$id'.")
+        }
+        repository.save(entity)
     }
 
     @ApiOperation("Give text document representation")

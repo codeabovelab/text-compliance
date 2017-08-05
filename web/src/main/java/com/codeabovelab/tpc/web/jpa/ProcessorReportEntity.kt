@@ -14,6 +14,6 @@ class ProcessorReportEntity {
     lateinit var date: LocalDateTime
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     lateinit var document: DocEntity
-    @Column(nullable = false, length = 10240 * 4)
+    @Column(nullable = false, length = DocEntity.MAX_DOC_SIZE * 4)
     lateinit var data: String
 }

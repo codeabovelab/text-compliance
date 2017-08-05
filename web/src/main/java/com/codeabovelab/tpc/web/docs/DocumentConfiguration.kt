@@ -18,7 +18,7 @@ class DocumentConfiguration {
 
     @Bean
     fun documentReaders() = DocumentReaders.Builder()
-            .set(EmailDocumentReader(), "email")
-            .set(TextDocumentReader(), "text")
+            .registerReader(EmailDocumentReader())
+            .registerReader(TextDocumentReader())
             .build()
 }

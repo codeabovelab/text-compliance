@@ -45,30 +45,20 @@ class ProcessingContext(
             return
         }
         val handledText = modifier.textHandler(text)
-        val trb = ProcessorReport.TextReport.Builder()
-        trb.textId = textual.id
-        rules.forEach{
-            applyRule(handledText, it, trb)
+        val ruleCtx = RuleContext(processingContext = this, text = handledText)
+        ruleCtx.textReport.textId = textual.id
+        rules.forEach {
+            ruleCtx.handleRule(it)
         }
-        textualBuilders.put(textual, trb)
+        textualBuilders.put(textual, ruleCtx.textReport)
     }
 
-    private fun <T: PredicateResult<*>> applyRule(text: Text, rule: Rule<T>, builder: ProcessorReport.TextReport.Builder) {
-        val predicate = rule.predicate
-        val predRes = predicate.test(getPredicateContext(), text)
-        if(predRes.isEmpty()) {
-           return
-        }
-        builder.rules.put(rule.id, RuleReport(rule.id, predRes))
-        rule.action.apply(this, text, predRes)
-    }
-
-    private fun getPredicateContext(): PredicateContext {
+    internal fun getPredicateContext(): PredicateContext {
         // now predicate context has snapshot of attributes
         // therefore we can not share it instance
         return PredicateContext(
                 document = document,
-                attributes = ImmutableMap.copyOf(getAttributes()),
+                attributes = ImmutableMap.copyOf(attributes),
                 thread = thread
         )
     }
@@ -77,5 +67,5 @@ class ProcessingContext(
      * Mutable map of attributes.
      * @return map of attributes
      */
-    fun getAttributes(): MutableMap<String, Any> = reportBuilder.attributes
+    val attributes : MutableMap<String, Any> = reportBuilder.attributes
 }

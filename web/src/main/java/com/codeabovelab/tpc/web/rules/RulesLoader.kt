@@ -19,10 +19,11 @@ class RulesLoader(
         private val classifierDir: String
 ) {
 
-    private val predicateObjs : ObjUri<RulePredicate<*>>
-    private val actionObjs = ObjUri<RuleAction<*>>()
+    final val predicates: ObjUri<RulePredicate<*>>
+    final val actions: ObjUri<RuleAction<*>>
 
     init {
+        //TODO in future we must move LearnConfig & etc to external initializer, possibly it can be lazy
         val lc = LearnConfig()
         val learnedDir = LearnConfig.learnedDir(classifierDir)
         lc.configure(learnedDir.config)
@@ -30,30 +31,47 @@ class RulesLoader(
                 learnedDir = learnedDir,
                 learnedConfig = lc
         )
-        val builder = ClassScheme.Builder<RulePredicate<*>>()
+        val preds = ClassScheme.Builder<RulePredicate<*>>()
         pp.publish {
-            builder.factories.add(it)
+            preds.factories.add(it)
         }
-        builder.factories.add(::RegexPredicate)
-        builder.factories.add(::ParticipantPredicate)
-        predicateObjs = ObjUri(builder.build())
+        preds.factories.add(::RegexPredicate)
+        preds.factories.add(::ParticipantPredicate)
+        predicates = ObjUri(preds.build())
+
+        val acts = ClassScheme.Builder<RuleAction<*>>()
+        acts.factories.add(::SetAttributeAction)
+        acts.factories.add(this::createApplyRulesAction)
+        actions = ObjUri(acts.build())
+    }
+
+    private fun createApplyRulesAction(actions: List<String>): ApplyRulesAction {
+        val actionInstances = actions.map {
+            loadById(it)
+        }
+        return ApplyRulesAction(actionInstances)
     }
 
     fun getRules(): List<Rule<*>> {
         val entities = repository.findAll()
-        return entities.map { this.load<PredicateResult<*>>(it) }
+        return entities.map { this.loadFromEntity(it) }
     }
 
-    private fun <T : PredicateResult<*>> load(entity: RuleEntity): Rule<T> {
+    private fun loadById(ruleId: String): Rule<*> {
+        val entity = repository.findByRuleId(ruleId)
+        return loadFromEntity(entity!!)
+    }
+
+    private fun loadFromEntity(entity: RuleEntity): Rule<*> {
         val action = if (entity.action == null) {
             RuleAction.NOP
         } else {
-            actionObjs.create(entity.action!!)
+            actions.create(entity.action!!)
         }
         return Rule(
                 id = entity.ruleId,
                 weight = entity.weight,
-                predicate = predicateObjs.create(entity.predicate),
+                predicate = predicates.create(entity.predicate),
                 action = action
         )
     }

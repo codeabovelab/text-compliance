@@ -1,6 +1,7 @@
 package com.codeabovelab.tpc.doc
 
 import com.codeabovelab.tpc.text.TextImpl
+import com.codeabovelab.tpc.util.MimeTypes
 import com.google.common.io.CharStreams
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -15,7 +16,7 @@ class TextDocumentReader(
 
     override val info = DocumentReader.Info(
             binary = false,
-            type = "text"
+            type = MimeTypes.TEXT
     )
 
     override fun read(id: String?, istr: InputStream): DocumentImpl.Builder {

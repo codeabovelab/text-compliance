@@ -23,7 +23,8 @@ class DocumentReaders private constructor(
 
         private val map = HashMap<String, DocumentReader<*>>()
 
-        operator fun set(reader: DocumentReader<*>, type: String) = apply {
+        fun registerReader(reader: DocumentReader<*>) = apply {
+            val type = reader.info.type
             val old = map.putIfAbsent(type, reader)
             if (old != null && old !== reader) {
                 throw IllegalArgumentException("Reader for '$type' is already registered: $old")

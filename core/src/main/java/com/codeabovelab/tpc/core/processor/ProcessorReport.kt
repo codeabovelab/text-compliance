@@ -99,5 +99,9 @@ class ProcessorReport(builder: Builder): Labeled {
 
             fun build() = TextReport(this)
         }
+
+        override fun toString(): String {
+            return "TextReport(rules=$rules, textId='$textId', childs=$childs)"
+        }
     }
 }
