@@ -4,12 +4,14 @@ import com.codeabovelab.tpc.core.nn.nlp.*
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.TextCoordinates
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import org.deeplearning4j.text.uima.UimaResource
 
 /**
  */
+@JsonTypeName("WordPredicate")
 class WordPredicate(
         val keywordMatcher: KeywordMatcher,
         val uima: UimaResource

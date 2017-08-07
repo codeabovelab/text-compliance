@@ -1,7 +1,10 @@
 package com.codeabovelab.tpc.core.processor
 
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 /**
  */
+@JsonTypeName("SetAttributeAction")
 class SetAttributeAction(
     val name: String,
     val value: Any

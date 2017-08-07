@@ -2,11 +2,13 @@ package com.codeabovelab.tpc.core.processor
 
 import com.codeabovelab.tpc.doc.MessageDocument
 import com.codeabovelab.tpc.text.Text
+import com.fasterxml.jackson.annotation.JsonTypeName
 import java.util.*
 
 /**
  * Analyze thread and current doc for detect participant adding/removing.
  */
+@JsonTypeName("ParticipantPredicate")
 class ParticipantPredicate : RulePredicate<ParticipantPredicate.Result> {
 
     val emptyResult = Result(added = listOf(), removed = listOf())

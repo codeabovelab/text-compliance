@@ -1,11 +1,11 @@
-package com.codeabovelab.tpc.objuri
+package com.codeabovelab.tpc.web.objf
 
 /**
  */
-class SchemeDefinition(
-        val paths: List<Path>
+class FactoriesDefinition(
+        val factories: List<Factory>
 ) {
-    class Path(
+    class Factory(
             val name: String,
             val arguments: List<Argument>
     )

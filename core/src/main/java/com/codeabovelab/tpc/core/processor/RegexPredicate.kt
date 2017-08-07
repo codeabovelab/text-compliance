@@ -1,18 +1,25 @@
 package com.codeabovelab.tpc.core.processor
 
 import com.codeabovelab.tpc.text.Text
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 import java.util.ArrayList
 import java.util.regex.Pattern
 
 /**
  */
-class RegexPredicate(regexp: String): RulePredicate<PredicateResult<*>> {
+@JsonTypeName("RegexPredicate")
+class RegexPredicate(
+        /**
+         * Need as property for json representation
+         */
+        val pattern: String
+): RulePredicate<PredicateResult<*>> {
 
-    val pattern: Pattern = Pattern.compile(regexp)
+    private val compiled: Pattern = Pattern.compile(this.pattern)
 
     override fun test(pc: PredicateContext, text: Text): PredicateResult<*> {
-        val matcher = pattern.matcher(text.data)
+        val matcher = compiled.matcher(text.data)
         var list: MutableList<PredicateResult.Entry>? = null
         while(matcher.find()) {
             val offset = matcher.start()

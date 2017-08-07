@@ -4,6 +4,7 @@ import com.codeabovelab.tpc.core.nn.nlp.*
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.text.Text
 import com.codeabovelab.tpc.text.TextCoordinates
+import com.fasterxml.jackson.annotation.JsonTypeName
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
@@ -16,6 +17,7 @@ import java.util.stream.Collectors
 
 /**
  */
+@JsonTypeName("TextClassifierPredicate")
 class TextClassifier(
         val vectorsFile: Path,
         val maxLabels: Int,
@@ -23,7 +25,7 @@ class TextClassifier(
         val wordSupplier: (wc: WordContext) -> String?
 ): RulePredicate<TextClassifierResult> {
 
-    val pv: ParagraphVectors
+    private val pv: ParagraphVectors
 
     init {
         pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile.toFile())

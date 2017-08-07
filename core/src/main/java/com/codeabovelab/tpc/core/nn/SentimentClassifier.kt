@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.core.nn
 
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.text.Text
+import com.fasterxml.jackson.annotation.JsonTypeName
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
@@ -17,16 +18,17 @@ import java.util.*
 
 /**
  */
+@JsonTypeName("SentimentClassifierPredicate")
 class SentimentClassifier(
         modelFile: Path,
         wordVectorFile: Path,
         val truncateReviewsToLength: Int
 ) : RulePredicate<SentimentClassifierResult> {
 
-    val net: MultiLayerNetwork
-    val tokenizerFactory: TokenizerFactory
-    val wordVectors: WordVectors
-    val vectorSize: Int
+    private val net: MultiLayerNetwork
+    private val tokenizerFactory: TokenizerFactory
+    private val wordVectors: WordVectors
+    private val vectorSize: Int
 
     init {
         net = ModelSerializer.restoreMultiLayerNetwork(modelFile.toFile())
