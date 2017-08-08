@@ -27,4 +27,13 @@ class RuleEntity {
 
     @Column(length = 1024)
     var description: String? = null
+    /**
+     * Flag which enable rule. Default true.
+     */
+    var enabled: Boolean = true
+    /**
+     * Flag which disable rule on top level. Child rule can be applied
+     * only when called from another rule.
+     */
+    var child: Boolean = true
 }

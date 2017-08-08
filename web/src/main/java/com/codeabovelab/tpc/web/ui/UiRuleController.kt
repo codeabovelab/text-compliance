@@ -71,7 +71,9 @@ class UiRuleController(
                 action = action,
                 predicate = predicate,
                 weight = weight,
-                description = description
+                description = description,
+                child = child,
+                enabled = enabled
         )
     }
 
@@ -82,6 +84,8 @@ class UiRuleController(
         entity.predicate = predicate
         entity.ruleId = ruleId
         entity.description = description
+        entity.child = child
+        entity.enabled = enabled
         return entity
     }
 }
@@ -91,5 +95,7 @@ class UiRule(
     var weight: Float,
     var predicate: String,
     var action: String?,
-    var description: String?
+    var description: String?,
+    var enabled: Boolean,
+    var child: Boolean
 )

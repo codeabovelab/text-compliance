@@ -59,7 +59,7 @@ class RulesLoader(
     }
 
     fun getRules(): List<Rule<*>> {
-        val entities = repository.findAll()
+        val entities = repository.findByEnabledTrueAndChildFalse()
         return entities.map { this.loadFromEntity(it) }
     }
 
@@ -69,6 +69,9 @@ class RulesLoader(
     }
 
     private fun loadFromEntity(entity: RuleEntity): Rule<*> {
+        if(!entity.enabled) {
+            throw IllegalArgumentException("Rule '${entity.ruleId}' is disabled.")
+        }
         val action: RuleAction<PredicateResult<*>> = if (entity.action == null) {
             RuleAction.NOP
         } else {
