@@ -1,6 +1,7 @@
 # Rules
 Texaco have a `com.codeabovelab.tpc.core.processor.Processor` which apply rules to Document. 
 Each rule have follow properties:
+
  * ruleId - Id of rule. It must be unique for whole system.
  * weight - Used for order of rules before applying to document. Less weight rules apply first.
  * predicate - Predicate which determine of applicability of rule. It encoded as JSON Object. 
