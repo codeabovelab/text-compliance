@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.web.jpa
 
+import java.time.LocalDateTime
 import javax.persistence.*
 
 /**
@@ -27,6 +28,8 @@ open class DocEntity {
     var filename: String? = null
     @Column(unique = true, nullable = false)
     lateinit var documentId: String
+    @Column(nullable = false)
+    lateinit var date: LocalDateTime
     /**
      * Raw data of document
      */

@@ -18,10 +18,9 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.nio.charset.StandardCharsets
-import javax.mail.internet.MimeUtility
 import org.springframework.web.multipart.MultipartFile
-import java.io.InputStream
 import java.net.URLEncoder
+import java.time.LocalDateTime
 
 
 /**
@@ -74,13 +73,14 @@ open class UiDocumentController(
     fun uploadSource(
             @RequestPart("file") file: MultipartFile,
             @RequestParam(name = "id", required = false) id: String?
-    ) {
+    ) : UiDocHeader {
         // we must not upload to already existed document!
         if(id != null && repository.findByDocumentId(id) != null) {
             throw IllegalAccessException("Document with $id already exists.")
         }
         val entity = DocEntity()
         entity.type = file.contentType
+        entity.date = LocalDateTime.now()
         entity.filename = file.originalFilename
         val reader = readers[entity.type]!!
         entity.binary = reader.info.binary
@@ -98,6 +98,9 @@ open class UiDocumentController(
             throw IllegalArgumentException("Doc id '${doc.id}' different from specified '$id'.")
         }
         repository.save(entity)
+        val dh = UiDocHeader()
+        dh.fromEntity(entity)
+        return dh
     }
 
     @ApiOperation("Give text document representation")
@@ -129,22 +132,32 @@ fun DocEntity?.toUi(): UiDoc? {
         return null
     }
     val ui = UiDoc()
-    ui.type = type
-    ui.documentId = documentId
+    ui.fromEntity(this)
     ui.data = JsonBlobs.toString(data, binary)
     return ui
 }
 
-class UiDoc {
-    var type: String? = null
-    var documentId: String? = null
+class UiDoc : UiDocHeader() {
     var data: String? = null
 
     fun toEntity(entity: DocEntity, readers: DocumentReaders): DocEntity {
         entity.type = this.type!!
         entity.documentId = this.documentId!!
         entity.binary = readers.isBinary(entity.type)
+        entity.date = date!!
         entity.data = JsonBlobs.fromString(this.data!!, entity.binary)
         return entity
+    }
+}
+
+open class UiDocHeader {
+    var type: String? = null
+    var date: LocalDateTime? = null
+    var documentId: String? = null
+
+    fun fromEntity(entity: DocEntity) {
+        type = entity.type
+        documentId = entity.documentId
+        date = entity.date
     }
 }
