@@ -2,11 +2,11 @@ package com.codeabovelab.tpc.tool.learn
 
 import com.codeabovelab.tpc.core.nn.nlp.Pos
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.nn.nlp.WordContext
 import com.codeabovelab.tpc.tool.util.Config
 import com.codeabovelab.tpc.tool.util.Copy
 import org.deeplearning4j.models.embeddings.loader.VectorsConfiguration
-import org.deeplearning4j.text.uima.UimaResource
 import org.slf4j.LoggerFactory
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -38,7 +38,7 @@ class LearnConfig {
         doc2vec.sampling = 1E-5
     }
 
-    fun createUimaResource(): UimaResource {
+    fun createUimaRequest(): UimaFactory.Request {
         var p = false
         var m = false
         when(wordsConversion) {
@@ -56,7 +56,7 @@ class LearnConfig {
                 //nothing
             }
         }
-        return SentenceIteratorImpl.uimaResource(pos = p, morphological = m)
+        return UimaFactory.Request(pos = p, morphological = m)
     }
 
 

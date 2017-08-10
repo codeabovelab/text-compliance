@@ -1,9 +1,10 @@
 package com.codeabovelab.tpc.web.docproc
 
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorFactoryImpl
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.processor.ProcessModifier
 import com.codeabovelab.tpc.core.processor.Processor
 import com.codeabovelab.tpc.core.processor.ProcessorReport
-import com.codeabovelab.tpc.core.thread.ThreadResolver
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.web.docs.DocsStorage
 import com.codeabovelab.tpc.web.docs.ThreadResolverService
@@ -24,7 +25,10 @@ class DocProcessor(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     private fun processorReport(doc: Document): ProcessorReport {
-        val processor = Processor(threadResolver = threadResolver.backend)
+        val processor = Processor(
+                threadResolver = threadResolver.backend,
+                sentenceIteratorFactory = SentenceIteratorFactoryImpl(UimaFactory.create(morphological = true))
+        )
         val rules = rulesLoader.getRules()
         rules.forEach {
             processor.addRule(it)

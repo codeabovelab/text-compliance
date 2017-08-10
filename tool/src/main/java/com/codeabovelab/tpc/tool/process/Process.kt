@@ -1,6 +1,8 @@
 package com.codeabovelab.tpc.tool.process
 
 import com.codeabovelab.tpc.core.kw.WordSearchResult
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorFactoryImpl
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentField
@@ -45,8 +47,9 @@ class Process(
     }
 
     fun run() {
-
-        val proc = Processor()
+        val proc = Processor(
+                sentenceIteratorFactory = SentenceIteratorFactoryImpl(UimaFactory.create(morphological = true))
+        )
         PredicateProvider(
                 learnedConfig = learnedConfig,
                 learnedDir = learnedDir

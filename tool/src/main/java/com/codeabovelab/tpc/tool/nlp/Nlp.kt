@@ -19,7 +19,7 @@ class Nlp(private val inDir: String,
     private val log = LoggerFactory.getLogger(this.javaClass)
     private val inDirPath = Paths.get(inDir)
     private val outDirPath = Paths.get(outDir ?: inDir)
-    private val ur = SentenceIteratorImpl.uimaResource(true, true)
+    private val ur = UimaFactory.create(true, true)
     private val escaper = CharEscaperBuilder()
             .addEscapes("|=".toCharArray(), "_")
             .addEscape('-', "")// lemma remain - at end of some words

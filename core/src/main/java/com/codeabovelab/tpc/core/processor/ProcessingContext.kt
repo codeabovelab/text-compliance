@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.processor
 
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorFactory
 import com.codeabovelab.tpc.core.thread.MessagesThread
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.text.Text
@@ -15,7 +16,8 @@ class ProcessingContext(
         val document: Document,
         val modifier: ProcessModifier,
         val rules: List<Rule<*>>,
-        val thread: MessagesThread
+        val thread: MessagesThread,
+        private val sentenceIteratorFactory: SentenceIteratorFactory
 ) {
 
     val reportBuilder = ProcessorReport.Builder()
@@ -59,7 +61,8 @@ class ProcessingContext(
         return PredicateContext(
                 document = document,
                 attributes = ImmutableMap.copyOf(attributes),
-                thread = thread
+                thread = thread,
+                sentenceIteratorFactory = sentenceIteratorFactory
         )
     }
 

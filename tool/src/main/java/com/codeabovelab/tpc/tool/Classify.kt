@@ -1,6 +1,8 @@
 package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.core.nn.TextClassifier
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorFactoryImpl
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.text.TextImpl
 import com.codeabovelab.tpc.tool.learn.LearnConfig
@@ -22,12 +24,13 @@ class Classify(
         val tc = TextClassifier(
                 vectorsFile = ld.doc2vec,
                 maxLabels = 3,
-                uima = lc.createUimaResource(),
                 wordSupplier = lc.wordSupplier()
         )
 
         var i = 0
-        val pc = PredicateContext.STUB
+        val pc = PredicateContext.create(
+                sentenceIteratorFactory = SentenceIteratorFactoryImpl(UimaFactory.create(lc.createUimaRequest()))
+        )
         for(text in texts) {
             i++
             println("Text #$i")

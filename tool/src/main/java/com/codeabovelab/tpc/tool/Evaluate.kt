@@ -43,7 +43,7 @@ class Evaluate(
             println("${label.word}\n\t$words")
         }
         if (inData != null) {
-            val uima = lc.createUimaResource()
+            val uima = UimaFactory.create(lc.createUimaRequest())
             val wordSupplier = lc.wordSupplier()
             val path = Paths.get(inData)
             println("For file: $path")

@@ -1,12 +1,7 @@
 package com.codeabovelab.tpc.core.nn.nlp
 
 import org.apache.uima.cas.CAS
-import org.apache.uima.fit.factory.AnalysisEngineFactory
 import org.apache.uima.fit.util.JCasUtil
-import org.cleartk.clearnlp.MpAnalyzer
-import org.cleartk.clearnlp.PosTagger
-import org.cleartk.clearnlp.Tokenizer
-import org.cleartk.opennlp.tools.SentenceAnnotator
 import org.cleartk.token.type.Sentence
 import org.cleartk.token.type.Token
 import org.deeplearning4j.text.uima.UimaResource
@@ -80,26 +75,7 @@ class SentenceIteratorImpl(
     }
 
     companion object {
-        fun uimaResource(
-                pos: Boolean = true,
-                morphological: Boolean = true
-        ): UimaResource {
-            // note that MpAnalyzer require POS, therefore we must enable both them
-            val args = if(morphological) {
-                 arrayOf(SentenceAnnotator.getDescription(),
-                        Tokenizer.getDescription(),
-                        PosTagger.getDescription(),
-                        MpAnalyzer.getDescription())
-            } else if(pos) {
-                arrayOf(SentenceAnnotator.getDescription(),
-                        Tokenizer.getDescription(),
-                        PosTagger.getDescription())
-            } else {
-                arrayOf(SentenceAnnotator.getDescription(),
-                        Tokenizer.getDescription())
-            }
-            return UimaResource(AnalysisEngineFactory.createEngine(AnalysisEngineFactory.createEngineDescription(*args)))
-        }
+
 
         /**
          * @see #uimaResource

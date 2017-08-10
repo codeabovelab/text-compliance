@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors
 import org.deeplearning4j.models.word2vec.VocabWord
-import org.deeplearning4j.text.uima.UimaResource
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.ops.transforms.Transforms
 import java.nio.file.Path
@@ -19,10 +18,9 @@ import java.util.stream.Collectors
  */
 @JsonTypeName("TextClassifierPredicate")
 class TextClassifier(
-        val vectorsFile: Path,
-        val maxLabels: Int,
-        val uima: UimaResource,
-        val wordSupplier: (wc: WordContext) -> String?
+        private val vectorsFile: Path,
+        private val maxLabels: Int,
+        private val wordSupplier: (wc: WordContext) -> String?
 ): RulePredicate<TextClassifierResult> {
 
     private val pv: ParagraphVectors
@@ -34,7 +32,7 @@ class TextClassifier(
     }
 
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {
-        val si = SentenceIteratorImpl.create(uima, TextIterator.singleton(text))
+        val si = pc.sentenceIterator(text)
         val entries = ArrayList<TextClassifierResult.Entry>()
         var count = 0
         var sum: INDArray? = null

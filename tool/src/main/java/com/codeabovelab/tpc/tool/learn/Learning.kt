@@ -71,7 +71,7 @@ class Learning(
     }
 
     private fun fileSupport(lc: LearnConfig): DirSeqIterator.FileSupport {
-        val ur = lc.createUimaResource()
+        val ur = UimaFactory.create(lc.createUimaRequest())
         val map = mapOf<String, (Path) -> SentenceIterator?>(
                 Pair("txt", { path ->
                     val fti = try {

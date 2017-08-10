@@ -4,6 +4,7 @@ import com.codeabovelab.tpc.core.kw.*
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.processor.RulePredicate
 import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
 import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
@@ -51,7 +52,6 @@ class PredicateProvider(
         val tc = TextClassifier(
                 vectorsFile = learnedDir.doc2vec,
                 maxLabels = 3,
-                uima = learnedConfig.createUimaResource(),
                 wordSupplier = learnedConfig.wordSupplier()
         )
         return tc
@@ -73,8 +73,7 @@ class PredicateProvider(
             loadFromFiles(keywordsDir, wordSynonyms, ksmBuilder)
         }
         val sw = WordPredicate(
-                keywordMatcher = ksmBuilder.build(),
-                uima = SentenceIteratorImpl.uimaResource(morphological = true)
+                keywordMatcher = ksmBuilder.build()
         )
         return sw
     }

@@ -1,6 +1,7 @@
 package com.codeabovelab.tpc.core.nn
 
-import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorFactoryImpl
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.processor.PredicateContext
 import com.codeabovelab.tpc.text.TextImpl
 import com.google.common.io.Resources
@@ -27,13 +28,14 @@ class TextClassifierTest {
         val tc = TextClassifier(
                 vectorsFile = Paths.get(filePath),
                 maxLabels = 3,
-                uima = SentenceIteratorImpl.uimaResource(pos = false, morphological = false),
                 wordSupplier = {it.word.str}
         )
 
         val texts = Resources.readLines(Resources.getResource(this.javaClass, "samples.txt"), StandardCharsets.UTF_8)
         var i = 0
-        val pc = PredicateContext.STUB
+        val pc = PredicateContext.create(
+                sentenceIteratorFactory = SentenceIteratorFactoryImpl(UimaFactory.create(morphological = false, pos = false))
+        )
         for(text in texts) {
             System.out.println(i++)
             val res = tc.test(pc, TextImpl(text))

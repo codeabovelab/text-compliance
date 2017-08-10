@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.core.processor
 
+import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorFactory
 import com.codeabovelab.tpc.core.thread.MessagesThread
 import com.codeabovelab.tpc.core.thread.ThreadResolver
 import com.codeabovelab.tpc.doc.Document
@@ -13,7 +14,8 @@ import java.util.concurrent.ConcurrentHashMap
  * Must be a thread safe.
  */
 class Processor(
-        private val threadResolver: ThreadResolver? = null
+        private val threadResolver: ThreadResolver? = null,
+        private val sentenceIteratorFactory: SentenceIteratorFactory = SentenceIteratorFactory.STUB
 ) {
 
     private val rules = ConcurrentHashMap<String, Rule<*>>()
@@ -27,10 +29,13 @@ class Processor(
 
     fun process(doc: Document, modifier: ProcessModifier = ProcessModifier.DEFAULT): ProcessorReport {
         val thread = detectThread(doc)
-        val pc = ProcessingContext(document = doc,
+        val pc = ProcessingContext(
+                document = doc,
                 modifier = modifier,
                 rules = selectRules(),
-                thread = thread)
+                thread = thread,
+                sentenceIteratorFactory = sentenceIteratorFactory
+        )
         doc.read(pc::onText)
         return pc.build()
     }
