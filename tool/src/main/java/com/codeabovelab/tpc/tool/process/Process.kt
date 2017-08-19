@@ -143,7 +143,7 @@ class Process(
                     if (old == null) label.similarity else Math.max(old, label.similarity)
                 }
                 entries.compute(entry.coordinates) { _, old ->
-                    val set = old ?: HashSet<LabelEntry>()
+                    val set = old ?: HashSet()
                     val notice = when (entry) {
                         is WordSearchResult.Entry -> "keyword=${entry.keywords.joinToString { it }}"
                         else -> "entry=${entry}"

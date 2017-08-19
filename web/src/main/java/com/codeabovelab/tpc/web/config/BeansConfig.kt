@@ -16,5 +16,4 @@ import org.springframework.context.annotation.Import
         ProcessorReportsStorage::class
 )
 @Configuration
-open class BeansConfig {
-}
+open class BeansConfig

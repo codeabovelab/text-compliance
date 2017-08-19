@@ -20,7 +20,7 @@ class WordPredicateTest {
     @Test
     fun test() {
 
-        val keyWord : String ="hell"
+        val keyWord = "hell"
         val tc = WordPredicate(
                 keywordMatcher = KeywordSetMatcher.Builder().add(keyWord, setOf(keyWord)).build()
         )

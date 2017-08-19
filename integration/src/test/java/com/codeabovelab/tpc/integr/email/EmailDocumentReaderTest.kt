@@ -4,7 +4,6 @@ import com.codeabovelab.tpc.doc.DocumentField
 import com.codeabovelab.tpc.doc.MessageDocumentImpl
 import com.codeabovelab.tpc.doc.ParentRef
 import com.codeabovelab.tpc.text.TextualUtil
-import com.google.common.collect.ImmutableList
 import org.junit.Test
 
 import java.io.ByteArrayInputStream

@@ -1,7 +1,6 @@
 package com.codeabovelab.tpc.web
 
 import com.codeabovelab.tpc.web.config.BeansConfig
-import com.codeabovelab.tpc.web.config.JacksonConfig
 import com.codeabovelab.tpc.web.docs.DocumentConfiguration
 import com.codeabovelab.tpc.web.jpa.JpaConfiguration
 import com.codeabovelab.tpc.web.ui.WebConfiguration
@@ -23,9 +22,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
         DocumentConfiguration::class
 )
 @SpringBootConfiguration
-open class Application {
-
-}
+class Application
 
 fun main(args: Array<String>) {
     SpringApplication.run(Application::class.java, *args)

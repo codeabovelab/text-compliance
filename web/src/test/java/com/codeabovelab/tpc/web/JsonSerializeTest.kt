@@ -42,6 +42,4 @@ class JsonSerializeTest {
     }
 }
 
-class CustomData {
-
-}
+class CustomData

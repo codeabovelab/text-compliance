@@ -25,6 +25,4 @@ import org.springframework.context.annotation.Import
 )
 @ComponentScan(basePackageClasses = arrayOf(WebConfiguration::class))
 @Configuration
-open class WebConfiguration {
-
-}
+open class WebConfiguration

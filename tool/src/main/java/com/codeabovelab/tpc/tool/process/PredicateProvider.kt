@@ -3,14 +3,11 @@ package com.codeabovelab.tpc.tool.process
 import com.codeabovelab.tpc.core.kw.*
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
-import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
-import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.processor.RulePredicate
 import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
 import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.util.PathUtils
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream

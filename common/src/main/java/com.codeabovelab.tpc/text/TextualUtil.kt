@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.text;
+package com.codeabovelab.tpc.text
 
 import com.google.common.collect.ImmutableList
 

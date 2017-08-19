@@ -34,5 +34,4 @@ data class SomeObject(
         val intArg: Int = 0,
         val listArg: List<String> = listOf(),
         val strArg: String = ""
-) {
-}
+)

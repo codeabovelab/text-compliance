@@ -1,13 +1,9 @@
 package com.codeabovelab.tpc.web.ui
 
-import com.codeabovelab.tpc.core.processor.RuleAction
-import com.codeabovelab.tpc.core.processor.RulePredicate
 import com.codeabovelab.tpc.web.objf.FactoriesDefinition
-import com.codeabovelab.tpc.util.letIfNotNull
 import com.codeabovelab.tpc.web.jpa.RuleEntity
 import com.codeabovelab.tpc.web.jpa.RulesRepository
 import com.codeabovelab.tpc.web.rules.RulesLoader
-import com.fasterxml.jackson.annotation.JsonRawValue
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional

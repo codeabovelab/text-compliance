@@ -3,7 +3,6 @@ package com.codeabovelab.tpc.tool
 import com.codeabovelab.tpc.core.nn.nlp.*
 import com.codeabovelab.tpc.text.TextImpl
 import com.codeabovelab.tpc.tool.learn.LearnConfig
-import com.google.common.base.Splitter
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.word2vec.VocabWord
 import org.nd4j.linalg.ops.transforms.Transforms

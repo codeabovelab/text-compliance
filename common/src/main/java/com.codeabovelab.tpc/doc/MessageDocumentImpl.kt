@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.doc
 
 import com.codeabovelab.tpc.text.TextConsumer
 import com.codeabovelab.tpc.util.Asserts
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.google.common.collect.ImmutableList
 import java.time.ZonedDateTime
 

@@ -10,7 +10,7 @@ class DocumentsRepositoryImpl : DocumentsRepository {
 
     override fun get(id: String): Document? = documents[id]
 
-    fun register(doc: Document): Unit {
+    fun register(doc: Document) {
         val old = documents.putIfAbsent(doc.id, doc)
         if(old != null && old !== doc) {
             throw IllegalArgumentException("Repository already has document with id: ${doc.id}")

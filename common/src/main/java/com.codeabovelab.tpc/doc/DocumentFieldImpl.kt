@@ -28,7 +28,7 @@ class DocumentFieldImpl private constructor(b: DocumentFieldImpl.Builder) : Docu
     override val id: String = b.id!!
     override val parent: Textual? = b.parent!!
     val data: TextImpl
-    override final val childs: List<Textual> = TextualUtil.buildChilds(this, b)
+    override val childs: List<Textual> = TextualUtil.buildChilds(this, b)
 
     init {
         this.data = TextImpl(b.data.orEmpty())

@@ -71,7 +71,7 @@ class KeywordSetMatcher private constructor(
 
         fun add(word: String, labels: Iterable<String>) = apply {
             map.compute(word) { _, old ->
-                val set = old ?: TreeSet<String>(String.CASE_INSENSITIVE_ORDER)
+                val set = old ?: TreeSet(String.CASE_INSENSITIVE_ORDER)
                 set.addAll(labels)
                 set
             }

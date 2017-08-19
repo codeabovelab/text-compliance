@@ -12,7 +12,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
 import kotlin.reflect.full.cast
-import kotlin.reflect.jvm.isAccessible
 
 /**
  * Tool for create object from standard json representation. <p/>
@@ -127,5 +126,5 @@ class ObjFactory<T : Any> private constructor(
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
-    private class MixIn {}
+    private class MixIn
 }

@@ -1,7 +1,6 @@
 package com.codeabovelab.tpc.tool.learn
 
 import com.codeabovelab.tpc.core.nn.nlp.Pos
-import com.codeabovelab.tpc.core.nn.nlp.SentenceIteratorImpl
 import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
 import com.codeabovelab.tpc.core.nn.nlp.WordContext
 import com.codeabovelab.tpc.tool.util.Config
