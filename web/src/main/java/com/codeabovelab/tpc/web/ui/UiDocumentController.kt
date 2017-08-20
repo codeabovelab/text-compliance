@@ -2,30 +2,31 @@ package com.codeabovelab.tpc.web.ui
 
 import com.codeabovelab.tpc.doc.Document
 import com.codeabovelab.tpc.doc.DocumentReaders
-import com.codeabovelab.tpc.web.jpa.DocEntity
-import com.codeabovelab.tpc.web.jpa.DocsRepository
 import com.codeabovelab.tpc.util.JsonBlobs
+import com.codeabovelab.tpc.util.MimeTypes
 import com.codeabovelab.tpc.web.docs.DocsStorage
 import com.codeabovelab.tpc.web.docs.ThreadResolverService
+import com.codeabovelab.tpc.web.jpa.DocEntity
+import com.codeabovelab.tpc.web.jpa.DocsRepository
 import io.swagger.annotations.ApiOperation
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.MimeTypeUtils
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
-import java.nio.charset.StandardCharsets
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
 
 /**
  */
-@RequestMapping( path = arrayOf("/doc"), produces = arrayOf(MimeTypeUtils.APPLICATION_JSON_VALUE))
+@RequestMapping(path = arrayOf("/doc"), produces = arrayOf(MimeTypeUtils.APPLICATION_JSON_VALUE))
 @Transactional(propagation = Propagation.REQUIRED)
 @RestController
 open class UiDocumentController(
@@ -49,7 +50,7 @@ open class UiDocumentController(
     @RequestMapping("/download", method = arrayOf(RequestMethod.GET))
     fun download(id: String): ResponseEntity<StreamingResponseBody> {
         val entity = repository.findByDocumentId(id)
-        if(entity == null) {
+        if (entity == null) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
         val headers = HttpHeaders()
@@ -63,38 +64,62 @@ open class UiDocumentController(
 
     private fun getFileName(entity: DocEntity): String {
         var name = entity.filename
-        if(name == null) {
+        if (name == null) {
             name = "doc-${entity.id}.data"
         }
         return URLEncoder.encode(name, StandardCharsets.UTF_8.name())
+    }
+
+    @RequestMapping("/upload-text", method = arrayOf(RequestMethod.POST), consumes = arrayOf(MediaType.TEXT_PLAIN_VALUE))
+    fun uploadText(
+            @RequestParam(name = "id", required = false) id: String?,
+            @RequestBody txt: String
+    ): UiDocHeader {
+        checkDocumentIsNew(id)
+        return processData(id = id!!, fileName = id, contentType = MimeTypes.TEXT, data = txt.toByteArray())
+    }
+
+    private fun checkDocumentIsNew(id: String?) {
+        // we must not upload to already existed document!
+        if (id != null && repository.findByDocumentId(id) != null) {
+            throw IllegalAccessException("Document with $id already exists.")
+        }
     }
 
     @RequestMapping("/upload", method = arrayOf(RequestMethod.POST))
     fun uploadSource(
             @RequestPart("file") file: MultipartFile,
             @RequestParam(name = "id", required = false) id: String?
-    ) : UiDocHeader {
-        // we must not upload to already existed document!
-        if(id != null && repository.findByDocumentId(id) != null) {
-            throw IllegalAccessException("Document with $id already exists.")
+    ): UiDocHeader {
+        checkDocumentIsNew(id)
+        checkContentSize(file.size)
+
+        return processData(id = id!!, fileName = file.name, contentType = file.contentType,
+                data = file.inputStream.use { it.readBytes(file.size.toInt()) })
+    }
+
+    private fun checkContentSize(size: Long) {
+        if (size >= DocEntity.MAX_DOC_SIZE) {
+            throw IllegalArgumentException("File is too big size: $size, limit: ${DocEntity.MAX_DOC_SIZE}")
         }
+    }
+
+    private fun processData(id: String, fileName: String, contentType: String, data: ByteArray): UiDocHeader {
+
+        val reader = readers[contentType]!!
         val entity = DocEntity()
-        entity.type = file.contentType
         entity.date = LocalDateTime.now()
-        entity.filename = file.originalFilename
-        val reader = readers[entity.type]!!
+        entity.type = reader.info.type
         entity.binary = reader.info.binary
-        if(file.size >= DocEntity.MAX_DOC_SIZE) {
-            throw IllegalArgumentException("Too big file: ${file.size}, max: ${DocEntity.MAX_DOC_SIZE}")
-        }
-        entity.data = file.inputStream.use { it.readBytes(file.size.toInt()) }
+        entity.filename = fileName
+        entity.data = data
 
         //test that document is readable and have correct id
         val doc = entity.data.inputStream().use {
             reader.read(id, it)
         }.build()
         entity.documentId = doc.id
-        if(id != null && doc.id != id) {
+        if (id != null && doc.id != id) {
             throw IllegalArgumentException("Doc id '${doc.id}' different from specified '$id'.")
         }
         repository.save(entity)
@@ -117,7 +142,7 @@ open class UiDocumentController(
     }
 
     @RequestMapping("/delete", method = arrayOf(RequestMethod.POST))
-    fun delete(id : String) {
+    fun delete(id: String) {
         repository.deleteByDocumentId(id)
     }
 
@@ -128,7 +153,7 @@ open class UiDocumentController(
 }
 
 fun DocEntity?.toUi(): UiDoc? {
-    if(this == null) {
+    if (this == null) {
         return null
     }
     val ui = UiDoc()
