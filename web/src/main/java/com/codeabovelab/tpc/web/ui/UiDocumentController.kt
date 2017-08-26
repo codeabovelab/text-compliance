@@ -119,7 +119,7 @@ open class UiDocumentController(
             reader.read(id, it)
         }.build()
         entity.documentId = doc.id
-        if (id != null && doc.id != id) {
+        if (doc.id != id) {
             throw IllegalArgumentException("Doc id '${doc.id}' different from specified '$id'.")
         }
         repository.save(entity)
