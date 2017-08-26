@@ -1,7 +1,6 @@
 package com.codeabovelab.tpc.tool.learn.sentiment
 
 import com.codeabovelab.tpc.tool.learn.LearnConfig
-import org.deeplearning4j.eval.Evaluation
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.nn.conf.GradientNormalization
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration
@@ -21,17 +20,18 @@ import java.nio.file.Paths
 /**
  */
 class SentimentLearning(
-        private val srcTrainDir: String,
-        private val srcTestDir: String,
+        private val srcDir: String,
         private val srcVectorDir: String,
         private val destDir: String,
         private val config: String?
 ) {
+    val srcTrainDir = Paths.get(srcDir, "train")
+    val srcTestDir = Paths.get(srcDir, "test")
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     fun run() {
-        log.info("Start learning on $srcVectorDir, save data to $destDir.")
+        log.info("Start learning on $srcDir, srcVectorDir $srcVectorDir, save data to $destDir.")
         val ld = LearnConfig.learnedDir(destDir)
         val pvf = ld.doc2vec.toFile()
         if (pvf.exists()) {
@@ -40,7 +40,7 @@ class SentimentLearning(
         }
         pvf.parentFile.mkdirs()
         val lc = LearnConfig()
-        if(config != null) {
+        if (config != null) {
             val srcConfigPath = Paths.get(config).toAbsolutePath()
             lc.configure(srcConfigPath) // this method will create config if absent
             lc.save(ld.config)
@@ -89,17 +89,7 @@ class SentimentLearning(
             train.reset()
             log.info("Epoch {} completed. Starting evaluation:", i)
 
-            val evaluation = Evaluation()
-            while (test.hasNext()) {
-                val t = test.next()
-                val features = t.features
-                val labels = t.labels
-                val inMask = t.featuresMaskArray
-                val outMask = t.labelsMaskArray
-                val predicted = net.output(features, false, inMask, outMask)
-
-                evaluation.evalTimeSeries(labels, predicted, outMask)
-            }
+            val evaluation = net.evaluate(test)
             test.reset()
 
             log.info("stats: {}", evaluation.stats())

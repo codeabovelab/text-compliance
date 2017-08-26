@@ -3,10 +3,10 @@ package com.codeabovelab.tpc.tool.learn.sentiment
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 import java.util.stream.Collectors
 
-class SentimentDocumentFilesArray(val dataDirectory: String) : SentimentDocumentArray {
+class SentimentDocumentFilesArray(private val dataDirectory: Path) : SentimentDocumentArray {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
@@ -27,13 +27,13 @@ class SentimentDocumentFilesArray(val dataDirectory: String) : SentimentDocument
 
     override fun reset() {
         log.warn("Call reset on $dataDirectory")
-        sentimentDocuments = Files.walk(Paths.get(dataDirectory))
+        sentimentDocuments = Files.walk(dataDirectory)
                 .filter { p -> p.toFile().isFile }
                 .map { p ->
                     if (p.toString().contains("pos")) {
                         SentimentDocumentFile(p.toFile(), SentimentLabel.POSITIVE)
                     } else {
-                        SentimentDocumentFile(p.toFile(), SentimentLabel.POSITIVE)
+                        SentimentDocumentFile(p.toFile(), SentimentLabel.NEGATIVE)
                     }
                 }.collect(Collectors.toList())
     }

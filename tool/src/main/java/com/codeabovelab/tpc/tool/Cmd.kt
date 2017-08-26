@@ -1,6 +1,7 @@
 package com.codeabovelab.tpc.tool
 
 import com.codeabovelab.tpc.tool.learn.Learning
+import com.codeabovelab.tpc.tool.learn.sentiment.SentimentLearning
 import com.codeabovelab.tpc.tool.nlp.Nlp
 import com.codeabovelab.tpc.tool.process.Process
 import org.kohsuke.args4j.Argument
@@ -38,6 +39,17 @@ class Cmd {
                 require(cmd::inPath, cmd::outPath)
                 return Learning(
                         srcDir = cmd.inPath!!,
+                        destDir = cmd.outPath!!,
+                        config = cmd.config
+                )::run
+            }
+        },
+        sentiment {
+            override fun create(cmd: Cmd): () -> Unit {
+                require(cmd::inPath, cmd::outPath)
+                return SentimentLearning(
+                        srcDir = cmd.inPath!!,
+                        srcVectorDir = cmd.learned!!,
                         destDir = cmd.outPath!!,
                         config = cmd.config
                 )::run
