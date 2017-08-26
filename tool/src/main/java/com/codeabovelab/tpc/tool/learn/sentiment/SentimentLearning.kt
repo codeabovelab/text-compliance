@@ -5,6 +5,7 @@ import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.nn.conf.GradientNormalization
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration
 import org.deeplearning4j.nn.conf.Updater
+import org.deeplearning4j.nn.conf.WorkspaceMode
 import org.deeplearning4j.nn.conf.layers.GravesLSTM
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
@@ -12,6 +13,7 @@ import org.deeplearning4j.nn.weights.WeightInit
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener
 import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.activations.Activation
+import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.lossfunctions.LossFunctions
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -52,13 +54,15 @@ class SentimentLearning(
 
     private fun learn(lc: LearnConfig) {
 
+        Nd4j.getMemoryManager().autoGcWindow = 10 * 1024 //https://deeplearning4j.org/workspaces
         val conf = NeuralNetConfiguration.Builder()
-                .updater(Updater.ADAM).adamMeanDecay(0.9).adamVarDecay(0.999)
+                .updater(Updater.ADAM)  //To configure: .updater(Adam.builder().beta1(0.9).beta2(0.999).build())
                 .regularization(true).l2(1e-5)
                 .weightInit(WeightInit.XAVIER)
                 .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
                 .gradientNormalizationThreshold(1.0)
                 .learningRate(lc.sentiment.learningRate)
+                .trainingWorkspaceMode(WorkspaceMode.SEPARATE).inferenceWorkspaceMode(WorkspaceMode.SEPARATE)   //https://deeplearning4j.org/workspaces
                 .list()
                 .layer(0, GravesLSTM.Builder().nIn(lc.sentiment.vectorSize).nOut(256)
                         .activation(Activation.TANH).build())
@@ -84,14 +88,13 @@ class SentimentLearning(
                 truncateLength = lc.sentiment.truncateReviewsToLength)
 
         log.info("Starting training")
-        for (i in 0..lc.sentiment.nEpochs - 1) {
+        for (i in 0 until lc.sentiment.nEpochs) {
+            log.info("Epoch {} started", i)
             net.fit(train)
             train.reset()
             log.info("Epoch {} completed. Starting evaluation:", i)
 
             val evaluation = net.evaluate(test)
-            test.reset()
-
             log.info("stats: {}", evaluation.stats())
         }
 

@@ -1,7 +1,7 @@
 ext {
-    nd4j = '0.8.0'
-    dl4j = '0.8.0'
-    datavec = '0.8.0'
+    nd4j = '0.9.1'
+    dl4j = '0.9.1'
+    datavec = '0.9.1'
 }
 
 dependencies {
