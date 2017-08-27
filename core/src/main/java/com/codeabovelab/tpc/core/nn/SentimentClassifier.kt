@@ -13,6 +13,7 @@ import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
+import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.util.*
 
@@ -22,16 +23,17 @@ import java.util.*
 class SentimentClassifier(
         modelFile: Path,
         wordVectorFile: Path,
-        val truncateReviewsToLength: Int
+        private val truncateReviewsToLength: Int = 256
 ) : RulePredicate<SentimentClassifierResult> {
 
-    private val net: MultiLayerNetwork
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
+    private val net: MultiLayerNetwork = ModelSerializer.restoreMultiLayerNetwork(modelFile.toFile())
     private val tokenizerFactory: TokenizerFactory
     private val wordVectors: WordVectors
     private val vectorSize: Int
 
     init {
-        net = ModelSerializer.restoreMultiLayerNetwork(modelFile.toFile())
         tokenizerFactory = DefaultTokenizerFactory()
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
         wordVectors = WordVectorSerializer.loadStaticModel(wordVectorFile.toFile())
@@ -43,10 +45,12 @@ class SentimentClassifier(
         val features = loadFeaturesFromString(text.data.toString(), truncateReviewsToLength)
         val networkOutput = net.output(features)
         val timeSeriesLength = networkOutput.size(2)
-        val probabilitiesAtLastWord = networkOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength - 1))
+        val probabilitiesAtLastWord = networkOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(),
+                NDArrayIndex.point(timeSeriesLength - 1))
 
         val positiveProbability = probabilitiesAtLastWord.getDouble(0)
         val negativeProbability = probabilitiesAtLastWord.getDouble(1)
+        log.debug("result {positive=$positiveProbability, negative=$negativeProbability} for $text")
         if (negativeProbability > positiveProbability) {
             return SentimentClassifierResult(Collections.singleton(Label("negative", negativeProbability)))
         }
@@ -54,7 +58,7 @@ class SentimentClassifier(
 
     }
 
-    fun loadFeaturesFromString(reviewContents: String, maxLength: Int): INDArray {
+    private fun loadFeaturesFromString(reviewContents: String, maxLength: Int): INDArray {
         val tokens = tokenizerFactory.create(reviewContents).tokens
         val tokensFiltered = tokens.filter { wordVectors.hasWord(it) }
         val outputLength = Math.max(maxLength, tokensFiltered.size)
