@@ -27,8 +27,6 @@ class SentimentLearning(
         private val destDir: String,
         private val config: String?
 ) {
-    val srcTrainDir = Paths.get(srcDir, "train")
-    val srcTestDir = Paths.get(srcDir, "test")
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
@@ -75,6 +73,8 @@ class SentimentLearning(
         //DataSetIterators for training and testing respectively
         val wordVectors = WordVectorSerializer.loadStaticModel(File(srcVectorDir))
 
+        val srcTrainDir = Paths.get(srcDir, "train")
+        val srcTestDir = Paths.get(srcDir, "test")
         val train = SentimentIterator(
                 wordVectors = wordVectors,
                 batchSize = lc.sentiment.batchSize,
@@ -98,7 +98,7 @@ class SentimentLearning(
             log.info("stats: {}", evaluation.stats())
         }
 
-        ModelSerializer.writeModel(net, File(destDir), false)
+        ModelSerializer.writeModel(net, File(destDir, "res.zip"), false)
 
     }
 
