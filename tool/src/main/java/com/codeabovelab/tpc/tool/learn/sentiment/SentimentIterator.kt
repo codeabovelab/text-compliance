@@ -9,22 +9,25 @@ import org.nd4j.linalg.dataset.api.DataSetPreProcessor
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
+import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.nio.file.Path
 import java.util.*
 
 class SentimentIterator(
         private val wordVectors: WordVectors,
         private val batchSize: Int,
-        private val textIterator: SentimentDocumentArray,
+        private val dataPath: Path,
         private val truncateLength: Int) : DataSetIterator {
 
-    private val vectorSize: Int
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
     private var cursor = 0
+    private val vectorSize: Int = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
     private val tokenizerFactory: TokenizerFactory
-
+    private val textIteratorPositive = SentimentDocumentFilesArray(dataPath.resolve("pos"), SentimentLabel.POSITIVE)
+    private val textIteratorNegative = SentimentDocumentFilesArray(dataPath.resolve("neg"), SentimentLabel.NEGATIVE)
     init {
-        this.vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
-
         tokenizerFactory = DefaultTokenizerFactory()
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
     }
@@ -61,17 +64,21 @@ class SentimentIterator(
         }
     }
 
-    fun nextDataSet(num: Int): DataSet {
+    private fun nextDataSet(num: Int): DataSet {
+        log.info("cursor {}", cursor)
         //First: load reviews to String. Alternate positive and negative reviews
-        val reviews = ArrayList<String>(num)
-        val positive = BooleanArray(num)
-
+        val reviews = ArrayList<SentimentDocument>(num)
         run {
             var i = 0
             while (i < num && cursor < totalExamples()) {
-                val sentence = textIterator[i]
-                reviews.add(sentence.text)
-                positive[i] = sentence.label == SentimentLabel.POSITIVE
+                val reviewNumber = cursor / 2
+                if(cursor % 2 == 0) {
+                    val sentence = textIteratorPositive[reviewNumber]
+                    reviews.add(sentence)
+                } else {
+                    val sentence = textIteratorNegative[reviewNumber]
+                    reviews.add(sentence)
+                }
                 cursor++
                 i++
             }
@@ -81,11 +88,8 @@ class SentimentIterator(
         val allTokens = ArrayList<List<String>>(reviews.size)
         var maxLength = 0
         for (s in reviews) {
-            val tokens = tokenizerFactory.create(s).tokens
-            val tokensFiltered = ArrayList<String>()
-            for (t in tokens) {
-                if (wordVectors.hasWord(t)) tokensFiltered.add(t)
-            }
+            val tokens = tokenizerFactory.create(s.text).tokens
+            val tokensFiltered = tokens.filter { wordVectors.hasWord(it) }
             allTokens.add(tokensFiltered)
             maxLength = Math.max(maxLength, tokensFiltered.size)
         }
@@ -118,7 +122,7 @@ class SentimentIterator(
                 j++
             }
 
-            val idx = if (positive[i]) 0 else 1
+            val idx = if (reviews[i].label == SentimentLabel.POSITIVE) 0 else 1
             val lastIdx = Math.min(tokens.size, maxLength)
             labels.putScalar(intArrayOf(i, idx, lastIdx - 1), 1.0)   //Set label: [0,1] for negative, [1,0] for positive
             labelsMask.putScalar(intArrayOf(i, lastIdx - 1), 1.0)   //Specify that an output exists at the final time step for this example
@@ -141,12 +145,11 @@ class SentimentIterator(
     }
 
     override fun totalExamples(): Int {
-        return textIterator.size()
+        return Math.min(textIteratorPositive.size(), textIteratorNegative.size()) * 2
     }
 
     override fun reset() {
         cursor = 0
-        textIterator.reset()
     }
 
     override fun hasNext(): Boolean {

@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.tool.learn.sentiment
 
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
+import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.nn.conf.GradientNormalization
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration
 import org.deeplearning4j.nn.conf.Updater
@@ -73,19 +74,8 @@ class SentimentLearning(
         //DataSetIterators for training and testing respectively
         val wordVectors = WordVectorSerializer.loadStaticModel(File(srcVectorDir))
 
-        val srcTrainDir = Paths.get(srcDir, "train")
-        val srcTestDir = Paths.get(srcDir, "test")
-        val train = SentimentIterator(
-                wordVectors = wordVectors,
-                batchSize = lc.sentiment.batchSize,
-                textIterator = SentimentDocumentFilesArray(srcTrainDir),
-                truncateLength = lc.sentiment.truncateReviewsToLength)
-
-        val test = SentimentIterator(
-                wordVectors = wordVectors,
-                batchSize = lc.sentiment.batchSize,
-                textIterator = SentimentDocumentFilesArray(srcTestDir),
-                truncateLength = lc.sentiment.truncateReviewsToLength)
+        val train = getIterator("train", lc, wordVectors)
+        val test = getIterator("test", lc, wordVectors)
 
         log.info("Starting training")
         for (i in 0 until lc.sentiment.nEpochs) {
@@ -95,11 +85,20 @@ class SentimentLearning(
             log.info("Epoch {} completed. Starting evaluation:", i)
 
             val evaluation = net.evaluate(test)
+            test.reset()
             log.info("stats: {}", evaluation.stats())
         }
 
         ModelSerializer.writeModel(net, File(destDir, "res.zip"), false)
 
+    }
+
+    private fun getIterator(dir: String, lc: LearnConfig, wordVectors: WordVectors): SentimentIterator {
+        return SentimentIterator(
+                wordVectors = wordVectors,
+                batchSize = lc.sentiment.batchSize,
+                dataPath = Paths.get(srcDir, dir),
+                truncateLength = lc.sentiment.truncateReviewsToLength)
     }
 
 }

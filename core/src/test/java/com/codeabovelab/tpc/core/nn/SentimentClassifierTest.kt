@@ -13,9 +13,9 @@ class SentimentClassifierTest {
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     @Test
-    @Ignore
+//    @Ignore
     fun test() {
-        val modelFile = Paths.get("/home/pronto/Downloads/sentiment/output/result.zip")
+        val modelFile = Paths.get("/home/pronto/Downloads/sentiment/output/res.zip")
         val wordVectorFile = Paths.get("/home/pronto/Downloads/sentiment/vectors-negative300.bin/vectors.bin")
         val classifier = SentimentClassifier(modelFile = modelFile, wordVectorFile = wordVectorFile)
 

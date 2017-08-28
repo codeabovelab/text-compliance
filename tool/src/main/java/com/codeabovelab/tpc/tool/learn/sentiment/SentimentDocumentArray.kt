@@ -4,5 +4,4 @@ interface SentimentDocumentArray {
 
     fun size(): Int
     operator fun get(cursor: Int): SentimentDocument
-    fun reset()
 }
