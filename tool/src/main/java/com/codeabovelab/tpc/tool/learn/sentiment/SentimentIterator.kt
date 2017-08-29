@@ -10,7 +10,6 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.nio.file.Path
 import java.util.*
 
@@ -57,11 +56,7 @@ class SentimentIterator(
 
     override fun next(num: Int): DataSet {
         if (cursor >= totalExamples()) throw NoSuchElementException()
-        try {
-            return nextDataSet(num)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+        return nextDataSet(num)
     }
 
     private fun nextDataSet(num: Int): DataSet {
@@ -87,8 +82,8 @@ class SentimentIterator(
         //Second: tokenize reviews and filter out unknown words
         val allTokens = ArrayList<List<String>>(reviews.size)
         var maxLength = 0
-        for (s in reviews) {
-            val tokens = tokenizerFactory.create(s.text).tokens
+        for ((text) in reviews) {
+            val tokens = tokenizerFactory.create(text).tokens
             val tokensFiltered = tokens.filter { wordVectors.hasWord(it) }
             allTokens.add(tokensFiltered)
             maxLength = Math.max(maxLength, tokensFiltered.size)

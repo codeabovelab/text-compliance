@@ -1,6 +1,9 @@
 package com.codeabovelab.tpc.tool.process
 
-import com.codeabovelab.tpc.core.kw.*
+import com.codeabovelab.tpc.core.kw.KeywordSetMatcher
+import com.codeabovelab.tpc.core.kw.KeywordsFileHeader
+import com.codeabovelab.tpc.core.kw.KeywordsFileReader
+import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
 import com.codeabovelab.tpc.core.processor.RulePredicate
@@ -26,8 +29,8 @@ class PredicateProvider(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     private val om = ObjectMapper()
-    val textClassifierPredicate = configureTextClassifier()
-    val wordPredicate = configureKeyWord()
+    private val textClassifierPredicate = configureTextClassifier()
+    private val wordPredicate = configureKeyWord()
 
     /**
      * Do not use this function. It need only for [publish], we make it public because consumer must has access

@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.tool.learn.sentiment
 
-class SentimentDocument(
+data class SentimentDocument(
         val text: String,
         val label: SentimentLabel
 )
