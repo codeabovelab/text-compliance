@@ -59,6 +59,8 @@ class PredicateProvider(
     private fun configureSentimentClassifier(): SentimentClassifier? {
         if (learnedConfig.sentiment.modelFile == null ||
                 learnedConfig.sentiment.wordVectorFile == null) {
+            log.warn("SentimentClassifier is not configured and will be disabled, see: {}",
+                    learnedConfig.sentiment)
             return null
         }
         return SentimentClassifier(
