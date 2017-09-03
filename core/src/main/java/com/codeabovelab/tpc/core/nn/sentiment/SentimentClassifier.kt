@@ -2,6 +2,8 @@ package com.codeabovelab.tpc.core.nn.sentiment
 
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.text.Text
+import com.codeabovelab.tpc.text.TextCoordinates
+import com.codeabovelab.tpc.text.TextCoordinatesImpl
 import com.fasterxml.jackson.annotation.JsonTypeName
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
@@ -15,7 +17,6 @@ import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
 import org.slf4j.LoggerFactory
 import java.nio.file.Path
-import java.util.*
 
 /**
  */
@@ -55,10 +56,14 @@ class SentimentClassifier(
         val negativeProbability = probabilitiesAtLastWord.getDouble(1)
         log.debug("result {positive=$positiveProbability, negative=$negativeProbability} for '$text'")
         if (negativeProbability - positiveProbability > precission) {
-            return SentimentClassifierResult(Collections.singleton(Label("negative", negativeProbability)))
+            val labels = listOf(Label("negative", negativeProbability))
+            return SentimentClassifierResult(
+                    labels = labels,
+                    entries = listOf(SentimentClassifierResult.Entry(coordinates = TextCoordinatesImpl(0, text.length),
+                            labels = labels))
+            )
         }
-        return SentimentClassifierResult(Collections.emptyList())
-
+        return SentimentClassifierResult(emptyList(), emptyList())
     }
 
     private fun loadFeaturesFromString(reviewContents: String, maxLength: Int): INDArray {
@@ -81,13 +86,12 @@ class SentimentClassifier(
 }
 
 class SentimentClassifierResult(
-        /**
-         * Labels for all text
-         */
+        entries: List<Entry>,
         override val labels: Collection<Label>
-) : Labeled, PredicateResult<PredicateResult.Entry>(listOf()) {
+): PredicateResult<SentimentClassifierResult.Entry>(entries), Labeled {
 
-    override fun isEmpty(): Boolean {
-        return labels.isEmpty()
-    }
+    class Entry(
+            coordinates: TextCoordinates,
+            override val labels: List<Label>
+    ) : PredicateResult.Entry(coordinates), Labeled
 }
