@@ -17,7 +17,7 @@ class SentimentDocumentFilesArray(private val dataDirectory: Path, private val l
                 .filter { p -> p.toFile().isFile }
                 .map { p -> SentimentDocumentFile(p.toFile(), label) }
                 .collect(Collectors.toList())
-        log.warn("documents scanned: {} {} at {}", sentimentDocuments,size(), label, dataDirectory)
+        log.warn("documents scanned: {} {} at {}", size(), label, dataDirectory)
     }
 
     override fun size(): Int {

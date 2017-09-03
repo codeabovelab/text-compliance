@@ -1,4 +1,4 @@
-package com.codeabovelab.tpc.core.nn
+package com.codeabovelab.tpc.core.nn.sentiment
 
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.text.Text
@@ -23,7 +23,8 @@ import java.util.*
 class SentimentClassifier(
         modelFile: Path,
         wordVectorFile: Path,
-        private val truncateReviewsToLength: Int = 256
+        private val truncateReviewsToLength: Int = 256,
+        private val precission: Double = 0.2
 ) : RulePredicate<SentimentClassifierResult> {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -35,6 +36,7 @@ class SentimentClassifier(
 
     init {
         tokenizerFactory = DefaultTokenizerFactory()
+//        tokenizerFactory = UimaTokenizerFactoryF(UimaFactory.create(morphological = true, pos = false))
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
         wordVectors = WordVectorSerializer.loadStaticModel(wordVectorFile.toFile())
         vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
@@ -50,8 +52,8 @@ class SentimentClassifier(
 
         val positiveProbability = probabilitiesAtLastWord.getDouble(0)
         val negativeProbability = probabilitiesAtLastWord.getDouble(1)
-        log.debug("result {positive=$positiveProbability, negative=$negativeProbability} for $text")
-        if (negativeProbability > positiveProbability) {
+        log.debug("result {positive=$positiveProbability, negative=$negativeProbability} for '$text'")
+        if (negativeProbability - positiveProbability > precission) {
             return SentimentClassifierResult(Collections.singleton(Label("negative", negativeProbability)))
         }
         return SentimentClassifierResult(Collections.emptyList())
@@ -61,9 +63,9 @@ class SentimentClassifier(
     private fun loadFeaturesFromString(reviewContents: String, maxLength: Int): INDArray {
         val tokens = tokenizerFactory.create(reviewContents).tokens
         val tokensFiltered = tokens.filter { wordVectors.hasWord(it) }
-        val outputLength = Math.max(maxLength, tokensFiltered.size)
+        val maxLength = Math.min(maxLength, tokensFiltered.size)
 
-        val features = Nd4j.create(1, vectorSize, outputLength)
+        val features = Nd4j.create(1, vectorSize, maxLength)
 
         var j = 0
         while (j < tokens.size && j < maxLength) {
@@ -77,7 +79,7 @@ class SentimentClassifier(
 
 }
 
-class SentimentClassifierResult(
+data class SentimentClassifierResult(
         /**
          * Labels for all text
          */

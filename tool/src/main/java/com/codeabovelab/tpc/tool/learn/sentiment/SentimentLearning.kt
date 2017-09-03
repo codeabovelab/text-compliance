@@ -19,6 +19,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Paths
+import java.time.Duration
 
 /**
  */
@@ -70,7 +71,7 @@ class SentimentLearning(
                 .pretrain(false).backprop(true).build()
         val net = MultiLayerNetwork(conf)
         net.init()
-        net.setListeners(ScoreIterationListener(1))
+        net.setListeners(ScoreIterationListener(lc.sentiment.nEpochs))
         //DataSetIterators for training and testing respectively
         val wordVectors = WordVectorSerializer.loadStaticModel(File(srcVectorDir))
 
@@ -79,13 +80,15 @@ class SentimentLearning(
 
         log.info("Starting training")
         for (i in 0 until lc.sentiment.nEpochs) {
+            var start = System.currentTimeMillis()
             log.info("Epoch {} started", i)
             net.fit(train)
             train.reset()
-            log.info("Epoch {} completed. Starting evaluation:", i)
-
+            log.info("Epoch {} completed for {} minutes. Starting evaluation:", i, Duration.ofMillis(start - System.currentTimeMillis()))
+            start = System.currentTimeMillis()
             val evaluation = net.evaluate(test)
             test.reset()
+            log.info("evaluation {} completed for {}.", i, Duration.ofMillis(start - System.currentTimeMillis()))
             log.info("stats: {}", evaluation.stats())
         }
 

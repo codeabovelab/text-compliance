@@ -7,4 +7,9 @@ class TextImpl(override val data: String) : Text {
 
     override val length: Int
         get() = data.length
+
+    override fun toString(): String {
+        return data
+    }
+
 }

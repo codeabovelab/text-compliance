@@ -26,8 +26,10 @@ class SentimentIterator(
     private val tokenizerFactory: TokenizerFactory
     private val textIteratorPositive = SentimentDocumentFilesArray(dataPath.resolve("pos"), SentimentLabel.POSITIVE)
     private val textIteratorNegative = SentimentDocumentFilesArray(dataPath.resolve("neg"), SentimentLabel.NEGATIVE)
+
     init {
         tokenizerFactory = DefaultTokenizerFactory()
+//        tokenizerFactory = UimaTokenizerFactoryF(UimaFactory.create(morphological = true, pos = false))
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
     }
 
@@ -60,32 +62,16 @@ class SentimentIterator(
     }
 
     private fun nextDataSet(num: Int): DataSet {
-        log.info("cursor {}", cursor)
-        //First: load reviews to String. Alternate positive and negative reviews
-        val reviews = ArrayList<SentimentDocument>(num)
-        run {
-            var i = 0
-            while (i < num && cursor < totalExamples()) {
-                val reviewNumber = cursor / 2
-                if(cursor % 2 == 0) {
-                    val sentence = textIteratorPositive[reviewNumber]
-                    reviews.add(sentence)
-                } else {
-                    val sentence = textIteratorNegative[reviewNumber]
-                    reviews.add(sentence)
-                }
-                cursor++
-                i++
-            }
-        }
+        //First: load documents to String. Alternate positive and negative documents
+        val documents = loadDocuments(num)
 
-        //Second: tokenize reviews and filter out unknown words
-        val allTokens = ArrayList<List<String>>(reviews.size)
+        //Second: tokenize documents and filter out unknown words
+        val allTokens = ArrayList<Result>(documents.size)
         var maxLength = 0
-        for ((text) in reviews) {
-            val tokens = tokenizerFactory.create(text).tokens
+        for (d in documents) {
+            val tokens = tokenizerFactory.create(d.text).tokens
             val tokensFiltered = tokens.filter { wordVectors.hasWord(it) }
-            allTokens.add(tokensFiltered)
+            allTokens.add(Result(tokensFiltered, d.label))
             maxLength = Math.max(maxLength, tokensFiltered.size)
         }
 
@@ -93,22 +79,22 @@ class SentimentIterator(
         if (maxLength > truncateLength) maxLength = truncateLength
 
         //Create data for training
-        //Here: we have reviews.size() examples of varying lengths
-        val features = Nd4j.create(intArrayOf(reviews.size, vectorSize, maxLength), 'f')
-        val labels = Nd4j.create(intArrayOf(reviews.size, 2, maxLength), 'f')    //Two labels: positive or negative
-        //Because we are dealing with reviews of different lengths and only one output at the final time step: use padding arrays
+        //Here: we have documents.size() examples of varying lengths
+        val features = Nd4j.create(intArrayOf(allTokens.size, vectorSize, maxLength), 'f')
+        val labels = Nd4j.create(intArrayOf(allTokens.size, 2, maxLength), 'f')    //Two labels: positive or negative
+        //Because we are dealing with documents of different lengths and only one output at the final time step: use padding arrays
         //Mask arrays contain 1 if data is present at that time step for that example, or 0 if data is just padding
-        val featuresMask = Nd4j.zeros(reviews.size, maxLength)
-        val labelsMask = Nd4j.zeros(reviews.size, maxLength)
+        val featuresMask = Nd4j.zeros(allTokens.size, maxLength)
+        val labelsMask = Nd4j.zeros(allTokens.size, maxLength)
 
-        val temp = IntArray(2)
-        for (i in reviews.indices) {
-            val tokens = allTokens[i]
+        for (i in allTokens.indices) {
+            val temp = IntArray(2)
+            val it = allTokens[i]
             temp[0] = i
             //Get word vectors for each word in review, and put them in the training data
             var j = 0
-            while (j < tokens.size && j < maxLength) {
-                val token = tokens[j]
+            while (j < it.tokens.size && j < maxLength) {
+                val token = it.tokens[j]
                 val vector = wordVectors.getWordVectorMatrix(token)
                 features.put(arrayOf(NDArrayIndex.point(i), NDArrayIndex.all(), NDArrayIndex.point(j)), vector)
 
@@ -117,14 +103,34 @@ class SentimentIterator(
                 j++
             }
 
-            val idx = if (reviews[i].label == SentimentLabel.POSITIVE) 0 else 1
-            val lastIdx = Math.min(tokens.size, maxLength)
+            val idx = if (it.label == SentimentLabel.POSITIVE) 0 else 1
+            val lastIdx = Math.min(it.tokens.size, maxLength)
             labels.putScalar(intArrayOf(i, idx, lastIdx - 1), 1.0)   //Set label: [0,1] for negative, [1,0] for positive
             labelsMask.putScalar(intArrayOf(i, lastIdx - 1), 1.0)   //Specify that an output exists at the final time step for this example
         }
 
         return DataSet(features, labels, featuresMask, labelsMask)
 
+    }
+
+    private fun loadDocuments(num: Int): ArrayList<SentimentDocument> {
+        run {
+            var documents = ArrayList<SentimentDocument>(num)
+            var i = 0
+            while (i < num && cursor < totalExamples()) {
+                val reviewNumber = cursor / 2
+                if (cursor % 2 == 0) {
+                    val sentence = textIteratorPositive[reviewNumber]
+                    documents.add(sentence)
+                } else {
+                    val sentence = textIteratorNegative[reviewNumber]
+                    documents.add(sentence)
+                }
+                cursor++
+                i++
+            }
+            return documents
+        }
     }
 
     override fun next(): DataSet {
@@ -163,4 +169,5 @@ class SentimentIterator(
         return true
     }
 
+    data class Result(val tokens: List<String>, val label: SentimentLabel)
 }
