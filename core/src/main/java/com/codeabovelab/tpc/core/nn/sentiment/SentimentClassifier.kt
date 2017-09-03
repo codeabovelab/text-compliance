@@ -40,6 +40,7 @@ class SentimentClassifier(
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
         wordVectors = WordVectorSerializer.loadStaticModel(wordVectorFile.toFile())
         vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
+        log.info("SentimentClassifier inited with modelFile={}, wordVectorFile={}", modelFile, wordVectorFile)
     }
 
     override fun test(pc: PredicateContext, text: Text): SentimentClassifierResult {

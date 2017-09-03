@@ -9,7 +9,6 @@ import org.nd4j.linalg.dataset.api.DataSetPreProcessor
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
-import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.util.*
 
@@ -18,8 +17,6 @@ class SentimentIterator(
         private val batchSize: Int,
         private val dataPath: Path,
         private val truncateLength: Int) : DataSetIterator {
-
-    private val log = LoggerFactory.getLogger(this.javaClass)
 
     private var cursor = 0
     private val vectorSize: Int = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
