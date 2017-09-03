@@ -80,7 +80,7 @@ class SentimentClassifier(
 
 }
 
-data class SentimentClassifierResult(
+class SentimentClassifierResult(
         /**
          * Labels for all text
          */
