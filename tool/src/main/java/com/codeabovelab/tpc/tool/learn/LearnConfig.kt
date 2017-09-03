@@ -149,7 +149,7 @@ class LearnConfig {
     data class Files(
             var root: Path,
             val config: Path,
-            val doc2vec: Path
+            val doc2vec: Path //move from root
     )
 
     data class ThesaurusConfiguration(
@@ -163,7 +163,9 @@ class LearnConfig {
             var vectorSize: Int = 300, //Size of the word vectors. 300 in the Google News model
             var nEpochs: Int = 2, //Number of epochs (full passes of training data) to train on
             var truncateReviewsToLength: Int = 256, //Truncate reviews with length (# words) greater than this
-            var learningRate: Double = 2e-2
+            var learningRate: Double = 2e-2,
+            val modelFile: Path? = null,
+            val wordVectorFile: Path? = null
     )
 }
 

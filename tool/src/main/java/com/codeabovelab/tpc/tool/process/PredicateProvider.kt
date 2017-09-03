@@ -6,6 +6,7 @@ import com.codeabovelab.tpc.core.kw.KeywordsFileReader
 import com.codeabovelab.tpc.core.kw.WordPredicate
 import com.codeabovelab.tpc.core.nn.TextClassifier
 import com.codeabovelab.tpc.core.nn.nlp.FileTextIterator
+import com.codeabovelab.tpc.core.nn.sentiment.SentimentClassifier
 import com.codeabovelab.tpc.core.processor.RulePredicate
 import com.codeabovelab.tpc.core.thesaurus.JwnlThesaurusDictionary
 import com.codeabovelab.tpc.core.thesaurus.WordSynonyms
@@ -30,6 +31,7 @@ class PredicateProvider(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val om = ObjectMapper()
     private val textClassifierPredicate = configureTextClassifier()
+    private val sentimentClassifier = configureSentimentClassifier()
     private val wordPredicate = configureKeyWord()
 
     /**
@@ -40,12 +42,29 @@ class PredicateProvider(
         return wordPredicate!!
     }
 
+    fun sentimentClassifier() : SentimentClassifier {
+        return sentimentClassifier!!
+    }
+
     fun publish(consumer: PredicateConsumer) {
         consumer(this::textClassifierPredicate)
-        val wp = this.wordPredicate
-        if(wp != null) {
+        if (sentimentClassifier != null) {
+            consumer(this::sentimentClassifier)
+        }
+        if(this.wordPredicate != null) {
             consumer(this::wordPredicateFactory)
         }
+    }
+
+    private fun configureSentimentClassifier(): SentimentClassifier? {
+        if (learnedConfig.sentiment.modelFile == null ||
+                learnedConfig.sentiment.wordVectorFile == null) {
+            return null
+        }
+        return SentimentClassifier(
+                modelFile = learnedConfig.sentiment.modelFile!!,
+                wordVectorFile = learnedConfig.sentiment.wordVectorFile!!
+        )
     }
 
     private fun configureTextClassifier(): TextClassifier {
