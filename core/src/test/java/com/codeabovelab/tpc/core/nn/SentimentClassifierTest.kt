@@ -17,7 +17,7 @@ class SentimentClassifierTest {
     @Test
     @Ignore
     fun test() {
-        val modelFile = Paths.get("/home/pronto/Downloads/sentiment/output/res_old.zip")
+        val modelFile = Paths.get("/home/pronto/Downloads/sentiment/output/sentiment_model.zip")
         val wordVectorFile = Paths.get("/home/pronto/Downloads/sentiment/sentiment_vectors.bin")
         val classifier = SentimentClassifier(modelFile = modelFile, wordVectorFile = wordVectorFile)
 
