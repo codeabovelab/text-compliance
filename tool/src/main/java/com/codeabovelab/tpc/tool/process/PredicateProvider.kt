@@ -30,9 +30,9 @@ class PredicateProvider(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     private val om = ObjectMapper()
-    private val textClassifierPredicate = configureTextClassifier()
-    private val sentimentClassifier = configureSentimentClassifier()
-    private val wordPredicate = configureKeyWord()
+    val textClassifierPredicate = configureTextClassifier()
+    val sentimentClassifier = configureSentimentClassifier()
+    val wordPredicate = configureKeyWord()
 
     /**
      * Do not use this function. It need only for [publish], we make it public because consumer must has access
