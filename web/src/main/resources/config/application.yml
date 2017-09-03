@@ -6,8 +6,8 @@ spring:
     throw-exception-if-no-handler-found: true
     log-resolved-exception: true
   datasource:
-    url: jdbc:hsqldb:mem:tmp
-    #url: jdbc:hsqldb:file:/tmp/db/db;shutdown=true
+#    url: jdbc:hsqldb:mem:tmp
+    url: jdbc:hsqldb:file:/tmp/db/db;shutdown=true
     username: user
     password: pass
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
@@ -16,7 +16,7 @@ server:
   display-name: "Texaco web app"
 
 texaco:
-  #processor.classifier.dir: /tmp/learned-data/
+  processor.classifier.dir: /home/ubuntu/data
 
 logging:
   level:
