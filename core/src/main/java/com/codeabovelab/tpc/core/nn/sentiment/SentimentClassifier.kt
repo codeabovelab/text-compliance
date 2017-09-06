@@ -55,14 +55,12 @@ class SentimentClassifier(
         val positiveProbability = probabilitiesAtLastWord.getDouble(0)
         val negativeProbability = probabilitiesAtLastWord.getDouble(1)
         log.debug("result {positive=$positiveProbability, negative=$negativeProbability} for '$text'")
-        if (negativeProbability - positiveProbability > precission) {
-            val labels = listOf(Label("negative", negativeProbability))
-            return SentimentClassifierResult(
-                    labels = labels,
-                    entries = listOf(SentimentClassifierResult.Entry(coordinates = TextCoordinatesImpl(0, text.length),
-                            labels = labels))
-            )
-        }
+        val labels = listOf(Label("negative", negativeProbability))
+        return SentimentClassifierResult(
+                labels = labels,
+                entries = listOf(SentimentClassifierResult.Entry(coordinates = TextCoordinatesImpl(0, text.length),
+                        labels = labels))
+        )
         return SentimentClassifierResult(emptyList(), emptyList())
     }
 
@@ -88,7 +86,7 @@ class SentimentClassifier(
 class SentimentClassifierResult(
         entries: List<Entry>,
         override val labels: Collection<Label>
-): PredicateResult<SentimentClassifierResult.Entry>(entries), Labeled {
+) : PredicateResult<SentimentClassifierResult.Entry>(entries), Labeled {
 
     class Entry(
             coordinates: TextCoordinates,
