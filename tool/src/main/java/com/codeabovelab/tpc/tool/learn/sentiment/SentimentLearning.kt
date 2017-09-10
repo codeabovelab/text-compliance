@@ -1,11 +1,11 @@
 package com.codeabovelab.tpc.tool.learn.sentiment
 
 import com.codeabovelab.tpc.tool.learn.LearnConfig
+import com.codeabovelab.tpc.tool.learn.PerfomanceSettings
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.nn.conf.GradientNormalization
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration
-import org.deeplearning4j.nn.conf.Updater
 import org.deeplearning4j.nn.conf.WorkspaceMode
 import org.deeplearning4j.nn.conf.layers.GravesLSTM
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer
@@ -14,7 +14,7 @@ import org.deeplearning4j.nn.weights.WeightInit
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener
 import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.activations.Activation
-import org.nd4j.linalg.factory.Nd4j
+import org.nd4j.linalg.learning.config.Adam
 import org.nd4j.linalg.lossfunctions.LossFunctions
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -53,21 +53,23 @@ class SentimentLearning(
     }
 
     private fun learn(lc: LearnConfig) {
-
-        Nd4j.getMemoryManager().autoGcWindow = 10 * 1024 //https://deeplearning4j.org/workspaces
+        PerfomanceSettings.useWorkspacesGC()
+        PerfomanceSettings.useCuda()
         val conf = NeuralNetConfiguration.Builder()
-                .updater(Updater.ADAM)  //To configure: .updater(Adam.builder().beta1(0.9).beta2(0.999).build())
+                .updater(Adam.builder().beta1(0.9).beta2(0.999).build())
                 .regularization(true).l2(1e-5)
                 .weightInit(WeightInit.XAVIER)
                 .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
                 .gradientNormalizationThreshold(1.0)
                 .learningRate(lc.sentiment.learningRate)
-                .trainingWorkspaceMode(WorkspaceMode.SEPARATE).inferenceWorkspaceMode(WorkspaceMode.SEPARATE)   //https://deeplearning4j.org/workspaces
+                .trainingWorkspaceMode(WorkspaceMode.SEPARATE).inferenceWorkspaceMode(WorkspaceMode.SEPARATE) //https://deeplearning4j.org/workspaces
                 .list()
-                .layer(0, GravesLSTM.Builder().nIn(lc.sentiment.vectorSize).nOut(256)
+                .layer(0, GravesLSTM.Builder().nIn(lc.sentiment.vectorSize)
+                        .nOut(lc.sentiment.truncateReviewsToLength)
                         .activation(Activation.TANH).build())
                 .layer(1, RnnOutputLayer.Builder().activation(Activation.SOFTMAX)
-                        .lossFunction(LossFunctions.LossFunction.MCXENT).nIn(256).nOut(2).build())
+                        .lossFunction(LossFunctions.LossFunction.MCXENT).nIn(lc.sentiment.truncateReviewsToLength)
+                        .nOut(2).build())
                 .pretrain(false).backprop(true).build()
         val net = MultiLayerNetwork(conf)
         net.init()
