@@ -159,11 +159,11 @@ class LearnConfig {
     )
 
     data class SentimentConfiguration(
-            var batchSize: Int = 64, //Number of examples in each minibatch
+            var batchSize: Int = 128, //Number of examples in each minibatch (128 worth for cuda)
             var vectorSize: Int = 300, //Size of the word vectors. 300 in the Google News model
-            var nEpochs: Int = 2, //Number of epochs (full passes of training data) to train on
+            var nEpochs: Int = 1, //Number of epochs (full passes of training data) to train on
             var truncateReviewsToLength: Int = 256, //Truncate reviews with length (# words) greater than this
-            var learningRate: Double = 2e-2,
+            var learningRate: Double = 1e-3,
             val modelFile: Path? = null,
             val wordVectorFile: Path? = null
     )

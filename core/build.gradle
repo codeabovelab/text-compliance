@@ -12,7 +12,8 @@ dependencies {
     compile 'com.google.guava:guava'
     compile 'com.fasterxml.jackson.core:jackson-annotations'
 
-    compile "org.nd4j:nd4j-native-platform:${nd4j}"
+//    compile "org.nd4j:nd4j-native-platform:${nd4j}"
+    compile "org.nd4j:nd4j-cuda-8.0-platform:${nd4j}" //works: Device name: [GeForce GTX 850M]; CC: [5.0]; Total/free memory: [4240965632]
     compile "org.deeplearning4j:deeplearning4j-core:${dl4j}"
     compile "org.deeplearning4j:deeplearning4j-nlp:${dl4j}"
     compile "org.deeplearning4j:deeplearning4j-nlp-uima:${dl4j}"
