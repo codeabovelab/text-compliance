@@ -1,8 +1,9 @@
 package com.codeabovelab.tpc.tool.learn.sentiment
 
+import com.codeabovelab.tpc.core.nn.nlp.UimaFactory
+import com.codeabovelab.tpc.core.nn.sentiment.UimaTokenizerFactoryF
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor
-import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory
 import org.nd4j.linalg.dataset.DataSet
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor
@@ -11,6 +12,7 @@ import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
 import java.nio.file.Path
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class SentimentIterator(
         private val wordVectors: WordVectors,
@@ -18,15 +20,15 @@ class SentimentIterator(
         private val dataPath: Path,
         private val truncateLength: Int) : DataSetIterator {
 
-    private var cursor = 0
+    private var cursor = AtomicInteger()
     private val vectorSize: Int = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
     private val tokenizerFactory: TokenizerFactory
     private val textIteratorPositive = SentimentDocumentFilesArray(dataPath.resolve("pos"), SentimentLabel.POSITIVE)
     private val textIteratorNegative = SentimentDocumentFilesArray(dataPath.resolve("neg"), SentimentLabel.NEGATIVE)
 
     init {
-        tokenizerFactory = DefaultTokenizerFactory()
-//        tokenizerFactory = UimaTokenizerFactoryF(UimaFactory.create(morphological = true, pos = false))
+//        tokenizerFactory = DefaultTokenizerFactory()
+        tokenizerFactory = UimaTokenizerFactoryF(UimaFactory.create(morphological = true, pos = false))
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
     }
 
@@ -35,11 +37,10 @@ class SentimentIterator(
     }
 
     override fun cursor(): Int {
-        return cursor
+        return cursor.get()
     }
 
-    override fun remove() {
-    }
+    override fun remove() {}
 
     override fun inputColumns(): Int {
         return vectorSize
@@ -54,13 +55,16 @@ class SentimentIterator(
     }
 
     override fun next(num: Int): DataSet {
-        if (cursor >= totalExamples()) throw NoSuchElementException()
-        return nextDataSet(num)
+        val cur = cursor.addAndGet(num)
+        val last = Math.min(cur, totalExamples())
+        val first = cur - num
+        if (last - first < 1) throw NoSuchElementException()
+        return nextDataSet(first, last)
     }
 
-    private fun nextDataSet(num: Int): DataSet {
+    private fun nextDataSet(first: Int, last: Int): DataSet {
         //First: load documents to String. Alternate positive and negative documents
-        val documents = loadDocuments(num)
+        val documents = loadDocuments(first, last)
 
         //Second: tokenize documents and filter out unknown words
         val allTokens = ArrayList<Result>(documents.size)
@@ -110,24 +114,19 @@ class SentimentIterator(
 
     }
 
-    private fun loadDocuments(num: Int): ArrayList<SentimentDocument> {
-        run {
-            var documents = ArrayList<SentimentDocument>(num)
-            var i = 0
-            while (i < num && cursor < totalExamples()) {
-                val reviewNumber = cursor / 2
-                if (cursor % 2 == 0) {
-                    val sentence = textIteratorPositive[reviewNumber]
-                    documents.add(sentence)
-                } else {
-                    val sentence = textIteratorNegative[reviewNumber]
-                    documents.add(sentence)
-                }
-                cursor++
-                i++
+    private fun loadDocuments(first: Int, last: Int): List<SentimentDocument> {
+        val documents = ArrayList<SentimentDocument>(last - first)
+        for (c in first .. last) {
+            val reviewNumber = c / 2
+            if (c % 2 == 0) {
+                val sentence = textIteratorPositive[reviewNumber]
+                documents.add(sentence)
+            } else {
+                val sentence = textIteratorNegative[reviewNumber]
+                documents.add(sentence)
             }
-            return documents
         }
+        return documents
     }
 
     override fun next(): DataSet {
@@ -143,15 +142,16 @@ class SentimentIterator(
     }
 
     override fun totalExamples(): Int {
+        // we use same count of positive and negative
         return Math.min(textIteratorPositive.size(), textIteratorNegative.size()) * 2
     }
 
     override fun reset() {
-        cursor = 0
+        cursor.set(0)
     }
 
     override fun hasNext(): Boolean {
-        return cursor < numExamples()
+        return cursor.get() < totalExamples()
     }
 
     override fun getPreProcessor(): DataSetPreProcessor {

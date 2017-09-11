@@ -2,6 +2,7 @@ package com.codeabovelab.tpc.tool.learn.sentiment
 
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.tool.learn.PerfomanceSettings
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.nn.conf.GradientNormalization
@@ -14,6 +15,7 @@ import org.deeplearning4j.nn.weights.WeightInit
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener
 import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.activations.Activation
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.learning.config.Adam
 import org.nd4j.linalg.lossfunctions.LossFunctions
 import org.slf4j.LoggerFactory
@@ -92,18 +94,19 @@ class SentimentLearning(
             test.reset()
             log.info("evaluation {} completed for {}.", i, Duration.ofMillis(start - System.currentTimeMillis()))
             log.info("stats: {}", evaluation.stats())
+            ModelSerializer.writeModel(net, File(destDir, "res--$i.zip"), false)
         }
-
-        ModelSerializer.writeModel(net, File(destDir, "res.zip"), false)
 
     }
 
-    private fun getIterator(dir: String, lc: LearnConfig, wordVectors: WordVectors): SentimentIterator {
-        return SentimentIterator(
-                wordVectors = wordVectors,
-                batchSize = lc.sentiment.batchSize,
-                dataPath = Paths.get(srcDir, dir),
-                truncateLength = lc.sentiment.truncateReviewsToLength)
+    private fun getIterator(dir: String, lc: LearnConfig, wordVectors: WordVectors): DataSetIterator {
+        return AsyncDataSetIterator(
+                SentimentIterator(
+                        wordVectors = wordVectors,
+                        batchSize = lc.sentiment.batchSize,
+                        dataPath = Paths.get(srcDir, dir),
+                        truncateLength = lc.sentiment.truncateReviewsToLength)
+                , 4)
     }
 
 }

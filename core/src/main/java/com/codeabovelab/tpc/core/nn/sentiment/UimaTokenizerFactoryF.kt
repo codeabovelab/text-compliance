@@ -33,7 +33,6 @@ class UimaTokenizerFactoryF(resource: UimaResource) : UimaTokenizerFactory(resou
                         .filter { !it.lemma.isNullOrEmpty() }
                         .filter { !it.pos.isNullOrEmpty() }
                         .filter { map.contains(it.pos) }
-                        .filter { !EnumSet.of(Pos.CC, Pos.CD, Pos.DT, Pos.EX, Pos.IN, Pos.PRP, Pos.SYM, Pos.UNKNOWN).contains(Pos.valueOf(it.pos)) }
                         .map { it.lemma }
 
             } catch (e: Exception) {
