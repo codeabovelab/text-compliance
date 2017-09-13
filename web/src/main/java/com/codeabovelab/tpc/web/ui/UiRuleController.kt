@@ -73,7 +73,19 @@ class UiRuleController(
         )
     }
 
-    fun UiRule.toEntity(entity: RuleEntity) : RuleEntity {
+}
+
+data class UiRule(
+    var ruleId: String,
+    var weight: Float,
+    var predicate: String,
+    var action: String?,
+    var description: String?,
+    var enabled: Boolean,
+    var child: Boolean
+) {
+
+    fun toEntity(entity: RuleEntity) : RuleEntity {
         //Note that passing raw string to entity may cause security issue
         entity.action = action
         entity.weight = weight
@@ -85,13 +97,3 @@ class UiRuleController(
         return entity
     }
 }
-
-class UiRule(
-    var ruleId: String,
-    var weight: Float,
-    var predicate: String,
-    var action: String?,
-    var description: String?,
-    var enabled: Boolean,
-    var child: Boolean
-)

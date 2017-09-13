@@ -1,0 +1,41 @@
+list:
+  -
+       ruleId: text-classification
+       weight: 1
+       predicate: '{"@type":"TextClassifierPredicate"}'
+       action: null
+       description: |
+            Relation to business conversation
+            Rule show relation to business conversation texts.
+              1 - closest relation
+              0 - no relation
+              -1 - negative relation
+       enabled: true
+       child: false
+  -
+      ruleId: keywords
+      weight: 1
+      predicate: '{"@type":"WordPredicate"}'
+      action: null
+      description: |
+          Classify text by keywords
+          Classify text by contained keywords. Currently support follow labels:
+              offensive-lang: 1 - has swear words, 0 - no swear words
+      enabled: true
+      child: false
+  -
+      ruleId: 3rd-party-brand
+      weight: 1
+      predicate: '{"@type":"RegexPredicate","pattern":"BRAND"}'
+      action: null
+      description: Detect 3rd party brands mention
+      enabled: true
+      child: false
+#-
+#    ruleId: multiRule
+#    weight: 1
+#    predicate: '{"@type":"RegexPredicate","pattern":".*"}'
+#    action: '{"@type":"ApplyRulesAction","rulesNames":["text-classification", "keywords"]}'
+#    description: null
+#    enabled: true
+#    child: false

@@ -3,6 +3,7 @@ package com.codeabovelab.tpc.web.config
 import com.codeabovelab.tpc.web.docproc.DocProcessor
 import com.codeabovelab.tpc.web.docproc.ProcessorReportsStorage
 import com.codeabovelab.tpc.web.job.JobsManager
+import com.codeabovelab.tpc.web.rules.DefaultRulesInjector
 import com.codeabovelab.tpc.web.rules.RulesLoader
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Import
         JobsManager::class,
         DocProcessor::class,
         RulesLoader::class,
+        DefaultRulesInjector::class,
         ProcessorReportsStorage::class
 )
 @Configuration
