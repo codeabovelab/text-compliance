@@ -1,5 +1,6 @@
 package com.codeabovelab.tpc.web.rules
 
+import com.codeabovelab.tpc.core.namedentity.ThirdPartyNamesPredicate
 import com.codeabovelab.tpc.core.processor.*
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.tool.process.PredicateProvider
@@ -18,7 +19,7 @@ class RulesLoader(
         /**
          * We must inject web kind of object mapper, because json is come raw from web.
          */
-        private var objectMapper: ObjectMapper,
+        private val objectMapper: ObjectMapper,
         @Value("\${texaco.processor.classifier.dir}")
         private val classifierDir: String
 ) {
@@ -42,6 +43,7 @@ class RulesLoader(
         }
         preds.factories.add(::RegexPredicate)
         preds.factories.add(::ParticipantPredicate)
+        preds.factories.add(::ThirdPartyNamesPredicate)
         predicates = preds.build()
 
         val acts = ObjFactory.Builder(RuleAction::class)

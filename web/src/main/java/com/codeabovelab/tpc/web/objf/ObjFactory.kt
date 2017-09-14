@@ -105,7 +105,7 @@ class ObjFactory<T : Any> private constructor(
         val tree = reader.readTree(string)
         val className = tree["@type"].textValue()
         val func = map[className]
-        Asserts.notNull(func, "Can not find factory for $className of '$string'")
+        Asserts.notNull(func, "Can not find factory for $className of '$string'. Available: ${map.keys}")
         val params = func!!.parameters
         val map = parseQuery(params, tree)
         val obj = func.callBy(map)
