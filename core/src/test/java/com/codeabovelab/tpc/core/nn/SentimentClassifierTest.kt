@@ -79,8 +79,8 @@ class SentimentClassifierTest {
                 It still needs a lot of work.
                 """)
         calc("""Jeff, can you take a look at the new admin UI page?
-                "We did an impromptu demo for our VP and it had errors all over the page. He wasn't pleased.
-                "We need to fix it as soon as possible. Thanks!
+                We did an impromptu demo for our VP and it had errors all over the page. He wasn't pleased.
+                We need to fix it as soon as possible. Thanks!
                 """)
         calc("""We had quite a few issue with our SAP meeting this morning.
                 The client wanted to see know more details and we didn't have those available.
