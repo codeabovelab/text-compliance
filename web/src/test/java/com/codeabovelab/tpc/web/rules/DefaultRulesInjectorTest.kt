@@ -2,7 +2,7 @@ package com.codeabovelab.tpc.web.rules
 
 import com.codeabovelab.tpc.web.jpa.RulesRepository
 import com.codeabovelab.tpc.web.ui.UiRule
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito
 import org.springframework.core.io.ResourceLoader
@@ -19,7 +19,7 @@ class DefaultRulesInjectorTest {
         val src = Thread.currentThread().contextClassLoader.getResourceAsStream("config/rules-default.yaml")
         val rules = ri.load(src)
         println(rules)
-        assertEquals(DefaultRulesInjector.Rules(list = listOf(
+        var defRules = DefaultRulesInjector.Rules(listOf(
                 UiRule(
                         ruleId = "text-classification",
                         weight = 1f,
@@ -54,8 +54,18 @@ Classify text by contained keywords. Currently support follow labels:
                         description = "Detect 3rd party brands mention",
                         enabled = true,
                         child = false
+                ),
+                UiRule(
+                        ruleId = "sentiment-classification",
+                        weight = 1f,
+                        predicate = """{"@type":"SentimentClassifierPredicate"}""",
+                        action = null,
+                        description = "Sentiment classification: 1 - negative, 0 - positive",
+                        enabled = true,
+                        child = false
                 )
-        )), rules)
+        ))
+        assertEquals(defRules, rules)
 
     }
 }

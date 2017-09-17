@@ -58,8 +58,8 @@ class SentimentIterator(
         val cur = cursor.addAndGet(num)
         val last = Math.min(cur, totalExamples())
         val first = cur - num
-        if (last - first < 1) throw NoSuchElementException()
-        return nextDataSet(first, last)
+        if (last - first <= 1) throw NoSuchElementException()
+        return nextDataSet(first, last - 1)
     }
 
     private fun nextDataSet(first: Int, last: Int): DataSet {

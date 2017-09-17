@@ -31,6 +31,14 @@ list:
       description: Detect 3rd party brands mention
       enabled: true
       child: false
+  -
+      ruleId: sentiment-classification
+      weight: 1
+      predicate: '{"@type":"SentimentClassifierPredicate"}'
+      action: null
+      description: 'Sentiment classification: 1 - negative, 0 - positive'
+      enabled: true
+      child: false
 #-
 #    ruleId: multiRule
 #    weight: 1

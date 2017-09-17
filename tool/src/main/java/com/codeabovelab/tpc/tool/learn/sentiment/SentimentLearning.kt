@@ -2,7 +2,6 @@ package com.codeabovelab.tpc.tool.learn.sentiment
 
 import com.codeabovelab.tpc.tool.learn.LearnConfig
 import com.codeabovelab.tpc.tool.learn.PerfomanceSettings
-import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.nn.conf.GradientNormalization
@@ -100,13 +99,14 @@ class SentimentLearning(
     }
 
     private fun getIterator(dir: String, lc: LearnConfig, wordVectors: WordVectors): DataSetIterator {
-        return AsyncDataSetIterator(
-                SentimentIterator(
+
+        //AsyncDataSetIterator(
+                return SentimentIterator(
                         wordVectors = wordVectors,
                         batchSize = lc.sentiment.batchSize,
                         dataPath = Paths.get(srcDir, dir),
                         truncateLength = lc.sentiment.truncateReviewsToLength)
-                , 4)
+               // )
     }
 
 }

@@ -10,7 +10,6 @@ import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor
-import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory
 import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.api.ndarray.INDArray
@@ -37,8 +36,8 @@ class SentimentClassifier(
     private val vectorSize: Int
 
     init {
-        tokenizerFactory = DefaultTokenizerFactory()
-//        tokenizerFactory = UimaTokenizerFactoryF(UimaFactory.create(morphological = true, pos = false))
+//        tokenizerFactory = DefaultTokenizerFactory()
+        tokenizerFactory = UimaTokenizerFactoryF(UimaFactory.create(morphological = true, pos = false))
         tokenizerFactory.setTokenPreProcessor(CommonPreprocessor())
         wordVectors = WordVectorSerializer.loadStaticModel(wordVectorFile.toFile())
         vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).size
