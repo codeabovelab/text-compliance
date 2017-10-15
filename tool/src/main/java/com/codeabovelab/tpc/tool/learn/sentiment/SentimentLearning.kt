@@ -87,7 +87,7 @@ class SentimentLearning(
             log.info("Epoch {} started", i)
             net.fit(train)
             train.reset()
-            log.info("Epoch {} completed for {} minutes. Starting evaluation:", i, Duration.ofMillis(start - System.currentTimeMillis()))
+            log.info("Epoch {} completed for {}. Starting evaluation:", i, Duration.ofMillis(start - System.currentTimeMillis()))
             start = System.currentTimeMillis()
             val evaluation = net.evaluate(test)
             test.reset()
