@@ -15,17 +15,15 @@ object UimaFactory {
 
     fun create(req: Request): UimaResource {
         // note that MpAnalyzer require POS, therefore we must enable both them
-        val args = if(req.morphological) {
-            arrayOf(SentenceAnnotator.getDescription(),
+        val args = when {
+            req.morphological -> arrayOf(SentenceAnnotator.getDescription(),
                     Tokenizer.getDescription(),
                     PosTagger.getDescription(),
                     MpAnalyzer.getDescription())
-        } else if(req.pos) {
-            arrayOf(SentenceAnnotator.getDescription(),
+            req.pos -> arrayOf(SentenceAnnotator.getDescription(),
                     Tokenizer.getDescription(),
                     PosTagger.getDescription())
-        } else {
-            arrayOf(SentenceAnnotator.getDescription(),
+            else -> arrayOf(SentenceAnnotator.getDescription(),
                     Tokenizer.getDescription())
         }
         val desc = AnalysisEngineFactory.createEngineDescription(*args)

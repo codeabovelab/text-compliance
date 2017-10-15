@@ -32,7 +32,7 @@ object ExecutorUtils {
         fun flush() {
             val old  = synchronized (lock) {
                 val tmp = this.queue
-                this.queue = CopyOnWriteArrayList<Runnable>()
+                this.queue = CopyOnWriteArrayList()
                 tmp
             }
             for(runnable in old) {

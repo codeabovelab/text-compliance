@@ -44,7 +44,7 @@ class PrepareReviewData(private val dataDirectory: Path, private val outputDirec
 
     private fun parse(jp: JsonParser, name: String, i: Int): Int {
         val review = Review(fileName = name)
-        while (jp.nextToken() !== JsonToken.END_OBJECT) {
+        while (jp.nextToken() != JsonToken.END_OBJECT) {
             when (jp.currentName) {
                 "overall" -> review.overall = jp.valueAsDouble.toInt()
                 "reviewerID" -> review.reviewerID = jp.valueAsString

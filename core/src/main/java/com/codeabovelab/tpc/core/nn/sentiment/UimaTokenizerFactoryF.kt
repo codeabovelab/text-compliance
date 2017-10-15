@@ -55,7 +55,7 @@ class UimaTokenizerFactoryF(resource: UimaResource) : UimaTokenizerFactory(resou
             var ret = tokens[index]
             index++
             if (preProcess != null)
-                ret = preProcess?.preProcess(ret)
+                ret = preProcess.preProcess(ret)
             return ret
         }
 

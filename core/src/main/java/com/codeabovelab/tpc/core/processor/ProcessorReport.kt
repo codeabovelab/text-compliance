@@ -42,7 +42,7 @@ class ProcessorReport(builder: Builder): Labeled {
             val sim = map.computeIfAbsent(label.label) { _ -> MutableSimilarity() }
             sim += label.similarity
         }
-        val list = map.mapTo(ArrayList<Label>()) {
+        val list = map.mapTo(ArrayList()) {
             e ->
             Label(e.key, e.value.value)
         }

@@ -12,11 +12,9 @@ class MutableSimilarity {
     }
 
     private fun limit(arg: Double) =
-            if (arg > 1.0) {
-                1.0
-            } else if (arg < -1.0) {
-                -1.0
-            } else {
-                arg
+            when {
+                arg > 1.0 -> 1.0
+                arg < -1.0 -> -1.0
+                else -> arg
             }
 }
