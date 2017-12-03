@@ -16,10 +16,7 @@ class DocsStorage(
 ): DocumentsRepository {
 
     override fun get(id: String): Document? {
-        val docEntity = repository.findByDocumentId(id)
-        if(docEntity == null) {
-            return null
-        }
+        val docEntity = repository.findByDocumentId(id) ?: return null
         val reader = readers[docEntity.type]!!
         val istr = ByteArrayInputStream(docEntity.data)
         val builder = istr.use {

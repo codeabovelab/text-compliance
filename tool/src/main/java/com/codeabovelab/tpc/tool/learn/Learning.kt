@@ -1,6 +1,6 @@
 package com.codeabovelab.tpc.tool.learn
 
-import com.codeabovelab.tpc.core.nn.TokenizerFactoryImpl
+import com.codeabovelab.tpc.core.nn.tokenizerFactory
 import com.codeabovelab.tpc.core.nn.nlp.*
 import com.codeabovelab.tpc.tool.util.Copy
 import com.codeabovelab.tpc.util.Reflections
@@ -58,7 +58,7 @@ class Learning(
                 fileSupport = fileSupport(lc)
         )
         val cache = AbstractCache<VocabWord>()
-        val t = TokenizerFactoryImpl()
+        val t = tokenizerFactory()
         val pv = ParagraphVectors.Builder(lc.doc2vec)
                 //.iterate(iter)
                 .vocabCache(cache)

@@ -16,7 +16,7 @@ class DocumentReaders private constructor(
      * return true if type is binary or unknown
      */
     fun isBinary(type: String): Boolean {
-        return this.get(type)?.info?.binary ?: true
+        return this[type]?.info?.binary ?: true
     }
 
     class Builder {

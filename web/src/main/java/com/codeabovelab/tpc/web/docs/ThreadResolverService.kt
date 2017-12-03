@@ -18,10 +18,7 @@ class ThreadResolverService(
     val backend = ThreadResolver(repo)
 
     fun getRelated(documentId: String) : List<String> {
-        val doc = repo[documentId]
-        if(doc !is MessageDocument) {
-            return listOf()
-        }
+        val doc = repo[documentId] as? MessageDocument ?: return listOf()
         val thread = backend.getThread(doc)
         return thread.documents
     }

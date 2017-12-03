@@ -10,7 +10,7 @@ dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
 
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.18"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3"
 
     testCompile 'org.jetbrains.kotlin:kotlin-test'
     testCompile 'org.jetbrains.kotlin:kotlin-test-junit'

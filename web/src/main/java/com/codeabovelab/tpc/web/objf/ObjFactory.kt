@@ -70,10 +70,7 @@ class ObjFactory<T : Any> private constructor(
     private fun parseQuery(reqParams: List<KParameter>, tree: JsonNode): Map<KParameter, Any?> {
         val map = HashMap<KParameter, Any?>()
         for (reqParam in reqParams) {
-            val node = tree[reqParam.name!!]
-            if (node == null) {
-                continue
-            }
+            val node = tree[reqParam.name!!] ?: continue
             val type = getJavaClass(reqParam)
             val obj = mapper.reader().treeToValue(node, type)
             map.put(reqParam, obj)

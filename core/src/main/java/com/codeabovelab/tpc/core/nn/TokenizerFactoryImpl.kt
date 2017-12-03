@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 /**
  */
 
-fun TokenizerFactoryImpl(): TokenizerFactory {
+fun tokenizerFactory(): TokenizerFactory {
     val tf = DefaultTokenizerFactory()
     tf.tokenPreProcessor = TokenPreProcessImpl()
     return tf

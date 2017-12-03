@@ -33,7 +33,7 @@ class EmailDocumentReader:
     )
 
     override fun read(id: String?, istr: InputStream): MessageDocumentImpl.Builder {
-        var session: Session? = null
+        val session: Session? = null
         val msg = MimeMessage(session, istr)
         val db = MessageDocumentImpl.Builder()
         db.id = id ?: msg.messageID
@@ -105,12 +105,10 @@ class EmailDocumentReader:
             // we not expect arrays of primitive here
             val arr = value as Array<*>
             val len = arr.size
-            if(len == 0) {
-                str = null
-            } else if(len == 1) {
-                str = toString(arr[0])
-            } else {
-                str = Arrays.stream(arr).map(this::toString).collect(Collectors.joining(", "))
+            when (len) {
+                0 -> str = null
+                1 -> str = toString(arr[0])
+                else -> str = Arrays.stream(arr).map(this::toString).collect(Collectors.joining(", "))
             }
         } else if(value is Date) {
             str = DateTimeUtil.toUTCString(value)

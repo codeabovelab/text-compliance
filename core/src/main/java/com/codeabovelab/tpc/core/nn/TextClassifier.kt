@@ -28,7 +28,7 @@ class TextClassifier(
     init {
         pv = WordVectorSerializer.readParagraphVectors(this.vectorsFile.toFile())
         pv.unk = UnkDetector.UNK
-        pv.tokenizerFactory = TokenizerFactoryImpl()
+        pv.tokenizerFactory = tokenizerFactory()
     }
 
     override fun test(pc: PredicateContext, text: Text): TextClassifierResult {

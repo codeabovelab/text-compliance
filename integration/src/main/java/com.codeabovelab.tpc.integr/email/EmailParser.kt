@@ -45,10 +45,7 @@ class EmailParser {
 
 
         private fun finishFragment() {
-            val builder = stack.pollLast()
-            if(builder == null) {
-                return
-            }
+            val builder = stack.pollLast() ?: return
             val frag = builder.build()
             if (!frag.content.isNullOrEmpty()) {
                 fragments.add(frag)
@@ -71,7 +68,7 @@ class EmailParser {
             var last: Int
             while(m.find()) {
                 last = m.start()
-                var group = m.group()
+                val group = m.group()
                 when(group) {
                     in LINE_HEADER_RM.lookingAt() -> {
                         //it full header in one line
