@@ -1,3 +1,24 @@
+License ([Apache Version 2.0](http://www.apache.org/licenses/LICENSE-2.0))
+-------
+Copyright 2017 [Code Above Lab Inc](https://www.codeabovelab.com)
+
+Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) (the "License");
+you may not use this file except in compliance with the License.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+## Index ##
+
+For additional technical detail, see:
+
+* [Architecture](/doc/architecture.md)
+* [Tool](/doc/tool.md)
+* [Rules](/doc/rules.md)
+
 ## Core Features
 
 1. API for processing documents
@@ -11,8 +32,8 @@
     2. SM for tasks like: a banker sends a loan pre-approval letter with a 3rd party such as real estate agent, builder.
     3. Full text search for supporting word Lists (page 11 of WIM email surv. beta doc)
 
-## Integration Engine
-1. support integration with different services (TODO: specify initial list)
+## Integration Enginetool
+1. support integration with different services
 
 ## Alert Engine
 1. provide api 
