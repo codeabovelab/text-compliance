@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.0'
+    ext.kotlin_version = '1.2.71'
     ext.jackson_version = '2.9.2'
 
     repositories {
@@ -9,8 +9,8 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.6.RELEASE"
     }
 }
 apply plugin: 'java'
@@ -40,7 +40,7 @@ allprojects {
             dependency "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
             dependency "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 
-            dependency "com.google.guava:guava:23.0"
+            dependency "com.google.guava:guava:27.0-jre"
             dependency "org.slf4j:slf4j-api:1.7.25"
             dependency "ch.qos.logback:logback-classic:1.2.3"
             dependency "junit:junit:4.12"
