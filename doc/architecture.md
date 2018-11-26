@@ -2,7 +2,7 @@
 
 Current draft:
 
-![Texaco_draft_acrh.png]()
+![Texaco_draft_acrh.png](https://raw.githubusercontent.com/codeabovelab/text-compliance/master/doc/Texaco_draft_acrh.png)
 
 **Note:** on first milestone we build server & worker apps in one, but consider that they must be split in future.
 
