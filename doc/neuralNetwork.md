@@ -1,4 +1,4 @@
-#NN model
+# NN model
 
 document classifier based on https://deeplearning4j.org/doc2vec library.
 
@@ -58,3 +58,15 @@ We test same data with different learning config. Found that most optimal config
 * learningRate: Double = 2e-2
 
 Can use lemmas for learning, see com/codeabovelab/tpc/tool/learn/sentiment/SentimentIterator.kt:init
+
+### Links
+
+* glove: https://nlp.stanford.edu/projects/glove/
+* Word2vec: https://en.wikipedia.org/wiki/Word2vec
+* TF-IDF: https://en.wikipedia.org/wiki/Tf%E2%80%93idf
+* Skip-gram, Negative Sampling, Subsampling & etc  http://arxiv.org/pdf/1310.4546.pdf
+* Tying Word Vectors and Word Classifiers: A Loss Framework for Language Modeling https://arxiv.org/abs/1611.01462
+* https://en.wikipedia.org/wiki/Cosine_similarity
+* Example analysis of Enron email https://jaycode.github.io/enron/identifying-fraud-from-enron-email.html
+* Example 2 analysis of Enron email https://github.com/yielder/identifying-fraud-from-enron-email
+* Analysis of communication patterns with scammers in Enron corpus https://arxiv.org/pdf/1509.00705.pdf
