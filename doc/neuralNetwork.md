@@ -4,7 +4,7 @@ document classifier based on https://deeplearning4j.org/doc2vec library.
 
 We use supervised algorithm, for this we need a lot of data:
 
-##Learning data
+## Learning data
 
 [learning data](), also [same data after NLP]()
 
@@ -34,7 +34,7 @@ We test same data with different learning config. Found that most optimal config
   `LEMMA` (Use lemma instead of word), `LEMMA_POS` (Use lemma + POS)
 
 
-# subsampling (in config 'sampling')
+# Subsampling (in config 'sampling')
 
 Subsampling in d4j use follow formula:
 
@@ -45,7 +45,7 @@ then it remove word if R less than random value in [0;1), therefore any R which 
 ![Screenshot_20170629_194219.png](https://raw.githubusercontent.com/codeabovelab/text-compliance/master/doc/subsampling.png)
 
 
-### sentiment analyses
+### Sentiment analyses
 
 Based on Word2Vec
 
