@@ -18,6 +18,7 @@ For additional technical detail, see:
 * [Architecture](/doc/architecture.md)
 * [Tool](/doc/tool.md)
 * [Rules](/doc/rules.md)
+* [NN model](/doc/neuralNetwork.md)
 
 ## Core Features
 

@@ -1,3 +1,5 @@
+#NN model
+
 document classifier based on https://deeplearning4j.org/doc2vec library.
 
 We use supervised algorithm, for this we need a lot of data:
